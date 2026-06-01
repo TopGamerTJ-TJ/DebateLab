@@ -1,0 +1,31 @@
+{
+  "name": "PlatformNotification",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "success",
+        "alert"
+      ]
+    },
+    "isActive": {
+      "type": "boolean"
+    },
+    "sentBy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "message"
+  ]
+}

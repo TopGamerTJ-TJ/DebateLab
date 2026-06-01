@@ -1,4 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid } from "lucide-react";
 
@@ -6,7 +8,24 @@ export default function Layout() {
   const location = useLocation();
   const [debateOpen, setDebateOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dismissedNotifs, setDismissedNotifs] = useState(() => JSON.parse(sessionStorage.getItem('dismissed_notifs') || '[]'));
   const timerRef = useRef(null);
+
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['platform_notifications'],
+    queryFn: () => base44.entities.PlatformNotification.filter({ isActive: true }),
+    refetchInterval: 60000,
+  });
+
+  const activeNotif = notifications.find(n => !dismissedNotifs.includes(n.id));
+
+  const dismissNotif = (id) => {
+    const next = [...dismissedNotifs, id];
+    setDismissedNotifs(next);
+    sessionStorage.setItem('dismissed_notifs', JSON.stringify(next));
+  };
+
+  const notifColors = { info: 'bg-blue-600', warning: 'bg-amber-500', success: 'bg-green-600', alert: 'bg-red-600' };
 
   const active = (paths) => (Array.isArray(paths) ? paths : [paths]).some(p => location.pathname.startsWith(p));
 
@@ -88,6 +107,15 @@ export default function Layout() {
           )}
         </div>
       </nav>
+      {activeNotif && (
+        <div className={`${notifColors[activeNotif.type] || 'bg-blue-600'} text-white px-4 py-2.5 flex items-center justify-between gap-4`}>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span className="text-sm font-semibold shrink-0">{activeNotif.title}</span>
+            <span className="text-xs text-white/80 truncate">{activeNotif.message}</span>
+          </div>
+          <button onClick={() => dismissNotif(activeNotif.id)} className="text-white/70 hover:text-white shrink-0 text-lg leading-none">×</button>
+        </div>
+      )}
       <main className="min-h-[calc(100vh-4rem)]">
         <Outlet />
       </main>

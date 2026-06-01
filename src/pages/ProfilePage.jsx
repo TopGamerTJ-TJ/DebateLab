@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Save, Target, BookOpen, Trophy, Brain, Settings, CheckCircle } from "lucide-react";
+import { User, Save, Target, BookOpen, Trophy, Brain, Settings, CheckCircle, Shield } from "lucide-react";
+import AdminPanel from "@/components/AdminPanel";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 
@@ -16,7 +17,11 @@ const GRADES = ["6th Grade", "7th Grade", "8th Grade", "9th Grade", "10th Grade"
 export default function ProfilePage() {
   const [form, setForm] = useState({ displayName: "", school: "", gradeLevel: "", preferredFormat: "", skillLevel: "intermediate", bio: "" });
   const [saved, setSaved] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
+  const [currentUser, setCurrentUser] = useState(null);
   const { toast } = useToast();
+
+  useEffect(() => { base44.auth.me().then(setCurrentUser).catch(() => {}); }, []);
   const queryClient = useQueryClient();
 
   const { data: profiles = [] } = useQuery({ queryKey: ['user_profiles'], queryFn: () => base44.entities.UserProfile.list() });
@@ -54,6 +59,7 @@ export default function ProfilePage() {
   const winRate = sessions.length > 0 ? Math.round((wins / sessions.length) * 100) : 0;
 
   const levelColors = { beginner: "bg-green-100 text-green-700", intermediate: "bg-blue-100 text-blue-700", advanced: "bg-purple-100 text-purple-700", expert: "bg-red-100 text-red-600" };
+  const isAdmin = currentUser?.role === 'admin';
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -70,7 +76,20 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit mb-6">
+        <button onClick={() => setActiveTab("profile")} className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTab === "profile" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
+          <User className="w-3.5 h-3.5" /> Profile
+        </button>
+        {isAdmin && (
+          <button onClick={() => setActiveTab("admin")} className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTab === "admin" ? "bg-white text-red-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
+            <Shield className="w-3.5 h-3.5" /> Admin Panel
+          </button>
+        )}
+      </div>
+
+      {activeTab === "admin" && isAdmin && <AdminPanel />}
+
+      {activeTab === "profile" && <div className="grid lg:grid-cols-3 gap-6">
         {/* Profile form */}
         <div className="lg:col-span-2 space-y-5">
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
@@ -163,7 +182,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

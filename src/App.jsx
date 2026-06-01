@@ -20,6 +20,7 @@ import FlowingTool from './pages/FlowingTool';
 import PracticeRound from './pages/PracticeRound';
 import AICoach from './pages/AICoach';
 import DebateFormats from './pages/DebateFormats';
+import AccessCodeGate from './components/AccessCodeGate';
 import LandingPreview from './pages/LandingPreview';
 
 const AuthenticatedApp = () => {
@@ -45,25 +46,27 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/parliamentary" element={<ParliamentaryDebate />} />
-        <Route path="/public-forum" element={<PublicForum />} />
-        <Route path="/model-un" element={<ModelUN />} />
-        <Route path="/model-congress" element={<ModelCongress />} />
-        <Route path="/tournament" element={<TournamentPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/wiki" element={<DebateWiki />} />
-        <Route path="/evidence-locker" element={<EvidenceLocker />} />
-        <Route path="/case-vault" element={<CaseVault />} />
-        <Route path="/flowing-tool" element={<FlowingTool />} />
-        <Route path="/practice" element={<PracticeRound />} />
-        <Route path="/ai-coach" element={<AICoach />} />
-        <Route path="/formats" element={<DebateFormats />} />
-      </Route>
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
+    <AccessCodeGate>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/parliamentary" element={<ParliamentaryDebate />} />
+          <Route path="/public-forum" element={<PublicForum />} />
+          <Route path="/model-un" element={<ModelUN />} />
+          <Route path="/model-congress" element={<ModelCongress />} />
+          <Route path="/tournament" element={<TournamentPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/wiki" element={<DebateWiki />} />
+          <Route path="/evidence-locker" element={<EvidenceLocker />} />
+          <Route path="/case-vault" element={<CaseVault />} />
+          <Route path="/flowing-tool" element={<FlowingTool />} />
+          <Route path="/practice" element={<PracticeRound />} />
+          <Route path="/ai-coach" element={<AICoach />} />
+          <Route path="/formats" element={<DebateFormats />} />
+        </Route>
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
+    </AccessCodeGate>
   );
 };
 
