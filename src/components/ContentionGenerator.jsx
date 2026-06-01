@@ -130,7 +130,7 @@ Return a JSON object with a "contentions" array. Each contention must include:
               <Select value={form.count} onValueChange={v => setForm({ ...form, count: v })}>
                 <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {["1", "2", "3", "4"].map(n => <SelectItem key={n} value={n}>{n} contention{n !== "1" ? "s" : ""}</SelectItem>)}
+                  {Array.from({length: 40}, (_, i) => String(i + 1)).map(n => <SelectItem key={n} value={n}>{n} contention{n !== "1" ? "s" : ""}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
