@@ -54,11 +54,10 @@ export default function Dashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-3 gap-4 mb-8">
         <StatCard label="Practice Sessions" value={sessions.length} color="text-blue-600" />
         <StatCard label="Contentions Saved" value={contentions.length} color="text-blue-600" />
         <StatCard label="Tournaments" value={tournaments.length} color="text-blue-600" />
-        <StatCard label="Win Rate" value={`${winRate}%`} color={winRate >= 50 ? "text-green-600" : "text-red-500"} />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">

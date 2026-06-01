@@ -19,6 +19,8 @@ import CaseVault from './pages/CaseVault';
 import FlowingTool from './pages/FlowingTool';
 import PracticeRound from './pages/PracticeRound';
 import AICoach from './pages/AICoach';
+import DebateFormats from './pages/DebateFormats';
+import LandingPreview from './pages/LandingPreview';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -37,9 +39,7 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
+      return <LandingPreview />;
     }
   }
 
@@ -60,6 +60,7 @@ const AuthenticatedApp = () => {
         <Route path="/flowing-tool" element={<FlowingTool />} />
         <Route path="/practice" element={<PracticeRound />} />
         <Route path="/ai-coach" element={<AICoach />} />
+        <Route path="/formats" element={<DebateFormats />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

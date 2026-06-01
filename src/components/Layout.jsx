@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid } from "lucide-react";
 
 export default function Layout() {
   const location = useLocation();
@@ -56,6 +56,7 @@ export default function Layout() {
               {[
                 ["/model-un", <Globe className="w-4 h-4" />, "Model UN"],
                 ["/model-congress", <FileText className="w-4 h-4" />, "Model Congress"],
+                ["/formats", <LayoutGrid className="w-4 h-4" />, "Formats"],
                 ["/tournament", <Trophy className="w-4 h-4" />, "Tournament"],
                 ["/profile", <User className="w-4 h-4" />, "Profile"],
               ].map(([to, icon, label]) => (
@@ -77,6 +78,7 @@ export default function Layout() {
                 ["/public-forum", "🎤 Public Forum Debate"],
                 ["/model-un", "🌍 Model UN"],
                 ["/model-congress", "🏛 Model Congress"],
+                ["/formats", "📚 Debate Formats"],
                 ["/tournament", "🏆 Tournament"],
                 ["/profile", "👤 Profile"],
               ].map(([to, label]) => (
