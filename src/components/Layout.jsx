@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X } from "lucide-react";
 
 export default function Layout() {
