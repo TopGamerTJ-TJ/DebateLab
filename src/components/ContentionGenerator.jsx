@@ -67,17 +67,18 @@ Return a JSON object with a "contentions" array. Each contention must include:
                 claim: { type: "string" },
                 warrant: { type: "string" },
                 impact: { type: "string" },
-                evidence: { type: "array", items: { type: "object", properties: { text: { type: "string" }, source: { type: "string" }, sourceUrl: { type: "string" } }, required: [] } },
+                evidence: { type: "array", items: { type: "object", properties: { text: { type: "string" }, source: { type: "string" }, sourceUrl: { type: "string" } }, required: ["text", "source", "sourceUrl"] } },
                 possibleRebuttals: { type: "array", items: { type: "string" } },
                 rebuttalResponses: { type: "array", items: { type: "string" } },
                 crossfireQuestions: { type: "array", items: { type: "string" } },
                 crossfireAnswers: { type: "array", items: { type: "string" } },
-                weighingMechanisms: { type: "object" },
                 strategicNotes: { type: "string" }
-              }
+              },
+              required: ["title", "claim", "warrant", "impact", "evidence", "possibleRebuttals", "rebuttalResponses", "crossfireQuestions", "crossfireAnswers", "strategicNotes"]
             }
           }
-        }
+        },
+        required: ["contentions"]
       }
     });
     setContentions(result.contentions || []);
