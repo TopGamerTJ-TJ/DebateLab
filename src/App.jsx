@@ -5,8 +5,20 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import ScrollToTop from './components/ScrollToTop';
-// Add page imports here
+import Layout from './components/Layout';
+import Dashboard from './pages/Dashboard';
+import ParliamentaryDebate from './pages/ParliamentaryDebate';
+import PublicForum from './pages/PublicForum';
+import ModelUN from './pages/ModelUN';
+import ModelCongress from './pages/ModelCongress';
+import TournamentPage from './pages/TournamentPage';
+import ProfilePage from './pages/ProfilePage';
+import DebateWiki from './pages/DebateWiki';
+import EvidenceLocker from './pages/EvidenceLocker';
+import CaseVault from './pages/CaseVault';
+import FlowingTool from './pages/FlowingTool';
+import PracticeRound from './pages/PracticeRound';
+import AICoach from './pages/AICoach';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -34,7 +46,21 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/parliamentary" element={<ParliamentaryDebate />} />
+        <Route path="/public-forum" element={<PublicForum />} />
+        <Route path="/model-un" element={<ModelUN />} />
+        <Route path="/model-congress" element={<ModelCongress />} />
+        <Route path="/tournament" element={<TournamentPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/wiki" element={<DebateWiki />} />
+        <Route path="/evidence-locker" element={<EvidenceLocker />} />
+        <Route path="/case-vault" element={<CaseVault />} />
+        <Route path="/flowing-tool" element={<FlowingTool />} />
+        <Route path="/practice" element={<PracticeRound />} />
+        <Route path="/ai-coach" element={<AICoach />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -47,7 +73,6 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
-          <ScrollToTop />
           <AuthenticatedApp />
         </Router>
         <Toaster />

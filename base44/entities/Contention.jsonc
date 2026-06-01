@@ -1,0 +1,109 @@
+{
+  "name": "Contention",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "parliamentary",
+        "public_forum"
+      ]
+    },
+    "resolution": {
+      "type": "string"
+    },
+    "side": {
+      "type": "string"
+    },
+    "claim": {
+      "type": "string"
+    },
+    "warrant": {
+      "type": "string"
+    },
+    "impact": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "sourceUrl": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    "possibleRebuttals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rebuttalResponses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "crossfireQuestions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "crossfireAnswers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "weighingMechanisms": {
+      "type": "object"
+    },
+    "strategicNotes": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "isFavorite": {
+      "type": "boolean"
+    },
+    "tournamentId": {
+      "type": "string"
+    },
+    "caseId": {
+      "type": "string"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "beginner",
+        "intermediate",
+        "advanced",
+        "expert"
+      ]
+    }
+  },
+  "required": [
+    "title",
+    "format",
+    "resolution",
+    "side"
+  ]
+}

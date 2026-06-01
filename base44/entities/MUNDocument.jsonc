@@ -1,0 +1,49 @@
+{
+  "name": "MUNDocument",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "position_paper",
+        "draft_resolution",
+        "working_paper",
+        "amendment",
+        "speech",
+        "country_profile",
+        "committee_prep"
+      ]
+    },
+    "country": {
+      "type": "string"
+    },
+    "committee": {
+      "type": "string"
+    },
+    "topic": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "isFavorite": {
+      "type": "boolean"
+    },
+    "tournamentId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "type"
+  ]
+}

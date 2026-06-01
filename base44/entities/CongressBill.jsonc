@@ -1,0 +1,56 @@
+{
+  "name": "CongressBill",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "bill",
+        "resolution",
+        "amendment",
+        "speech",
+        "committee_prep"
+      ]
+    },
+    "sponsor": {
+      "type": "string"
+    },
+    "topic": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "policyArea": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "isFavorite": {
+      "type": "boolean"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "submitted",
+        "passed",
+        "failed"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "type"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "name": "Case",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "parliamentary",
+        "public_forum",
+        "model_un",
+        "model_congress"
+      ]
+    },
+    "resolution": {
+      "type": "string"
+    },
+    "side": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "contentionIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidenceIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "isFavorite": {
+      "type": "boolean"
+    },
+    "tournamentId": {
+      "type": "string"
+    },
+    "version": {
+      "type": "number"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "format"
+  ]
+}

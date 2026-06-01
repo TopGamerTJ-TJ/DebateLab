@@ -1,0 +1,33 @@
+{
+  "name": "Flow",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string"
+    },
+    "resolution": {
+      "type": "string"
+    },
+    "columns": {
+      "type": "object"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tournamentId": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

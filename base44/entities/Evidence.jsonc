@@ -1,0 +1,49 @@
+{
+  "name": "Evidence",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "sourceUrl": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "category": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string"
+    },
+    "isFavorite": {
+      "type": "boolean"
+    },
+    "contentionId": {
+      "type": "string"
+    },
+    "caseId": {
+      "type": "string"
+    },
+    "tournamentId": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "content"
+  ]
+}

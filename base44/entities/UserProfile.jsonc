@@ -1,0 +1,46 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "displayName": {
+      "type": "string"
+    },
+    "school": {
+      "type": "string"
+    },
+    "gradeLevel": {
+      "type": "string"
+    },
+    "preferredFormat": {
+      "type": "string"
+    },
+    "skillLevel": {
+      "type": "string",
+      "enum": [
+        "beginner",
+        "intermediate",
+        "advanced",
+        "expert"
+      ]
+    },
+    "bio": {
+      "type": "string"
+    },
+    "totalPracticeSessions": {
+      "type": "number"
+    },
+    "totalContentions": {
+      "type": "number"
+    },
+    "totalTournaments": {
+      "type": "number"
+    },
+    "wins": {
+      "type": "number"
+    },
+    "losses": {
+      "type": "number"
+    }
+  },
+  "required": []
+}

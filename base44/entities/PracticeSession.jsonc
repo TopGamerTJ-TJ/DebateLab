@@ -1,0 +1,58 @@
+{
+  "name": "PracticeSession",
+  "type": "object",
+  "properties": {
+    "format": {
+      "type": "string"
+    },
+    "side": {
+      "type": "string"
+    },
+    "resolution": {
+      "type": "string"
+    },
+    "difficulty": {
+      "type": "string"
+    },
+    "transcript": {
+      "type": "string"
+    },
+    "rfd": {
+      "type": "string"
+    },
+    "winner": {
+      "type": "string"
+    },
+    "speakerPoints": {
+      "type": "number"
+    },
+    "strengths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "weaknesses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "keyVotingIssues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "format",
+    "side"
+  ]
+}
