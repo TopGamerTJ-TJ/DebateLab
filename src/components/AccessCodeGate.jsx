@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Zap, Lock, AlertTriangle } from "lucide-react";
 
 const SESSION_KEY = "dl_access_code";
-const DEFAULT_CODE = "001122";
+const DEFAULT_CODE = "HoraceMannDebate";
 
 export default function AccessCodeGate({ children }) {
   const [status, setStatus] = useState("loading"); // loading | checking | code_required | banned | granted
