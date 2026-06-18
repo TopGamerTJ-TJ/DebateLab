@@ -128,7 +128,7 @@ export default function AccessCodeGate({ children }) {
               {verifying ? "Verifying..." : "Enter Platform →"}
             </Button>
           </div>
-          <p className="text-center text-slate-500 text-xs mt-4">Contact your administrator for the access code.</p>
+          <p className="text-center text-slate-500 text-xs mt-4">Contact DebateLab@Outlook.com for the access code.</p>
         </div>
       </div>
     );
