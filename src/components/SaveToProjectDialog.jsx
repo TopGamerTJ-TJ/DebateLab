@@ -23,7 +23,10 @@ export default function SaveToProjectDialog({ open, onClose, onSave, count = 1 }
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list('-created_date'),
+    queryFn: async () => {
+      const all = await base44.entities.Project.list('-created_date');
+      return all.filter(p => !p.isArchived);
+    },
     enabled: open,
   });
 

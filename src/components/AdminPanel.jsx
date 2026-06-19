@@ -5,13 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Ban, Bell, Key, Trash2, Plus, Send, Eye, EyeOff } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Shield, Ban, Bell, Trash2, Send, Mail, CheckCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function AdminPanel() {
-  const [tab, setTab] = useState("code");
-  const [newCode, setNewCode] = useState("");
-  const [showCode, setShowCode] = useState(false);
+  const [tab, setTab] = useState("bans");
   const [banEmail, setBanEmail] = useState("");
   const [banReason, setBanReason] = useState("");
   const [notifTitle, setNotifTitle] = useState("");
@@ -20,10 +19,6 @@ export default function AdminPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: codeSettings = [] } = useQuery({
-    queryKey: ['app_settings', 'access_code'],
-    queryFn: () => base44.entities.AppSettings.filter({ key: "access_code" }),
-  });
   const { data: banned = [] } = useQuery({
     queryKey: ['banned_users'],
     queryFn: () => base44.entities.BannedUser.list('-created_date'),
@@ -32,19 +27,9 @@ export default function AdminPanel() {
     queryKey: ['platform_notifications'],
     queryFn: () => base44.entities.PlatformNotification.list('-created_date'),
   });
-
-  const currentCode = codeSettings[0];
-
-  const updateCode = useMutation({
-    mutationFn: async (code) => {
-      if (currentCode) return base44.entities.AppSettings.update(currentCode.id, { value: code });
-      return base44.entities.AppSettings.create({ key: "access_code", value: code });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['app_settings'] });
-      toast({ title: "Access code updated!" });
-      setNewCode("");
-    }
+  const { data: contactRequests = [] } = useQuery({
+    queryKey: ['contact_requests'],
+    queryFn: () => base44.entities.ContactRequest.list('-created_date'),
   });
 
   const addBan = useMutation({
@@ -80,10 +65,22 @@ export default function AdminPanel() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['platform_notifications'] })
   });
 
+  const markRead = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.ContactRequest.update(id, { status }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contact_requests'] })
+  });
+
+  const deleteContact = useMutation({
+    mutationFn: (id) => base44.entities.ContactRequest.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contact_requests'] })
+  });
+
+  const newContacts = contactRequests.filter(c => c.status === "new").length;
+
   const tabs = [
-    { id: "code", icon: Key, label: "Access Code" },
     { id: "bans", icon: Ban, label: `Bans (${banned.length})` },
     { id: "notify", icon: Bell, label: "Notifications" },
+    { id: "contacts", icon: Mail, label: `Contact Requests${newContacts > 0 ? ` (${newContacts} new)` : ""}` },
   ];
 
   return (
@@ -96,43 +93,16 @@ export default function AdminPanel() {
         </div>
       </div>
 
-      {/* Sub tabs */}
-      <div className="flex border-b border-slate-100">
+      <div className="flex border-b border-slate-100 overflow-x-auto">
         {tabs.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            className={`flex items-center gap-1.5 px-4 py-3 text-xs font-medium transition-all ${tab === t.id ? "border-b-2 border-red-500 text-red-600" : "text-slate-500 hover:text-slate-700"}`}>
+            className={`flex items-center gap-1.5 px-4 py-3 text-xs font-medium transition-all whitespace-nowrap ${tab === t.id ? "border-b-2 border-red-500 text-red-600" : "text-slate-500 hover:text-slate-700"}`}>
             <t.icon className="w-3.5 h-3.5" />{t.label}
           </button>
         ))}
       </div>
 
       <div className="p-5">
-        {tab === "code" && (
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-slate-600 mb-3">The access code is required for anyone to use DebateLab — even after logging in. Change it here to immediately lock out all sessions.</p>
-              <div className="bg-slate-50 rounded-xl p-4 mb-4 flex items-center justify-between">
-                <div>
-                  <div className="text-xs text-slate-500 mb-1">Current code</div>
-                  <div className="font-mono font-bold text-lg text-slate-900">
-                    {showCode ? (currentCode?.value || "001122") : "••••••"}
-                  </div>
-                </div>
-                <button onClick={() => setShowCode(!showCode)} className="p-2 hover:bg-slate-200 rounded-lg transition-colors">
-                  {showCode ? <EyeOff className="w-4 h-4 text-slate-500" /> : <Eye className="w-4 h-4 text-slate-500" />}
-                </button>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Input value={newCode} onChange={e => setNewCode(e.target.value)} placeholder="New alphanumeric code (e.g. AB1234)" className="font-mono" maxLength={20} />
-              <Button onClick={() => updateCode.mutate(newCode)} disabled={!newCode.trim() || updateCode.isPending} className="bg-red-600 hover:bg-red-700 shrink-0">
-                Update
-              </Button>
-            </div>
-            <p className="text-xs text-slate-400">Changing the code logs out all current sessions immediately.</p>
-          </div>
-        )}
-
         {tab === "bans" && (
           <div className="space-y-4">
             <div className="space-y-2">
@@ -177,7 +147,7 @@ export default function AdminPanel() {
                 </SelectContent>
               </Select>
               <Button onClick={() => sendNotif.mutate()} disabled={!notifTitle || !notifMsg || sendNotif.isPending} className="w-full gap-2">
-                <Send className="w-4 h-4" /> Push Notification
+                <Send className="w-4 h-4" /> Push Notification to All Users
               </Button>
             </div>
             {notifications.length > 0 && (
@@ -202,6 +172,39 @@ export default function AdminPanel() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {tab === "contacts" && (
+          <div className="space-y-3">
+            {contactRequests.length === 0 ? (
+              <p className="text-center text-slate-400 text-sm py-8">No contact requests yet.</p>
+            ) : contactRequests.map(c => (
+              <div key={c.id} className={`rounded-xl border p-4 ${c.status === "new" ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white"}`}>
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-slate-900">{c.subject}</span>
+                      {c.status === "new" && <span className="text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded-full">NEW</span>}
+                      {c.status === "resolved" && <CheckCircle className="w-3.5 h-3.5 text-green-500" />}
+                    </div>
+                    <span className="text-xs text-slate-500">{c.email}</span>
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    {c.status !== "resolved" && (
+                      <button onClick={() => markRead.mutate({ id: c.id, status: "resolved" })}
+                        className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full hover:bg-green-200 transition-colors">
+                        Resolve
+                      </button>
+                    )}
+                    <button onClick={() => deleteContact.mutate(c.id)} className="p-1 hover:bg-red-50 rounded-lg text-slate-300 hover:text-red-400 transition-colors">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{c.body}</p>
+              </div>
+            ))}
           </div>
         )}
       </div>

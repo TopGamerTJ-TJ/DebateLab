@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Folder, Plus, Trash2, ArrowRight, BookOpen } from "lucide-react";
+import { Folder, Plus, Trash2, ArrowRight, BookOpen, Archive, ArchiveRestore } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const FORMATS = [
@@ -26,14 +26,18 @@ const FORMAT_COLORS = {
 
 export default function Projects() {
   const [showCreate, setShowCreate] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
   const [form, setForm] = useState({ name: "", description: "", format: "", resolution: "", side: "" });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: projects = [], isLoading } = useQuery({
+  const { data: allProjects = [], isLoading } = useQuery({
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.list('-created_date'),
   });
+
+  const projects = allProjects.filter(p => !p.isArchived);
+  const archivedProjects = allProjects.filter(p => p.isArchived);
 
   const createProject = useMutation({
     mutationFn: (data) => base44.entities.Project.create(data),
@@ -50,6 +54,11 @@ export default function Projects() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['projects'] }); toast({ title: "Project deleted" }); }
   });
 
+  const archiveProject = useMutation({
+    mutationFn: ({ id, val }) => base44.entities.Project.update(id, { isArchived: val }),
+    onSuccess: (_, { val }) => { queryClient.invalidateQueries({ queryKey: ['projects'] }); toast({ title: val ? "Project archived" : "Project unarchived" }); }
+  });
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
@@ -57,9 +66,16 @@ export default function Projects() {
           <h1 className="text-2xl font-bold text-slate-900 font-heading">Projects</h1>
           <p className="text-slate-500 text-sm mt-1">Organize your contentions, notes, and debate prep by project</p>
         </div>
-        <Button onClick={() => setShowCreate(true)} className="gap-2">
-          <Plus className="w-4 h-4" /> New Project
-        </Button>
+        <div className="flex gap-2">
+          {archivedProjects.length > 0 && (
+            <Button variant="outline" size="sm" onClick={() => setShowArchived(!showArchived)} className="gap-1.5 text-xs">
+              <Archive className="w-3.5 h-3.5" />{showArchived ? "Hide Archived" : `Archived (${archivedProjects.length})`}
+            </Button>
+          )}
+          <Button onClick={() => setShowCreate(true)} className="gap-2">
+            <Plus className="w-4 h-4" /> New Project
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -75,20 +91,28 @@ export default function Projects() {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {projects.map(p => (
-            <div key={p.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
+          {(showArchived ? archivedProjects : projects).map(p => (
+            <div key={p.id} className={`bg-white rounded-2xl border shadow-sm hover:shadow-md transition-all group relative overflow-hidden ${p.isArchived ? "opacity-60 border-slate-300" : "border-slate-200"}`}>
               <div className="absolute top-0 left-0 right-0 h-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
                     <Folder className="w-5 h-5 text-primary" />
                   </div>
-                  <button
-                    onClick={(e) => { e.preventDefault(); if (confirm("Delete this project?")) deleteProject.mutate(p.id); }}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 transition-all"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                    <button
+                      onClick={(e) => { e.preventDefault(); archiveProject.mutate({ id: p.id, val: !p.isArchived }); }}
+                      className="p-1.5 rounded-lg hover:bg-amber-50 text-slate-300 hover:text-amber-500 transition-all" title={p.isArchived ? "Unarchive" : "Archive"}
+                    >
+                      {p.isArchived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={(e) => { e.preventDefault(); if (confirm("Delete this project?")) deleteProject.mutate(p.id); }}
+                      className="p-1.5 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 transition-all"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 <h3 className="font-bold text-slate-900 font-heading mb-1 truncate">{p.name}</h3>
                 {p.description && <p className="text-xs text-slate-500 line-clamp-2 mb-2">{p.description}</p>}

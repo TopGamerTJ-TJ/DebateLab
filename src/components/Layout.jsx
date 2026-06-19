@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut } from "lucide-react";
 
 export default function Layout() {
   const location = useLocation();
@@ -86,9 +86,19 @@ export default function Layout() {
               ))}
             </div>
 
-            <button className="md:hidden p-2 rounded-lg hover:bg-slate-100" onClick={() => setMobileOpen(!mobileOpen)}>
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => base44.auth.logout("/")}
+                className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all"
+                title="Log out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">Log out</span>
+              </button>
+              <button className="md:hidden p-2 rounded-lg hover:bg-slate-100" onClick={() => setMobileOpen(!mobileOpen)}>
+                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
 
           {mobileOpen && (
@@ -105,6 +115,10 @@ export default function Layout() {
               ].map(([to, label]) => (
                 <Link key={to} to={to} onClick={() => setMobileOpen(false)} className={`block px-3 py-2 text-sm rounded-lg transition-colors ${active(to) ? 'bg-blue-50 text-primary font-medium' : 'hover:bg-slate-50 text-slate-700'}`}>{label}</Link>
               ))}
+              <button onClick={() => { setMobileOpen(false); base44.auth.logout("/"); }}
+                className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-red-50 text-red-500 transition-colors flex items-center gap-2">
+                <LogOut className="w-4 h-4" /> Log out
+              </button>
             </div>
           )}
         </div>

@@ -1,0 +1,29 @@
+{
+  "name": "ContactRequest",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "read",
+        "resolved"
+      ],
+      "default": "new"
+    }
+  },
+  "required": [
+    "subject",
+    "email",
+    "body"
+  ]
+}

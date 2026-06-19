@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square } from "lucide-react";
+import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ReactMarkdown from "react-markdown";
 
@@ -25,6 +25,9 @@ export default function ProjectDetail() {
   const [messages, setMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
+  const [agentQuery, setAgentQuery] = useState("");
+  const [agentLoading, setAgentLoading] = useState(false);
+  const [agentResults, setAgentResults] = useState(null);
   const chatRef = useRef(null);
 
   const { data: project, isLoading: projLoading } = useQuery({
@@ -55,6 +58,55 @@ export default function ProjectDetail() {
     mutationFn: () => base44.entities.Project.delete(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['projects'] }); navigate('/projects'); toast({ title: "Project deleted" }); }
   });
+
+  const archiveProject = useMutation({
+    mutationFn: (val) => base44.entities.Project.update(id, { isArchived: val }),
+    onSuccess: (_, val) => { queryClient.invalidateQueries({ queryKey: ['projects'] }); toast({ title: val ? "Project archived" : "Project unarchived" }); }
+  });
+
+  const runAgent = async () => {
+    if (!agentQuery.trim() || agentLoading || project?.isArchived) return;
+    setAgentLoading(true);
+    setAgentResults(null);
+    const q = agentQuery.trim();
+    const context = [project?.resolution, project?.format, project?.side].filter(Boolean).join(', ');
+    const res = await base44.integrations.Core.InvokeLLM({
+      prompt: `You are a research agent for the debate project "${project?.name}". Context: ${context}.
+The user wants to research: "${q}"
+Search the web and provide:
+1. A concise summary of key findings (3-5 bullet points)
+2. 2-3 specific facts/statistics that could be used as debate evidence
+3. 2-3 suggested contention titles this research could support
+4. Any counterarguments found in the research
+Format clearly with headers.`,
+      add_context_from_internet: true,
+      model: "gemini_3_flash",
+      response_json_schema: {
+        type: "object",
+        properties: {
+          summary: { type: "string" },
+          keyFacts: { type: "array", items: { type: "string" } },
+          suggestedContentions: { type: "array", items: { type: "string" } },
+          counterarguments: { type: "array", items: { type: "string" } }
+        }
+      }
+    });
+    setAgentResults(res);
+    setAgentLoading(false);
+  };
+
+  const addAgentContention = async (title) => {
+    await base44.entities.Contention.create({
+      title,
+      format: project?.format || "parliamentary",
+      resolution: project?.resolution || "",
+      side: project?.side || "",
+      claim: `Research-based argument: ${title}`,
+      projectId: id,
+    });
+    queryClient.invalidateQueries({ queryKey: ['project_contentions', id] });
+    toast({ title: "Contention added from agent!" });
+  };
 
   const saveNote = async () => {
     if (!note.trim()) return;
@@ -158,6 +210,7 @@ Provide specific, actionable coaching advice tailored to this project's contenti
     { id: "contentions", icon: BookOpen, label: `Contentions (${contentions.length})` },
     { id: "notes", icon: StickyNote, label: "Notes" },
     { id: "chat", icon: MessageSquare, label: "AI Coach" },
+    { id: "agent", icon: Globe, label: "Research Agent" },
   ];
 
   return (
@@ -180,14 +233,27 @@ Provide specific, actionable coaching advice tailored to this project's contenti
               <Maximize2 className="w-3.5 h-3.5" /> Speaking Mode
             </Button>
           )}
+          <Button variant="outline" size="sm"
+            onClick={() => archiveProject.mutate(!project.isArchived)}
+            className="gap-1.5 text-xs hidden sm:flex">
+            {project.isArchived ? <><ArchiveRestore className="w-3.5 h-3.5" /> Unarchive</> : <><Archive className="w-3.5 h-3.5" /> Archive</>}
+          </Button>
           <Button variant="outline" size="sm" onClick={() => { if (confirm("Delete this entire project?")) deleteProject.mutate(); }} className="gap-1.5 text-xs text-red-500 hover:text-red-600 border-red-200 hover:border-red-300 hidden sm:flex">
             <Trash2 className="w-3.5 h-3.5" /> Delete Project
           </Button>
         </div>
       </div>
 
+      {/* Archived banner */}
+      {project.isArchived && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-amber-800 text-sm">
+          <Archive className="w-4 h-4 text-amber-500 shrink-0" />
+          <span><strong>Archived project</strong> — this project is frozen. Unarchive to make edits or use the Research Agent.</span>
+        </div>
+      )}
+
       {/* Tabs */}
-      <div className="flex border-b border-slate-200 mb-6 gap-1">
+      <div className="flex border-b border-slate-200 mb-6 gap-1 overflow-x-auto">
         {tabs.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all ${tab === t.id ? "border-primary text-primary" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
@@ -258,6 +324,101 @@ Provide specific, actionable coaching advice tailored to this project's contenti
           <Textarea value={note} onChange={e => setNote(e.target.value)}
             placeholder="Add notes, strategy, research, reminders for this project..."
             rows={16} className="resize-none text-sm font-mono leading-relaxed" />
+        </div>
+      )}
+
+      {/* Research Agent tab */}
+      {tab === "agent" && (
+        <div className="space-y-4">
+          {project.isArchived ? (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8 text-center text-amber-700">
+              <Globe className="w-8 h-8 mx-auto mb-2 text-amber-400" />
+              <p className="font-medium">Research Agent is disabled for archived projects.</p>
+              <p className="text-sm mt-1">Unarchive this project to use the Research Agent.</p>
+            </div>
+          ) : (
+            <>
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <Globe className="w-4 h-4 text-primary" />
+                  <div>
+                    <h3 className="font-bold text-slate-900 font-heading text-sm">Web Research Agent</h3>
+                    <p className="text-xs text-slate-400">Searches the web for debate-relevant info and suggests contentions</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    value={agentQuery}
+                    onChange={e => setAgentQuery(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && runAgent()}
+                    placeholder={`Research topic for "${project.name}"...`}
+                    className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <Button onClick={runAgent} disabled={agentLoading || !agentQuery.trim()} className="gap-1.5 text-sm shrink-0">
+                    {agentLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    {agentLoading ? "Searching..." : "Research"}
+                  </Button>
+                </div>
+              </div>
+
+              {agentLoading && (
+                <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
+                  <p className="text-slate-500 text-sm">Scouring the web for debate intelligence...</p>
+                </div>
+              )}
+
+              {agentResults && (
+                <div className="space-y-4">
+                  {agentResults.summary && (
+                    <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                      <h4 className="font-bold text-slate-900 font-heading text-sm mb-2">📋 Research Summary</h4>
+                      <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{agentResults.summary}</p>
+                    </div>
+                  )}
+                  {agentResults.keyFacts?.length > 0 && (
+                    <div className="bg-blue-50 rounded-2xl border border-blue-100 p-5">
+                      <h4 className="font-bold text-blue-900 font-heading text-sm mb-3">📊 Key Facts & Statistics</h4>
+                      <ul className="space-y-2">
+                        {agentResults.keyFacts.map((f, i) => (
+                          <li key={i} className="text-sm text-blue-800 flex gap-2">
+                            <span className="shrink-0 font-bold text-blue-500">{i+1}.</span>{f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {agentResults.suggestedContentions?.length > 0 && (
+                    <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                      <h4 className="font-bold text-slate-900 font-heading text-sm mb-3">💡 Suggested Contentions</h4>
+                      <div className="space-y-2">
+                        {agentResults.suggestedContentions.map((c, i) => (
+                          <div key={i} className="flex items-center justify-between gap-3 p-3 bg-slate-50 rounded-xl">
+                            <span className="text-sm text-slate-800">{c}</span>
+                            <Button size="sm" variant="outline" onClick={() => addAgentContention(c)} className="text-xs shrink-0 gap-1">
+                              <Plus className="w-3 h-3" /> Add
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {agentResults.counterarguments?.length > 0 && (
+                    <div className="bg-red-50 rounded-2xl border border-red-100 p-5">
+                      <h4 className="font-bold text-red-900 font-heading text-sm mb-3">⚠️ Counterarguments Found</h4>
+                      <ul className="space-y-2">
+                        {agentResults.counterarguments.map((c, i) => (
+                          <li key={i} className="text-sm text-red-800 flex gap-2">
+                            <span className="shrink-0 font-bold text-red-400">•</span>{c}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
 

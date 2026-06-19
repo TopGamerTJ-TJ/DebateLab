@@ -9,6 +9,7 @@ import { User, Save, Target, BookOpen, Trophy, Brain, Settings, CheckCircle, Shi
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import AdminPanel from "@/components/AdminPanel";
+import ContactForm from "@/components/ContactForm";
 
 const FORMATS = ["Parliamentary Debate", "Public Forum", "Model UN", "Model Congress"];
 const LEVELS = ["beginner", "intermediate", "advanced", "expert"];
@@ -191,6 +192,9 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* Contact form on all subpages */}
+      <ContactForm />
 
       <div className="mt-8 text-center text-xs text-slate-400">
         <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service & Privacy Policy</Link>
