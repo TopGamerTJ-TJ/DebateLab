@@ -1,0 +1,39 @@
+{
+  "name": "Project",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "parliamentary",
+        "public_forum",
+        "model_un",
+        "model_congress"
+      ]
+    },
+    "resolution": {
+      "type": "string"
+    },
+    "side": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "isArchived": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

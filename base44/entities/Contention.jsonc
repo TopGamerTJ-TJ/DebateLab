@@ -90,6 +90,9 @@
     "caseId": {
       "type": "string"
     },
+    "projectId": {
+      "type": "string"
+    },
     "difficulty": {
       "type": "string",
       "enum": [

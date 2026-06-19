@@ -20,8 +20,11 @@ import FlowingTool from './pages/FlowingTool';
 import PracticeRound from './pages/PracticeRound';
 import AICoach from './pages/AICoach';
 import DebateFormats from './pages/DebateFormats';
-import AccessCodeGate from './components/AccessCodeGate';
 import LandingPreview from './pages/LandingPreview';
+import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
+import TermsAndPrivacy from './pages/TermsAndPrivacy';
+import BanGate from './components/BanGate';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -40,14 +43,22 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      return <LandingPreview />;
+      return (
+        <Routes>
+          <Route path="/terms" element={<TermsAndPrivacy />} />
+          <Route path="/login" element={<LandingPreview />} />
+          <Route path="/register" element={<LandingPreview />} />
+          <Route path="*" element={<LandingPreview />} />
+        </Routes>
+      );
     }
   }
 
   // Render the main app
   return (
-    <AccessCodeGate>
+    <BanGate>
       <Routes>
+        <Route path="/terms" element={<TermsAndPrivacy />} />
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/parliamentary" element={<ParliamentaryDebate />} />
@@ -63,10 +74,12 @@ const AuthenticatedApp = () => {
           <Route path="/practice" element={<PracticeRound />} />
           <Route path="/ai-coach" element={<AICoach />} />
           <Route path="/formats" element={<DebateFormats />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id" element={<ProjectDetail />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
-    </AccessCodeGate>
+    </BanGate>
   );
 };
 

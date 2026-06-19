@@ -4,9 +4,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Sparkles, Save, BookOpen, Trash2 } from "lucide-react";
+import { Loader2, Sparkles, Save, BookOpen, Trash2, Info } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ContentionCard from "./ContentionCard";
+import SaveToProjectDialog from "./SaveToProjectDialog";
 
 const BATCH_SIZE = 8;
 
@@ -60,6 +61,8 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
   const [form, setForm] = useState({ resolution: "", side: "", count: "2", difficulty: "intermediate", evidencePreference: "academic" });
   const [generatedContentions, setGeneratedContentions] = useState([]);
   const [generating, setGenerating] = useState(false);
+  const [saveDialog, setSaveDialog] = useState(null); // null | "single" | "all"
+  const [singleContention, setSingleContention] = useState(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -68,16 +71,32 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
     queryFn: () => base44.entities.Contention.filter({ format }),
   });
 
-  const saveContention = useMutation({
-    mutationFn: (c) => base44.entities.Contention.create({
-      title: c.title, format, resolution: form.resolution || c.resolution, side: form.side || c.side,
-      claim: c.claim, warrant: c.warrant, impact: c.impact, evidence: c.evidence,
-      possibleRebuttals: c.possibleRebuttals, rebuttalResponses: c.rebuttalResponses,
-      crossfireQuestions: c.crossfireQuestions, crossfireAnswers: c.crossfireAnswers,
-      strategicNotes: c.strategicNotes, difficulty: form.difficulty,
-    }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['contentions'] }); toast({ title: "Contention saved to library!" }); }
+  const buildContention = (c, projectId) => ({
+    title: c.title, format, resolution: form.resolution || c.resolution, side: form.side || c.side,
+    claim: c.claim, warrant: c.warrant, impact: c.impact, evidence: c.evidence,
+    possibleRebuttals: c.possibleRebuttals, rebuttalResponses: c.rebuttalResponses,
+    crossfireQuestions: c.crossfireQuestions, crossfireAnswers: c.crossfireAnswers,
+    strategicNotes: c.strategicNotes, difficulty: form.difficulty,
+    ...(projectId ? { projectId } : {}),
   });
+
+  const saveContention = useMutation({
+    mutationFn: ({ c, projectId }) => base44.entities.Contention.create(buildContention(c, projectId)),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['contentions'] }); }
+  });
+
+  const handleSingleSave = (c) => { setSingleContention(c); setSaveDialog("single"); };
+  const handleSaveAll = () => setSaveDialog("all");
+
+  const doSave = async (projectId, projectName) => {
+    const toSave = saveDialog === "all" ? generatedContentions : [singleContention];
+    await Promise.all(toSave.map(c => base44.entities.Contention.create(buildContention(c, projectId))));
+    queryClient.invalidateQueries({ queryKey: ['contentions'] });
+    queryClient.invalidateQueries({ queryKey: ['project_contentions', projectId] });
+    toast({ title: `${toSave.length} contention${toSave.length !== 1 ? 's' : ''} saved to "${projectName}"` });
+    setSaveDialog(null);
+    setSingleContention(null);
+  };
 
   const deleteContention = useMutation({
     mutationFn: (id) => base44.entities.Contention.delete(id),
@@ -89,12 +108,15 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
       toast({ title: "Please enter the resolution and select a side", variant: "destructive" }); return;
     }
     setGenerating(true);
+    setGeneratedContentions([]);
     const total = parseInt(form.count);
     const batches = [];
     for (let i = 0; i < total; i += BATCH_SIZE) batches.push(Math.min(BATCH_SIZE, total - i));
     const batchResults = await Promise.all(batches.map(n => generateBatch(n, form, format)));
-    setGeneratedContentions(batchResults.flat());
+    const all = batchResults.flat().slice(0, total);
+    setGeneratedContentions(all);
     setGenerating(false);
+    toast({ title: `${all.length} contention${all.length !== 1 ? 's' : ''} generated!` });
   };
 
   const sideOptions = format === "parliamentary"
@@ -163,9 +185,15 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-slate-600 flex gap-2">
+                <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                 <div>
-                  <label className="text-xs font-medium text-slate-600 mb-1.5 block">Side</label>
+                  <strong>Difficulty:</strong> Beginner = simple logic; Intermediate = stats & strategy; Advanced = complex multi-layered; Expert = highly technical/philosophical. <strong className="ml-1">Evidence:</strong> Academic = peer-reviewed; News = current events; Government = official reports; Mixed = variety.
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div>
+                <label className="text-xs font-medium text-slate-600 mb-1.5 block">Side</label>
                   <Select value={form.side} onValueChange={v => setForm({ ...form, side: v })}>
                     <SelectTrigger className="text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent>{sideOptions.map(o => <SelectItem key={o.v} value={o.v}>{o.l}</SelectItem>)}</SelectContent>
@@ -220,15 +248,21 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
                   <BookOpen className="w-4 h-4 text-primary" />
                   Generated Contentions ({generatedContentions.length})
                 </h3>
-                <Button variant="outline" size="sm" onClick={() => generatedContentions.forEach(c => saveContention.mutate(c))} className="gap-1.5 text-xs">
-                  <Save className="w-3.5 h-3.5" /> Save All
+                <Button variant="outline" size="sm" onClick={handleSaveAll} className="gap-1.5 text-xs">
+                  <Save className="w-3.5 h-3.5" /> Save All to Project
                 </Button>
               </div>
               {generatedContentions.map((c, i) => (
-                <ContentionCard key={i} contention={c} onSave={() => saveContention.mutate(c)} saving={saveContention.isPending} />
+                <ContentionCard key={i} contention={c} onSave={() => handleSingleSave(c)} saving={false} />
               ))}
             </div>
           )}
+          <SaveToProjectDialog
+            open={!!saveDialog}
+            onClose={() => { setSaveDialog(null); setSingleContention(null); }}
+            onSave={doSave}
+            count={saveDialog === "all" ? generatedContentions.length : 1}
+          />
         </>
       )}
     </div>

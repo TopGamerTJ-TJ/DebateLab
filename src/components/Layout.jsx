@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder } from "lucide-react";
 
 export default function Layout() {
   const location = useLocation();
@@ -75,6 +75,7 @@ export default function Layout() {
               {[
                 ["/model-un", <Globe className="w-3.5 h-3.5" />, "MUN"],
                 ["/model-congress", <FileText className="w-3.5 h-3.5" />, "Congress"],
+                ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
                 ["/formats", <LayoutGrid className="w-3.5 h-3.5" />, "Formats"],
                 ["/tournament", <Trophy className="w-3.5 h-3.5" />, "Tournament"],
                 ["/profile", <User className="w-3.5 h-3.5" />, "Profile"],
@@ -97,6 +98,7 @@ export default function Layout() {
                 ["/public-forum", "🎤 Public Forum Debate"],
                 ["/model-un", "🌍 Model UN"],
                 ["/model-congress", "🏛 Model Congress"],
+                ["/projects", "📁 Projects"],
                 ["/formats", "📚 Debate Formats"],
                 ["/tournament", "🏆 Tournament"],
                 ["/profile", "👤 Profile"],

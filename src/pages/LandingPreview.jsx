@@ -111,6 +111,14 @@ export default function LandingPreview() {
           </Link>
         </div>
       </div>
+
+      {/* Footer */}
+      <div className="border-t border-slate-100 py-8 px-6 text-center text-xs text-slate-400 space-x-4">
+        <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
+        <Link to="/terms" className="hover:text-primary transition-colors">Privacy Policy</Link>
+        <a href="mailto:DebateLab@outlook.com" className="hover:text-primary transition-colors">DebateLab@outlook.com</a>
+        <span>© 2025 DebateLab</span>
+      </div>
     </div>
   );
 }
