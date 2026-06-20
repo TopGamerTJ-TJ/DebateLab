@@ -104,6 +104,7 @@ export default function Layout() {
               {[
                 ["/model-un", <Globe className="w-3.5 h-3.5" />, "MUN"],
                 ["/model-congress", <FileText className="w-3.5 h-3.5" />, "Congress"],
+                ["/forum", <MessageSquare className="w-3.5 h-3.5" />, "Forum"],
                 ["/office-hours", <MessageSquare className="w-3.5 h-3.5" />, "Office Hours"],
                 ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
                 ["/formats", <LayoutGrid className="w-3.5 h-3.5" />, "Formats"],
@@ -140,7 +141,8 @@ export default function Layout() {
                 ["/public-forum", "🎤 Public Forum Debate"],
                 ["/model-un", "🌍 Model UN"],
                 ["/model-congress", "🏛 Model Congress"],
-                ["/office-hours", "💬 Office Hours"],
+                ["/forum", "💬 Forum"],
+                ["/office-hours", "🤖 Office Hours"],
                 ["/projects", "📁 Projects"],
                 ["/formats", "📚 Debate Formats"],
                 ["/tournament", "🏆 Tournament"],
@@ -165,29 +167,9 @@ export default function Layout() {
           <button onClick={() => dismissNotif(activeNotif.id)} className="text-white/70 hover:text-white shrink-0 text-lg leading-none">×</button>
         </div>
       )}
-      <main className="min-h-[calc(100vh-4rem)] pb-20 lg:pb-0">
+      <main className="min-h-[calc(100vh-4rem)] pb-8">
         <Outlet />
       </main>
-
-      {/* Mobile bottom tab bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
-        <div className="flex items-stretch">
-          {[
-            { to: "/home", icon: LayoutDashboard, label: "Home" },
-            { to: "/projects", icon: Folder, label: "Projects" },
-            { to: "/practice", icon: Brain, label: "Practice" },
-            { to: "/profile", icon: User, label: "Profile" },
-          ].map(({ to, icon: Icon, label }) => {
-            const isActive = to === "/home" ? location.pathname === "/home" : location.pathname.startsWith(to);
-            return (
-              <Link key={to} to={to} className={`flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 select-none transition-colors ${isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"}`}>
-                <Icon className="w-5 h-5" />
-                <span className="text-[10px] font-medium">{label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
     </div>
   );
 }

@@ -1,0 +1,30 @@
+{
+  "name": "ForumComment",
+  "type": "object",
+  "properties": {
+    "postId": {
+      "type": "string"
+    },
+    "parentCommentId": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "authorName": {
+      "type": "string"
+    },
+    "upvotes": {
+      "type": "number",
+      "default": 0
+    },
+    "downvotes": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "postId",
+    "content"
+  ]
+}

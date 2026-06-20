@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { BookOpen, Globe, FileText, Trophy, Brain, BarChart2, Zap, ArrowRight, Target, Layers, Archive, Columns } from "lucide-react";
 import TourModal from "@/components/TourModal";
+import AnimatedPage from "@/components/AnimatedPage";
+import PullToRefresh from "@/components/PullToRefresh";
 
 const StatCard = ({ label, value, color }) => (
   <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
@@ -27,9 +29,16 @@ const QuickAction = ({ to, icon, title, desc, color }) => (
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { data: sessions = [] } = useQuery({ queryKey: ['practice_sessions'], queryFn: () => base44.entities.PracticeSession.list('-created_date', 50) });
   const { data: contentions = [] } = useQuery({ queryKey: ['contentions'], queryFn: () => base44.entities.Contention.list('-created_date', 100) });
   const { data: tournaments = [] } = useQuery({ queryKey: ['tournaments'], queryFn: () => base44.entities.Tournament.list('-created_date', 100) });
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['practice_sessions'] });
+    await queryClient.invalidateQueries({ queryKey: ['contentions'] });
+    await queryClient.invalidateQueries({ queryKey: ['tournaments'] });
+  };
 
   const wins = sessions.filter(s => s.winner === 'user').length;
   const losses = sessions.filter(s => s.winner === 'ai').length;
@@ -38,6 +47,8 @@ export default function Dashboard() {
   const recentSessions = sessions.slice(0, 5);
 
   return (
+    <AnimatedPage>
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <TourModal />
       {/* Hero */}
@@ -123,5 +134,7 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+    </PullToRefresh>
+    </AnimatedPage>
   );
 }

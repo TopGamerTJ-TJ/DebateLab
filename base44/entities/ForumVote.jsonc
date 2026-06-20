@@ -1,0 +1,28 @@
+{
+  "name": "ForumVote",
+  "type": "object",
+  "properties": {
+    "itemId": {
+      "type": "string"
+    },
+    "itemType": {
+      "type": "string",
+      "enum": [
+        "post",
+        "comment"
+      ]
+    },
+    "voteValue": {
+      "type": "number",
+      "enum": [
+        1,
+        -1
+      ]
+    }
+  },
+  "required": [
+    "itemId",
+    "itemType",
+    "voteValue"
+  ]
+}

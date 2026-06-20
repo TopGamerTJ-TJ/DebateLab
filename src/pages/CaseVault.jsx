@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Layers, Plus, Trash2, Star, Search, Edit3, Filter } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import AnimatedPage from "@/components/AnimatedPage";
+import PullToRefresh from "@/components/PullToRefresh";
 
 const FORMATS = [["parliamentary", "Parliamentary"], ["public_forum", "Public Forum"], ["model_un", "Model UN"], ["model_congress", "Model Congress"]];
 
@@ -26,18 +28,55 @@ export default function CaseVault() {
     mutationFn: (data) => editId
       ? base44.entities.Case.update(editId, { ...data, tags: data.tags ? data.tags.split(',').map(t => t.trim()) : [] })
       : base44.entities.Case.create({ ...data, tags: data.tags ? data.tags.split(',').map(t => t.trim()) : [] }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cases'] }); toast({ title: editId ? "Case updated!" : "Case saved!" }); setShowForm(false); setEditId(null); setForm({ title: "", format: "parliamentary", resolution: "", side: "", description: "", tags: "", notes: "" }); }
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: ['cases'] });
+      const previousCases = queryClient.getQueryData(['cases']);
+      const formattedTags = newData.tags ? (typeof newData.tags === 'string' ? newData.tags.split(',').map(t => t.trim()) : newData.tags) : [];
+      if (editId) {
+        queryClient.setQueryData(['cases'], old => old.map(c => c.id === editId ? { ...c, ...newData, tags: formattedTags } : c));
+      } else {
+        queryClient.setQueryData(['cases'], old => [{ id: 'temp-' + Date.now(), ...newData, tags: formattedTags, created_date: new Date().toISOString() }, ...(old || [])]);
+      }
+      setShowForm(false);
+      return { previousCases };
+    },
+    onError: (err, newData, context) => {
+      queryClient.setQueryData(['cases'], context.previousCases);
+      toast({ title: "Error saving case", variant: "destructive" });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['cases'] });
+    },
+    onSuccess: () => { toast({ title: editId ? "Case updated!" : "Case saved!" }); setEditId(null); setForm({ title: "", format: "parliamentary", resolution: "", side: "", description: "", tags: "", notes: "" }); }
   });
 
   const del = useMutation({
     mutationFn: (id) => base44.entities.Case.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cases'] })
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['cases'] });
+      const previousCases = queryClient.getQueryData(['cases']);
+      queryClient.setQueryData(['cases'], old => old.filter(c => c.id !== id));
+      return { previousCases };
+    },
+    onError: (err, id, context) => queryClient.setQueryData(['cases'], context.previousCases),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['cases'] })
   });
 
   const toggleFav = useMutation({
     mutationFn: ({ id, val }) => base44.entities.Case.update(id, { isFavorite: val }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cases'] })
+    onMutate: async ({ id, val }) => {
+      await queryClient.cancelQueries({ queryKey: ['cases'] });
+      const previousCases = queryClient.getQueryData(['cases']);
+      queryClient.setQueryData(['cases'], old => old.map(c => c.id === id ? { ...c, isFavorite: val } : c));
+      return { previousCases };
+    },
+    onError: (err, variables, context) => queryClient.setQueryData(['cases'], context.previousCases),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['cases'] })
   });
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['cases'] });
+  };
 
   const openEdit = (c) => {
     setEditId(c.id);
@@ -55,6 +94,8 @@ export default function CaseVault() {
   const sideColors = { affirmative: "bg-green-100 text-green-700", negative: "bg-red-100 text-red-600", government: "bg-green-100 text-green-700", opposition: "bg-red-100 text-red-600" };
 
   return (
+    <AnimatedPage>
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="bg-gradient-to-br from-rose-500 to-pink-600 rounded-3xl p-8 mb-8 text-white shadow-lg">
         <div className="flex items-center gap-2 mb-3 text-rose-200 text-sm"><span>🗂️</span> Case Vault</div>
@@ -85,7 +126,7 @@ export default function CaseVault() {
           <Button onClick={() => setShowForm(true)} className="gap-2"><Plus className="w-4 h-4" /> New Case</Button>
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-4">
           {filtered.map(c => (
             <div key={c.id} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-3">
@@ -93,15 +134,15 @@ export default function CaseVault() {
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${formatColors[c.format] || 'bg-slate-100 text-slate-600'}`}>{c.format?.replace('_', ' ')}</span>
                   {c.side && <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${sideColors[c.side] || 'bg-slate-100 text-slate-600'}`}>{c.side}</span>}
                 </div>
-                <div className="flex gap-1 shrink-0">
-                  <button onClick={() => toggleFav.mutate({ id: c.id, val: !c.isFavorite })} className="p-1.5 rounded-lg hover:bg-slate-100">
-                    <Star className={`w-3.5 h-3.5 ${c.isFavorite ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
+                <div className="flex gap-2 shrink-0">
+                  <button onClick={() => toggleFav.mutate({ id: c.id, val: !c.isFavorite })} className="min-w-[44px] min-h-[44px] -m-2 flex items-center justify-center rounded-lg hover:bg-slate-100">
+                    <Star className={`w-4 h-4 ${c.isFavorite ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
                   </button>
-                  <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-blue-50">
-                    <Edit3 className="w-3.5 h-3.5 text-slate-400 hover:text-primary" />
+                  <button onClick={() => openEdit(c)} className="min-w-[44px] min-h-[44px] -m-2 flex items-center justify-center rounded-lg hover:bg-blue-50">
+                    <Edit3 className="w-4 h-4 text-slate-400 hover:text-primary" />
                   </button>
-                  <button onClick={() => del.mutate(c.id)} className="p-1.5 rounded-lg hover:bg-red-50">
-                    <Trash2 className="w-3.5 h-3.5 text-slate-300 hover:text-red-500" />
+                  <button onClick={() => del.mutate(c.id)} className="min-w-[44px] min-h-[44px] -m-2 flex items-center justify-center rounded-lg hover:bg-red-50">
+                    <Trash2 className="w-4 h-4 text-slate-300 hover:text-red-500" />
                   </button>
                 </div>
               </div>
@@ -148,5 +189,7 @@ export default function CaseVault() {
         </DialogContent>
       </Dialog>
     </div>
+    </PullToRefresh>
+    </AnimatedPage>
   );
 }

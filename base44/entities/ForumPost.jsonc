@@ -1,0 +1,33 @@
+{
+  "name": "ForumPost",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "imageUrl": {
+      "type": "string"
+    },
+    "authorName": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string"
+    },
+    "upvotes": {
+      "type": "number",
+      "default": 0
+    },
+    "downvotes": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "title",
+    "content"
+  ]
+}

@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -22,6 +23,8 @@ import AICoach from './pages/AICoach';
 import DebateFormats from './pages/DebateFormats';
 import LandingPreview from './pages/LandingPreview';
 import OfficeHours from './pages/OfficeHours';
+import Forum from './pages/Forum';
+import ForumPostDetail from './pages/ForumPostDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -33,6 +36,7 @@ import BanGate from './components/BanGate';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
+  const location = useLocation();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -80,7 +84,8 @@ const AuthenticatedApp = () => {
   // Authenticated → full app
   return (
     <BanGate>
-      <Routes>
+      <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
         <Route path="/" element={<LandingPreview />} />
         <Route path="/terms" element={<TermsAndPrivacy />} />
         <Route path="/login" element={<Login />} />
@@ -102,12 +107,15 @@ const AuthenticatedApp = () => {
           <Route path="/practice" element={<PracticeRound />} />
           <Route path="/ai-coach" element={<AICoach />} />
           <Route path="/office-hours" element={<OfficeHours />} />
+          <Route path="/forum" element={<Forum />} />
+          <Route path="/forum/:id" element={<ForumPostDetail />} />
           <Route path="/formats" element={<DebateFormats />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
+      </AnimatePresence>
     </BanGate>
   );
 };
