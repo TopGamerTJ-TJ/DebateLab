@@ -21,6 +21,10 @@ import PracticeRound from './pages/PracticeRound';
 import AICoach from './pages/AICoach';
 import DebateFormats from './pages/DebateFormats';
 import LandingPreview from './pages/LandingPreview';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 import TermsAndPrivacy from './pages/TermsAndPrivacy';
@@ -46,8 +50,10 @@ const AuthenticatedApp = () => {
       return (
         <Routes>
           <Route path="/terms" element={<TermsAndPrivacy />} />
-          <Route path="/login" element={<LandingPreview />} />
-          <Route path="/register" element={<LandingPreview />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<LandingPreview />} />
         </Routes>
       );
@@ -59,6 +65,10 @@ const AuthenticatedApp = () => {
     <BanGate>
       <Routes>
         <Route path="/terms" element={<TermsAndPrivacy />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/parliamentary" element={<ParliamentaryDebate />} />
