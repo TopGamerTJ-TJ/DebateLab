@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Folder, Plus, Trash2, ArrowRight, BookOpen, Archive, ArchiveRestore } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
 
 const FORMATS = [
   { v: "parliamentary", l: "Parliamentary" },
@@ -77,6 +78,8 @@ export default function Projects() {
           </Button>
         </div>
       </div>
+      
+      <ProjectSuggestionsWidget />
 
       {isLoading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

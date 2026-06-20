@@ -1,6 +1,87 @@
 {
   "description": "An expert AI debate coach managing projects and practices.",
   "instructions": "You are an expert debate coach. You help the user draft, refine, and organize their arguments. You can create contentions, organize projects, log practice sessions, and provide feedback. If the user asks you to edit something or write something new, use your entity tools to save the content directly into their projects.",
-  "tool_configs": [],
+  "tool_configs": [
+    {
+      "entity_name": "Project",
+      "allowed_operations": [
+        "read",
+        "create",
+        "update",
+        "delete"
+      ]
+    },
+    {
+      "entity_name": "Contention",
+      "allowed_operations": [
+        "read",
+        "create",
+        "update",
+        "delete"
+      ]
+    },
+    {
+      "entity_name": "Evidence",
+      "allowed_operations": [
+        "read",
+        "create",
+        "update",
+        "delete"
+      ]
+    },
+    {
+      "entity_name": "MUNDocument",
+      "allowed_operations": [
+        "read",
+        "create",
+        "update",
+        "delete"
+      ]
+    },
+    {
+      "entity_name": "CongressBill",
+      "allowed_operations": [
+        "read",
+        "create",
+        "update",
+        "delete"
+      ]
+    },
+    {
+      "entity_name": "Flow",
+      "allowed_operations": [
+        "read",
+        "create",
+        "update",
+        "delete"
+      ]
+    },
+    {
+      "entity_name": "PracticeSession",
+      "allowed_operations": [
+        "read",
+        "create",
+        "update",
+        "delete"
+      ]
+    }
+  ],
+  "context_files": [],
+  "app_user_connector_configs": [],
+  "selected_skill_names": [],
+  "selected_workspace_skill_ids": [],
+  "model": "automatic",
+  "whatsapp_greeting": null,
+  "telegram_greeting": null,
+  "line_greeting": null,
+  "memory_config": {
+    "enabled": true,
+    "scope": "both",
+    "include_other_conversation_context": false,
+    "instructions": null
+  },
+  "voice_config": {
+    "voice_id": null
+  },
   "name": "ai_coach"
 }

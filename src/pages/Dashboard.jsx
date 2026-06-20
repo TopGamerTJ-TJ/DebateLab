@@ -6,6 +6,7 @@ import { BookOpen, Globe, FileText, Trophy, Brain, BarChart2, Zap, ArrowRight, T
 import TourModal from "@/components/TourModal";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
+import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
 
 const StatCard = ({ label, value, color }) => (
   <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
@@ -51,6 +52,8 @@ export default function Dashboard() {
     <PullToRefresh onRefresh={handleRefresh}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <TourModal />
+      <ProjectSuggestionsWidget />
+      
       {/* Hero */}
       <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-8 mb-8 text-white shadow-lg">
         <div className="flex items-center gap-2 mb-2 text-blue-200 text-sm font-medium">

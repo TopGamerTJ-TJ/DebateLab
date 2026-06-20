@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target } from "lucide-react";
 
 const doLogout = async () => {
   await base44.auth.logout();
@@ -18,7 +18,7 @@ export default function Layout() {
   const timerRef = useRef(null);
 
   // Detect if we're on a sub-route (not a root tab) for mobile back button
-  const rootPaths = ["/home", "/projects", "/practice", "/forum", "/profile"];
+  const rootPaths = ["/home", "/projects", "/practice", "/forum", "/profile", "/coach"];
   const isSubRoute = !rootPaths.includes(location.pathname);
 
   const { data: notifications = [] } = useQuery({
@@ -48,7 +48,7 @@ export default function Layout() {
 
             {/* Mobile: back button on sub-routes, logo on root */}
             <div className="lg:hidden flex items-center gap-2">
-              {isSubRoute ? (
+              {isSubRoute && location.pathname !== "/coach" ? (
                 <button onClick={() => navigate(-1)} className="p-2 -ml-1 rounded-xl hover:bg-slate-100 active:bg-slate-200 transition-colors select-none">
                   <ChevronDown className="w-5 h-5 text-slate-600 rotate-90" />
                 </button>
@@ -149,12 +149,12 @@ export default function Layout() {
       </main>
 
       {/* Mobile bottom tab bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-slate-200 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transform-gpu will-change-transform">
-        <div className="flex items-stretch">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-slate-200 pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
+        <div className="flex items-stretch h-14">
           {[
             { to: "/home", icon: LayoutDashboard, label: "Home" },
             { to: "/projects", icon: Folder, label: "Projects" },
-            { to: "/practice", icon: Brain, label: "Practice" },
+            { to: "/coach", icon: Brain, label: "Coach" },
             { to: "/forum", icon: MessageSquare, label: "Forum" },
           ].map(({ to, icon: Icon, label }) => {
             const isActive = to === "/home" ? location.pathname === "/home" : location.pathname.startsWith(to);
@@ -189,7 +189,8 @@ export default function Layout() {
             {[
               ["/home", LayoutDashboard, "Home"],
               ["/projects", Folder, "Projects"],
-              ["/practice", Brain, "Practice"],
+              ["/coach", Brain, "Coach"],
+              ["/practice", Target, "Practice Rounds"],
               ["/forum", MessageSquare, "Forum"],
               ["/profile", User, "Profile"],
               ["/parliamentary", BookOpen, "Parliamentary"],

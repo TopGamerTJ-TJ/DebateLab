@@ -23,6 +23,7 @@ import AICoach from './pages/AICoach';
 import DebateFormats from './pages/DebateFormats';
 import LandingPreview from './pages/LandingPreview';
 import OfficeHours from './pages/OfficeHours';
+import CoachChat from './pages/CoachChat';
 import Forum from './pages/Forum';
 import ForumPostDetail from './pages/ForumPostDetail';
 import Login from './pages/Login';
@@ -106,6 +107,7 @@ const AuthenticatedApp = () => {
           <Route path="/flowing-tool" element={<FlowingTool />} />
           <Route path="/practice" element={<PracticeRound />} />
           <Route path="/ai-coach" element={<AICoach />} />
+          <Route path="/coach" element={<CoachChat />} />
           <Route path="/office-hours" element={<OfficeHours />} />
           <Route path="/forum" element={<Forum />} />
           <Route path="/forum/:id" element={<ForumPostDetail />} />
