@@ -49,13 +49,13 @@ const AuthenticatedApp = () => {
     } else if (authError.type === 'auth_required') {
     return (
       <Routes>
+        <Route path="/" element={<LandingPreview />} />
         <Route path="/terms" element={<TermsAndPrivacy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/landing" element={<LandingPreview />} />
-        <Route path="*" element={<Login />} />
+        <Route path="*" element={<LandingPreview />} />
       </Routes>
     );
     }
@@ -65,13 +65,13 @@ const AuthenticatedApp = () => {
   if (!isAuthenticated) {
     return (
       <Routes>
+        <Route path="/" element={<LandingPreview />} />
         <Route path="/terms" element={<TermsAndPrivacy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/landing" element={<LandingPreview />} />
-        <Route path="*" element={<Login />} />
+        <Route path="*" element={<LandingPreview />} />
       </Routes>
     );
   }
@@ -80,13 +80,14 @@ const AuthenticatedApp = () => {
   return (
     <BanGate>
       <Routes>
+        <Route path="/" element={<LandingPreview />} />
         <Route path="/terms" element={<TermsAndPrivacy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<Layout />}>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/home" element={<Dashboard />} />
           <Route path="/parliamentary" element={<ParliamentaryDebate />} />
           <Route path="/public-forum" element={<PublicForum />} />
           <Route path="/model-un" element={<ModelUN />} />

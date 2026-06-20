@@ -18,7 +18,7 @@ export default function Layout() {
   const timerRef = useRef(null);
 
   // Detect if we're on a sub-route (not a root tab) for mobile back button
-  const rootPaths = ["/", "/projects", "/practice", "/profile"];
+  const rootPaths = ["/home", "/projects", "/practice", "/profile"];
   const isSubRoute = !rootPaths.includes(location.pathname);
 
   const { data: notifications = [] } = useQuery({
@@ -53,7 +53,7 @@ export default function Layout() {
                   <ChevronDown className="w-5 h-5 text-slate-600 rotate-90" />
                 </button>
               ) : (
-                <Link to="/" className="flex items-center gap-2 shrink-0">
+                <Link to="/home" className="flex items-center gap-2 shrink-0">
                   <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
                     <Zap className="w-4 h-4 text-white" />
                   </div>
@@ -63,7 +63,7 @@ export default function Layout() {
             </div>
 
             {/* Desktop logo */}
-            <Link to="/" className="hidden md:flex items-center gap-2.5 shrink-0">
+            <Link to="/home" className="hidden md:flex items-center gap-2.5 shrink-0">
               <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
                 <Zap className="w-4 h-4 text-white" />
               </div>
@@ -171,12 +171,12 @@ export default function Layout() {
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-stretch">
           {[
-            { to: "/", icon: LayoutDashboard, label: "Home" },
+            { to: "/home", icon: LayoutDashboard, label: "Home" },
             { to: "/projects", icon: Folder, label: "Projects" },
             { to: "/practice", icon: Brain, label: "Practice" },
             { to: "/profile", icon: User, label: "Profile" },
           ].map(({ to, icon: Icon, label }) => {
-            const isActive = to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);
+            const isActive = to === "/home" ? location.pathname === "/home" : location.pathname.startsWith(to);
             return (
               <Link key={to} to={to} className={`flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 select-none transition-colors ${isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"}`}>
                 <Icon className="w-5 h-5" />
