@@ -1,15 +1,22 @@
 import { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut } from "lucide-react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain } from "lucide-react";
+
+const doLogout = () => base44.auth.redirectToLogin();
 
 export default function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [debateOpen, setDebateOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dismissedNotifs, setDismissedNotifs] = useState(() => JSON.parse(sessionStorage.getItem('dismissed_notifs') || '[]'));
   const timerRef = useRef(null);
+
+  // Detect if we're on a sub-route (not a root tab) for mobile back button
+  const rootPaths = ["/", "/projects", "/practice", "/profile"];
+  const isSubRoute = !rootPaths.includes(location.pathname);
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['platform_notifications'],
@@ -30,11 +37,30 @@ export default function Layout() {
   const active = (paths) => (Array.isArray(paths) ? paths : [paths]).some(p => location.pathname.startsWith(p));
 
   return (
-    <div className="min-h-screen bg-slate-50 font-body">
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+    <div className="min-h-screen bg-slate-50 font-body pb-[env(safe-area-inset-bottom)]">
+      {/* Desktop + Mobile top nav */}
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center justify-between h-14 md:h-16">
+
+            {/* Mobile: back button on sub-routes, logo on root */}
+            <div className="md:hidden flex items-center gap-2">
+              {isSubRoute ? (
+                <button onClick={() => navigate(-1)} className="p-2 -ml-1 rounded-xl hover:bg-slate-100 active:bg-slate-200 transition-colors select-none">
+                  <ChevronDown className="w-5 h-5 text-slate-600 rotate-90" />
+                </button>
+              ) : (
+                <Link to="/" className="flex items-center gap-2 shrink-0">
+                  <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
+                    <Zap className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="font-bold text-base tracking-tight text-slate-900 font-heading">DebateLab</span>
+                </Link>
+              )}
+            </div>
+
+            {/* Desktop logo */}
+            <Link to="/" className="hidden md:flex items-center gap-2.5 shrink-0">
               <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
                 <Zap className="w-4 h-4 text-white" />
               </div>
@@ -88,14 +114,16 @@ export default function Layout() {
 
             <div className="flex items-center gap-1">
               <button
-                onClick={() => base44.auth.logout("/")}
-                className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all"
+                onClick={doLogout}
+                className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all select-none"
                 title="Log out"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span className="hidden lg:inline">Log out</span>
               </button>
-              <button className="md:hidden p-2 rounded-lg hover:bg-slate-100" onClick={() => setMobileOpen(!mobileOpen)}>
+              {/* Mobile: page title on sub-routes */}
+              {isSubRoute && <span className="md:hidden font-semibold text-slate-900 text-sm truncate max-w-[140px]">{location.pathname.split('/').filter(Boolean).map(s => s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ')).pop()}</span>}
+              <button className="md:hidden p-2 rounded-xl hover:bg-slate-100 select-none" onClick={() => setMobileOpen(!mobileOpen)}>
                 {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
@@ -115,8 +143,8 @@ export default function Layout() {
               ].map(([to, label]) => (
                 <Link key={to} to={to} onClick={() => setMobileOpen(false)} className={`block px-3 py-2 text-sm rounded-lg transition-colors ${active(to) ? 'bg-blue-50 text-primary font-medium' : 'hover:bg-slate-50 text-slate-700'}`}>{label}</Link>
               ))}
-              <button onClick={() => { setMobileOpen(false); base44.auth.logout("/"); }}
-                className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-red-50 text-red-500 transition-colors flex items-center gap-2">
+              <button onClick={() => { setMobileOpen(false); doLogout(); }}
+                className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-red-50 text-red-500 transition-colors flex items-center gap-2 select-none">
                 <LogOut className="w-4 h-4" /> Log out
               </button>
             </div>
@@ -132,9 +160,29 @@ export default function Layout() {
           <button onClick={() => dismissNotif(activeNotif.id)} className="text-white/70 hover:text-white shrink-0 text-lg leading-none">×</button>
         </div>
       )}
-      <main className="min-h-[calc(100vh-4rem)]">
+      <main className="min-h-[calc(100vh-4rem)] pb-20 md:pb-0">
         <Outlet />
       </main>
+
+      {/* Mobile bottom tab bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
+        <div className="flex items-stretch">
+          {[
+            { to: "/", icon: LayoutDashboard, label: "Home" },
+            { to: "/projects", icon: Folder, label: "Projects" },
+            { to: "/practice", icon: Brain, label: "Practice" },
+            { to: "/profile", icon: User, label: "Profile" },
+          ].map(({ to, icon: Icon, label }) => {
+            const isActive = to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);
+            return (
+              <Link key={to} to={to} className={`flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 select-none transition-colors ${isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"}`}>
+                <Icon className="w-5 h-5" />
+                <span className="text-[10px] font-medium">{label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

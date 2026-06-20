@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Save, Target, BookOpen, Trophy, Brain, Settings, CheckCircle, Shield } from "lucide-react";
+import { User, Save, Target, BookOpen, Trophy, Brain, Settings, CheckCircle, Shield, Trash2, AlertTriangle, LogOut } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import AdminPanel from "@/components/AdminPanel";
@@ -20,6 +20,9 @@ export default function ProfilePage() {
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState("profile");
   const [currentUser, setCurrentUser] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -62,6 +65,20 @@ export default function ProfilePage() {
   const levelColors = { beginner: "bg-green-100 text-green-700", intermediate: "bg-blue-100 text-blue-700", advanced: "bg-purple-100 text-purple-700", expert: "bg-red-100 text-red-600" };
 
   const isAdmin = currentUser?.role === "admin";
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== "DELETE") return;
+    setDeleting(true);
+    try {
+      // Delete user profile data
+      if (profile) await base44.entities.UserProfile.delete(profile.id);
+      // Log out and redirect
+      base44.auth.redirectToLogin();
+    } catch {
+      toast({ title: "Error deleting account. Please contact support.", variant: "destructive" });
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -195,6 +212,53 @@ export default function ProfilePage() {
 
       {/* Contact form on all subpages */}
       <ContactForm />
+
+      {/* Delete Account */}
+      <div className="bg-red-50 border border-red-200 rounded-2xl p-5 mt-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="font-bold text-red-800 text-sm font-heading">Delete Account</h4>
+            <p className="text-red-600 text-xs mt-0.5">Permanently delete your account and all data. This cannot be undone.</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(true)} className="text-red-600 border-red-300 hover:bg-red-100 hover:border-red-400 gap-1.5 shrink-0">
+            <Trash2 className="w-3.5 h-3.5" /> Delete
+          </Button>
+        </div>
+      </div>
+
+      {/* Delete account confirmation dialog */}
+      {showDeleteDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 font-heading">Delete Account</h3>
+                <p className="text-xs text-slate-500">This action is irreversible</p>
+              </div>
+            </div>
+            <p className="text-sm text-slate-700 mb-4">All your data including projects, contentions, and practice history will be permanently deleted. Type <strong>DELETE</strong> to confirm.</p>
+            <Input
+              value={deleteConfirmText}
+              onChange={e => setDeleteConfirmText(e.target.value)}
+              placeholder="Type DELETE to confirm"
+              className="mb-4 font-mono"
+            />
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => { setShowDeleteDialog(false); setDeleteConfirmText(""); }} className="flex-1">Cancel</Button>
+              <Button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== "DELETE" || deleting}
+                className="flex-1 bg-red-600 hover:bg-red-700 gap-1.5"
+              >
+                <Trash2 className="w-4 h-4" />{deleting ? "Deleting..." : "Delete Forever"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="mt-8 text-center text-xs text-slate-400">
         <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service & Privacy Policy</Link>
