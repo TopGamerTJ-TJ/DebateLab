@@ -40,9 +40,12 @@ export default function Layout() {
   const active = (paths) => (Array.isArray(paths) ? paths : [paths]).some(p => location.pathname.startsWith(p));
 
   return (
-    <div className="min-h-[100dvh] bg-slate-50 font-body pb-0 lg:pb-[env(safe-area-inset-bottom)]">
+    <div className="min-h-[100dvh] bg-slate-50 font-body flex flex-col">
       {/* Desktop + Mobile top nav */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm pt-[env(safe-area-inset-top)]">
+      <nav 
+        className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 md:h-16">
 
@@ -138,12 +141,15 @@ export default function Layout() {
           <button onClick={() => dismissNotif(activeNotif.id)} className="text-white/70 hover:text-white shrink-0 text-lg leading-none">×</button>
         </div>
       )}
-      <main className="min-h-[calc(100vh-4rem)] pb-8">
+      <main className="flex-1 w-full pb-24 lg:pb-8">
         <Outlet />
       </main>
 
       {/* Mobile bottom tab bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-slate-200 pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
+      <nav 
+        className="lg:hidden fixed bottom-0 left-0 right-0 w-full z-[60] bg-white border-t border-slate-200 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] transform-gpu"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
         <div className="flex items-stretch h-14">
           {[
             { to: "/home", icon: LayoutDashboard, label: "Home" },
