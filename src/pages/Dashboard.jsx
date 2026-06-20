@@ -9,22 +9,22 @@ import PullToRefresh from "@/components/PullToRefresh";
 import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
 
 const StatCard = ({ label, value, color }) => (
-  <div className="bg-card text-card-foreground rounded-2xl border border-border p-5 shadow-sm">
+  <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
     <div className={`text-3xl font-bold ${color} font-heading`}>{value}</div>
-    <div className="text-sm text-muted-foreground mt-1">{label}</div>
+    <div className="text-sm text-slate-500 mt-1">{label}</div>
   </div>
 );
 
 const QuickAction = ({ to, icon, title, desc, color }) => (
-  <Link to={to} className="group bg-card text-card-foreground rounded-2xl border border-border p-5 shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex gap-4 items-start">
+  <Link to={to} className="group bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-primary/30 transition-all flex gap-4 items-start">
     <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
       {icon}
     </div>
     <div className="min-w-0">
-      <div className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">{title}</div>
-      <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{desc}</div>
+      <div className="font-semibold text-slate-900 text-sm group-hover:text-primary transition-colors">{title}</div>
+      <div className="text-xs text-slate-500 mt-0.5 leading-relaxed">{desc}</div>
     </div>
-    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mt-1 ml-auto" />
+    <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors shrink-0 mt-1 ml-auto" />
   </Link>
 );
 
@@ -55,17 +55,17 @@ export default function Dashboard() {
       <ProjectSuggestionsWidget />
       
       {/* Hero */}
-      <div className="bg-primary rounded-3xl p-8 mb-8 text-primary-foreground shadow-lg">
-        <div className="flex items-center gap-2 mb-2 text-primary-foreground/80 text-sm font-medium">
+      <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-8 mb-8 text-white shadow-lg">
+        <div className="flex items-center gap-2 mb-2 text-blue-200 text-sm font-medium">
           <Zap className="w-4 h-4" /> DebateLab
         </div>
         <h1 className="text-3xl font-bold font-heading mb-2">Welcome back, {user?.full_name?.split(" ")[0] || 'Debater'}.</h1>
-        <p className="text-primary-foreground/90 max-w-xl">Your complete competitive debate preparation platform. Generate contentions, practice rounds, and manage tournaments — all powered by AI.</p>
+        <p className="text-blue-100 max-w-xl">Your complete competitive debate preparation platform. Generate contentions, practice rounds, and manage tournaments — all powered by AI.</p>
         <div className="flex flex-wrap gap-3 mt-6">
-          <Link to="/parliamentary" className="bg-background text-foreground px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-accent transition-colors">
+          <Link to="/parliamentary" className="bg-white text-blue-700 px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-50 transition-colors">
             Parliamentary Debate →
           </Link>
-          <Link to="/public-forum" className="bg-primary-foreground/20 text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-primary-foreground/30 transition-colors">
+          <Link to="/public-forum" className="bg-blue-500/50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-500/70 transition-colors">
             Public Forum →
           </Link>
         </div>
@@ -73,9 +73,9 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <StatCard label="Practice Sessions" value={sessions.length} color="text-primary" />
-        <StatCard label="Contentions Saved" value={contentions.length} color="text-primary" />
-        <StatCard label="Tournaments" value={tournaments.length} color="text-primary" />
+        <StatCard label="Practice Sessions" value={sessions.length} color="text-blue-600" />
+        <StatCard label="Contentions Saved" value={contentions.length} color="text-blue-600" />
+        <StatCard label="Tournaments" value={tournaments.length} color="text-blue-600" />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">

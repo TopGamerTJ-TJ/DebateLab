@@ -42,22 +42,22 @@ export default function Layout() {
   return (
     <div className="min-h-[100dvh] bg-slate-50 font-body pb-0 lg:pb-[env(safe-area-inset-bottom)]">
       {/* Desktop + Mobile top nav */}
-      <nav className="sticky top-0 z-50 bg-background border-b border-border shadow-sm pt-[env(safe-area-inset-top)]">
+      <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 md:h-16">
 
             {/* Mobile: back button on sub-routes, logo on root */}
             <div className="lg:hidden flex items-center gap-2">
               {isSubRoute && location.pathname !== "/coach" ? (
-                <button onClick={() => navigate(-1)} className="p-2 -ml-1 rounded-xl hover:bg-accent active:bg-accent/80 transition-colors select-none text-foreground">
-                  <ChevronDown className="w-5 h-5 rotate-90" />
+                <button onClick={() => navigate(-1)} className="p-2 -ml-1 rounded-xl hover:bg-slate-100 active:bg-slate-200 transition-colors select-none">
+                  <ChevronDown className="w-5 h-5 text-slate-600 rotate-90" />
                 </button>
               ) : (
                 <Link to="/home" className="flex items-center gap-2 shrink-0">
                   <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
-                    <Zap className="w-4 h-4 text-primary-foreground" />
+                    <Zap className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-bold text-base tracking-tight text-foreground font-heading">DebateLab</span>
+                  <span className="font-bold text-base tracking-tight text-slate-900 font-heading">DebateLab</span>
                 </Link>
               )}
             </div>
@@ -65,9 +65,9 @@ export default function Layout() {
             {/* Desktop logo */}
             <Link to="/home" className="hidden lg:flex items-center gap-2.5 shrink-0">
               <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
-                <Zap className="w-4 h-4 text-primary-foreground" />
+                <Zap className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold text-lg tracking-tight text-foreground font-heading">DebateLab</span>
+              <span className="font-bold text-lg tracking-tight text-slate-900 font-heading">DebateLab</span>
             </Link>
 
             <div className="hidden lg:flex items-center gap-1 flex-wrap justify-center">
@@ -76,25 +76,25 @@ export default function Layout() {
                 onMouseEnter={() => { clearTimeout(timerRef.current); setDebateOpen(true); }}
                 onMouseLeave={() => { timerRef.current = setTimeout(() => setDebateOpen(false), 200); }}
               >
-                <button className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${active(['/parliamentary', '/public-forum']) ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}>
+                <button className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${active(['/parliamentary', '/public-forum']) ? 'bg-primary text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}>
                   <BookOpen className="w-4 h-4" />
                   Debate
                   <ChevronDown className={`w-3 h-3 transition-transform ${debateOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {debateOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-60 bg-card rounded-xl shadow-xl border border-border p-1.5 z-50">
-                    <Link to="/parliamentary" onClick={() => setDebateOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${active('/parliamentary') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-foreground'}`}>
+                  <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-slate-200 p-1.5 z-50">
+                    <Link to="/parliamentary" onClick={() => setDebateOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm hover:bg-blue-50 hover:text-primary transition-colors ${active('/parliamentary') ? 'bg-blue-50 text-primary' : 'text-slate-700'}`}>
                       <span className="text-xl">🏛️</span>
                       <div>
                         <div className="font-medium">Parliamentary</div>
-                        <div className="text-xs opacity-70">BP, AP, MSPDP formats</div>
+                        <div className="text-xs text-slate-400">BP, AP, MSPDP formats</div>
                       </div>
                     </Link>
-                    <Link to="/public-forum" onClick={() => setDebateOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${active('/public-forum') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-foreground'}`}>
+                    <Link to="/public-forum" onClick={() => setDebateOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm hover:bg-blue-50 hover:text-primary transition-colors ${active('/public-forum') ? 'bg-blue-50 text-primary' : 'text-slate-700'}`}>
                       <span className="text-xl">🎤</span>
                       <div>
                         <div className="font-medium">Public Forum</div>
-                        <div className="text-xs opacity-70">NSDA Public Forum format</div>
+                        <div className="text-xs text-slate-400">NSDA Public Forum format</div>
                       </div>
                     </Link>
                   </div>
@@ -108,13 +108,13 @@ export default function Layout() {
                 ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
                 ["/formats", <LayoutGrid className="w-3.5 h-3.5" />, "Formats"],
               ].map(([to, icon, label]) => (
-                <Link key={to} to={to} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${active(to) ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}>
+                <Link key={to} to={to} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${active(to) ? 'bg-primary text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}>
                   {icon}{label}
                 </Link>
               ))}
               
               {/* Desktop More Button */}
-              <button onClick={() => setMobileOpen(true)} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap text-muted-foreground hover:text-foreground hover:bg-accent`}>
+              <button onClick={() => setMobileOpen(true)} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100`}>
                 <Menu className="w-3.5 h-3.5" /> More
               </button>
             </div>

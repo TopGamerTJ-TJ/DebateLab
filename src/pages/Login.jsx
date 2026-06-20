@@ -48,7 +48,7 @@ export default function Login() {
     >
       <Button
         variant="outline"
-        className="w-full h-12 text-sm font-medium mb-6 border-border text-foreground hover:bg-accent bg-card google-btn"
+        className="w-full h-12 text-sm font-medium mb-6 border-slate-300 text-slate-700 hover:bg-slate-50 bg-white google-btn"
         onClick={handleGoogle}
       >
         <GoogleIcon className="w-5 h-5 mr-2" />
@@ -57,10 +57,10 @@ export default function Login() {
 
       <div className="relative mb-6">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border or-divider" />
+          <div className="w-full border-t border-slate-200 or-divider" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-3 text-muted-foreground or-label">or</span>
+          <span className="bg-white px-3 text-slate-400 or-label">or</span>
         </div>
       </div>
 
