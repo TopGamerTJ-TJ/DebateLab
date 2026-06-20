@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore } from "lucide-react";
+import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ReactMarkdown from "react-markdown";
 
@@ -28,6 +28,9 @@ export default function ProjectDetail() {
   const [agentQuery, setAgentQuery] = useState("");
   const [agentLoading, setAgentLoading] = useState(false);
   const [agentResults, setAgentResults] = useState(null);
+  const [rebuttalInput, setRebuttalInput] = useState("");
+  const [rebuttalLoading, setRebuttalLoading] = useState(false);
+  const [rebuttals, setRebuttals] = useState([]);
   const chatRef = useRef(null);
 
   const { data: project, isLoading: projLoading } = useQuery({
@@ -120,6 +123,28 @@ Format clearly with headers.`,
   useEffect(() => { if (project?.notes) setNote(project.notes || ""); }, [project]);
   useEffect(() => { chatRef.current?.scrollTo(0, chatRef.current.scrollHeight); }, [messages]);
 
+  const generateRebuttals = async () => {
+    if (!rebuttalInput.trim() || rebuttalLoading) return;
+    setRebuttalLoading(true);
+    const context = contentions.slice(0, 5).map(c => `- ${c.title}: ${c.claim}`).join('\n');
+    const prompt = `You are an expert debater representing the ${project?.side || 'Affirmative'} side for the resolution "${project?.resolution || 'not set'}".
+    
+Your opponent just made the following arguments:
+"""
+${rebuttalInput}
+"""
+
+Our side's current contentions context:
+${context || 'No contentions yet'}
+
+Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a clean list of concise, punchy rebuttals. Do NOT include pleasantries, just the rebuttals.`;
+
+    const res = await base44.integrations.Core.InvokeLLM({ prompt });
+    setRebuttals(prev => [{ input: rebuttalInput, output: res }, ...prev]);
+    setRebuttalInput("");
+    setRebuttalLoading(false);
+  };
+
   const sendChat = async () => {
     if (!chatInput.trim() || chatLoading) return;
     const userMsg = chatInput.trim();
@@ -208,6 +233,7 @@ Provide specific, actionable coaching advice tailored to this project's contenti
 
   const tabs = [
     { id: "contentions", icon: BookOpen, label: `Contentions (${contentions.length})` },
+    { id: "rebuttals", icon: ShieldAlert, label: "Rebuttal Hub" },
     { id: "notes", icon: StickyNote, label: "Notes" },
     { id: "chat", icon: MessageSquare, label: "AI Coach" },
     { id: "agent", icon: Globe, label: "Research Agent" },
@@ -261,6 +287,49 @@ Provide specific, actionable coaching advice tailored to this project's contenti
           </button>
         ))}
       </div>
+
+      {/* Rebuttal Hub tab */}
+      {tab === "rebuttals" && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldAlert className="w-5 h-5 text-teal-600" />
+              <div>
+                <h3 className="font-bold text-slate-900 font-heading text-sm">Rebuttal Hub</h3>
+                <p className="text-xs text-slate-500">Enter your opponent's arguments to generate real-time counter-arguments perfectly aligned with your side.</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3">
+              <Textarea 
+                value={rebuttalInput} 
+                onChange={e => setRebuttalInput(e.target.value)} 
+                placeholder="Opponent's arguments (e.g. 'They claim that universal healthcare will bankrupt the economy because...') " 
+                rows={4} 
+                className="resize-none text-sm bg-slate-50 border-slate-200" 
+              />
+              <Button onClick={generateRebuttals} disabled={rebuttalLoading || !rebuttalInput.trim()} className="self-end gap-2 bg-teal-600 hover:bg-teal-700 text-white">
+                {rebuttalLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                Generate Rebuttals
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {rebuttals.map((r, i) => (
+              <div key={i} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                <div className="bg-slate-50 border-b border-slate-100 p-4">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Opponent Argued</div>
+                  <p className="text-sm text-slate-700 italic border-l-2 border-slate-300 pl-3">"{r.input}"</p>
+                </div>
+                <div className="p-5">
+                  <div className="text-xs font-bold text-teal-600 uppercase tracking-wider mb-3 flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5" /> Your Rebuttals</div>
+                  <ReactMarkdown className="prose prose-sm max-w-none prose-slate prose-p:leading-relaxed prose-li:my-1">{r.output}</ReactMarkdown>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Contentions tab */}
       {tab === "contentions" && (

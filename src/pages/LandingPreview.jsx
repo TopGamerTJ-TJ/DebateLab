@@ -151,58 +151,77 @@ export default function LandingPreview() {
 
       {/* DISCOVER */}
       {activeTab === "discover" && (
-        <div className="max-w-3xl mx-auto px-6 pt-6 pb-20">
-          <div className="bg-neutral-900 border border-white border-opacity-10 rounded-2xl p-12 text-center mb-8">
-            <div className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-md mb-6 tracking-wide uppercase">
-              Demo Mode
-            </div>
-            <h2 className="text-4xl font-bold font-heading mb-4">
-              Prepare your next{" "}
-              <span className="text-blue-400">argument.</span>
-            </h2>
-            <p className="text-white text-opacity-40 text-sm mb-8 max-w-sm mx-auto leading-relaxed">
-              AI-powered debate prep that adapts to your style.<br />
-              Create an account for personalized contentions and coaching.
+        <div className="max-w-4xl mx-auto px-6 pt-12 pb-20">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold font-heading mb-3">Discover powerful features.</h2>
+            <p className="text-white text-opacity-40 text-base max-w-md mx-auto">
+              Explore the tools that give DebateLab users a competitive edge in every round.
             </p>
-            <div className="flex items-center justify-center gap-3">
-              <Link to="/register">
-                <button className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all text-sm">
-                  Get Started Free <Sparkles className="w-3.5 h-3.5" />
-                </button>
-              </Link>
-              <Link to="/login">
-                <button className="px-6 py-2.5 text-sm text-white border border-white border-opacity-20 rounded-xl hover:border-opacity-40 transition-all">
-                  Sign In
-                </button>
-              </Link>
-            </div>
           </div>
-
-          <div className="flex gap-3 mb-8">
-            <div className="flex-1 flex items-center gap-2 bg-neutral-900 border border-white border-opacity-10 rounded-xl px-4">
-              <Search className="w-4 h-4 text-white text-opacity-30 shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search resolutions, formats, topics..."
-                className="flex-1 bg-transparent text-sm text-white placeholder-white outline-none py-3"
-                style={{ opacity: 1 }}
-              />
+          
+          <div className="space-y-8">
+            <div className="bg-neutral-900 border border-white border-opacity-10 rounded-2xl p-8 flex flex-col md:flex-row gap-8 items-center hover:border-opacity-20 transition-all">
+              <div className="flex-1 text-left">
+                <div className="flex items-center gap-3 mb-3">
+                  <Brain className="w-6 h-6 text-blue-400" />
+                  <h3 className="text-2xl font-bold font-heading text-white">AI Coach</h3>
+                </div>
+                <p className="text-white text-opacity-50 leading-relaxed mb-6">
+                  Meet your personalized, 24/7 debate coach. Our AI analyzes your performance, tracks your win rates and speaker points, and gives you actionable feedback after every practice round. Review your strengths and target specific weaknesses before tournament day.
+                </p>
+                <Link to="/register"><button className="text-sm font-semibold text-blue-400 hover:text-blue-300">Try AI Coach →</button></Link>
+              </div>
+              <div className="w-full md:w-1/2 aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
+                <img src="https://media.base44.com/images/public/6a1d6e51e5d2301311f71188/96838290d_generated_image.png" alt="AI Coach" className="w-full h-full object-cover" />
+              </div>
             </div>
-            <button className="px-5 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all text-sm">
-              Search
-            </button>
-          </div>
 
-          <div>
-            <div className="flex items-center gap-2 text-white font-semibold mb-4">
-              <TrendingUp className="w-4 h-4 text-blue-400" />
-              Trending Topics
+            <div className="bg-neutral-900 border border-white border-opacity-10 rounded-2xl p-8 flex flex-col md:flex-row-reverse gap-8 items-center hover:border-opacity-20 transition-all">
+              <div className="flex-1 text-left">
+                <div className="flex items-center gap-3 mb-3">
+                  <MessageSquare className="w-6 h-6 text-violet-400" />
+                  <h3 className="text-2xl font-bold font-heading text-white">Practice Rounds</h3>
+                </div>
+                <p className="text-white text-opacity-50 leading-relaxed mb-6">
+                  Debate against an advanced AI opponent that simulates realistic tournament conditions. Customize the difficulty, format, and side. Deliver your speeches, get cross-examined, and receive a comprehensive judge decision (RFD) with detailed scoring.
+                </p>
+                <Link to="/register"><button className="text-sm font-semibold text-violet-400 hover:text-violet-300">Start Practicing →</button></Link>
+              </div>
+              <div className="w-full md:w-1/2 aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
+                <img src="https://media.base44.com/images/public/6a1d6e51e5d2301311f71188/a38e20df3_generated_image.png" alt="Practice Rounds" className="w-full h-full object-cover" />
+              </div>
             </div>
-            <div className="bg-neutral-900 border border-white border-opacity-10 rounded-2xl p-12 text-center">
-              <TrendingUp className="w-8 h-8 text-white text-opacity-20 mx-auto mb-3" />
-              <p className="text-white text-opacity-30 text-sm">Trending topics will appear as debaters practice. Check back soon!</p>
+
+            <div className="bg-neutral-900 border border-white border-opacity-10 rounded-2xl p-8 flex flex-col md:flex-row gap-8 items-center hover:border-opacity-20 transition-all">
+              <div className="flex-1 text-left">
+                <div className="flex items-center gap-3 mb-3">
+                  <FileText className="w-6 h-6 text-teal-400" />
+                  <h3 className="text-2xl font-bold font-heading text-white">Rebuttal Hub</h3>
+                </div>
+                <p className="text-white text-opacity-50 leading-relaxed mb-6">
+                  Instantly counter your opponent's arguments. Type in their claims during the round, and the Rebuttal Hub generates real-time, evidence-backed counter-arguments perfectly aligned with your side of the motion. Say goodbye to struggling during prep time.
+                </p>
+                <Link to="/register"><button className="text-sm font-semibold text-teal-400 hover:text-teal-300">Explore Rebuttals →</button></Link>
+              </div>
+              <div className="w-full md:w-1/2 aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
+                <img src="https://media.base44.com/images/public/6a1d6e51e5d2301311f71188/db0119a2b_generated_image.png" alt="Rebuttal Hub" className="w-full h-full object-cover" />
+              </div>
+            </div>
+
+            <div className="bg-neutral-900 border border-white border-opacity-10 rounded-2xl p-8 flex flex-col md:flex-row-reverse gap-8 items-center hover:border-opacity-20 transition-all">
+              <div className="flex-1 text-left">
+                <div className="flex items-center gap-3 mb-3">
+                  <Globe className="w-6 h-6 text-amber-400" />
+                  <h3 className="text-2xl font-bold font-heading text-white">Office Hours</h3>
+                </div>
+                <p className="text-white text-opacity-50 leading-relaxed mb-6">
+                  Stuck on debate jargon, rules, or tournament strategy? Drop into Office Hours to ask our AI debate expert anything. Get immediate, clear answers on formatting, speaker duties, and tactical maneuvers.
+                </p>
+                <Link to="/register"><button className="text-sm font-semibold text-amber-400 hover:text-amber-300">Join Office Hours →</button></Link>
+              </div>
+              <div className="w-full md:w-1/2 aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
+                <img src="https://media.base44.com/images/public/6a1d6e51e5d2301311f71188/e71aee368_generated_image.png" alt="Office Hours" className="w-full h-full object-cover" />
+              </div>
             </div>
           </div>
         </div>

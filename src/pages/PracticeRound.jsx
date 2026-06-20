@@ -1,12 +1,13 @@
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Target, Sparkles, Loader2, Send, Bot, User, CheckCircle, XCircle, Award } from "lucide-react";
+import { Target, Sparkles, Loader2, Send, Bot, User, CheckCircle, XCircle, Award, Plus, Menu, Trash2, MessageSquare } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
 
 export default function PracticeRound() {
   const [phase, setPhase] = useState("setup"); // setup | round | result
@@ -15,13 +16,57 @@ export default function PracticeRound() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [activeSessionId, setActiveSessionId] = useState(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const messagesEndRef = useRef(null);
+
+  const { data: sessions = [] } = useQuery({ 
+      queryKey: ['practice_sessions'], 
+      queryFn: () => base44.entities.PracticeSession.list('-created_date', 50) 
+  });
 
   const saveSession = useMutation({
     mutationFn: (data) => base44.entities.PracticeSession.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['practice_sessions'] })
+    onSuccess: (res) => {
+        setActiveSessionId(res.id);
+        queryClient.invalidateQueries({ queryKey: ['practice_sessions'] });
+    }
   });
+  
+  const deleteSession = useMutation({
+      mutationFn: (id) => base44.entities.PracticeSession.delete(id),
+      onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['practice_sessions'] });
+      }
+  });
+
+  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  useEffect(() => { if (phase === 'round') scrollToBottom(); }, [messages, phase]);
+
+  const loadPastSession = (session) => {
+      setPhase("result");
+      setResult({
+          winner: session.winner === 'user' ? 'debater' : 'opponent',
+          rfd: session.rfd,
+          speakerPoints: session.speakerPoints,
+          keyVotingIssues: session.keyVotingIssues,
+          strengths: session.strengths,
+          weaknesses: session.weaknesses,
+          advice: session.notes
+      });
+      setActiveSessionId(session.id);
+      if (window.innerWidth < 1024) setSidebarOpen(false);
+  };
+
+  const handleNewChat = () => {
+      setPhase("setup");
+      setMessages([]);
+      setResult(null);
+      setActiveSessionId(null);
+      if (window.innerWidth < 1024) setSidebarOpen(false);
+  };
 
   const startRound = async () => {
     if (!config.resolution) { toast({ title: "Please enter a resolution", variant: "destructive" }); return; }
@@ -118,9 +163,9 @@ Provide a detailed judge's decision in this JSON format:
     setLoading(false);
   };
 
-  if (phase === "result" && result) {
+  const renderResult = () => {
     return (
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-3xl mx-auto py-8">
         <div className={`rounded-3xl p-8 mb-8 text-white shadow-lg ${result.winner === 'debater' ? 'bg-gradient-to-br from-green-500 to-emerald-600' : 'bg-gradient-to-br from-red-500 to-rose-600'}`}>
           <div className="flex items-center gap-3 mb-4">
             {result.winner === 'debater' ? <CheckCircle className="w-8 h-8" /> : <XCircle className="w-8 h-8" />}
@@ -163,21 +208,59 @@ Provide a detailed judge's decision in this JSON format:
             </div>
           )}
 
-          <Button onClick={() => { setPhase("setup"); setMessages([]); setResult(null); }} className="w-full h-12">Practice Another Round</Button>
+          <Button onClick={handleNewChat} className="w-full h-12">Practice Another Round</Button>
         </div>
       </div>
     );
-  }
+  };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      <div className="bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl p-8 mb-8 text-white shadow-lg">
-        <div className="flex items-center gap-2 mb-3 text-green-100 text-sm"><span>⚡</span> Practice Round</div>
-        <h1 className="text-3xl font-bold font-heading mb-2">AI Practice Debate</h1>
-        <p className="text-green-100 max-w-2xl">Debate against an AI opponent that simulates real competition. Get judge feedback and performance analysis when you're done.</p>
+    <div className="flex h-[calc(100dvh-56px)] lg:h-[calc(100vh-64px)] bg-slate-50 overflow-hidden relative">
+      {/* Sidebar Overlay (Mobile) */}
+      {isSidebarOpen && (
+          <div className="fixed inset-0 bg-slate-900/20 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <div className={cn("fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 flex flex-col", isSidebarOpen ? "translate-x-0" : "-translate-x-full")}>
+          <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+              <Button onClick={handleNewChat} className="w-full gap-2 font-medium" variant="outline">
+                  <Plus className="w-4 h-4" /> New Practice Round
+              </Button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-3 space-y-1">
+              {sessions.length === 0 ? (
+                  <div className="text-center p-4 text-sm text-slate-500">No past practice rounds</div>
+              ) : (
+                  sessions.map(s => (
+                      <button key={s.id} onClick={() => loadPastSession(s)} className={cn("w-full flex items-center justify-between p-3 rounded-xl text-sm transition-colors text-left group", activeSessionId === s.id ? "bg-green-50 text-green-700 font-medium" : "hover:bg-slate-50 text-slate-700")}>
+                          <div className="flex items-center gap-3 overflow-hidden">
+                              <Target className={cn("w-4 h-4 shrink-0", activeSessionId === s.id ? "text-green-600" : "text-slate-400")} />
+                              <div className="flex flex-col min-w-0">
+                                <span className="truncate">{s.resolution || "Practice Round"}</span>
+                                <span className="text-[10px] opacity-70 truncate">{s.format?.replace('_', ' ')} • {s.winner === 'user' ? 'Won' : 'Lost'}</span>
+                              </div>
+                          </div>
+                          <button onClick={(e) => { e.stopPropagation(); if(confirm('Delete?')) deleteSession.mutate(s.id); }} className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-600 rounded-md transition-all">
+                              <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                      </button>
+                  ))
+              )}
+          </div>
       </div>
 
-      {phase === "setup" ? (
+      {/* Main Area */}
+      <div className="flex-1 flex flex-col min-w-0 bg-white relative">
+        <div className="h-14 lg:h-0 shrink-0 border-b border-slate-200 flex items-center px-4 lg:hidden bg-white/95 backdrop-blur z-30 absolute top-0 left-0 right-0">
+            <button onClick={() => setSidebarOpen(true)} className="p-2 -ml-2 rounded-lg hover:bg-slate-100 text-slate-600">
+                <Menu className="w-5 h-5" />
+            </button>
+            <span className="ml-2 font-semibold text-slate-800 font-heading">Practice Rounds</span>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8 scroll-smooth">
+          {phase === "result" ? renderResult() : phase === "setup" ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm max-w-2xl mx-auto">
           <h3 className="font-bold text-slate-900 font-heading text-lg mb-6">Round Setup</h3>
           <div className="space-y-4">
@@ -216,14 +299,14 @@ Provide a detailed judge's decision in this JSON format:
                 </Select>
               </div>
             </div>
-            <Button onClick={startRound} className="w-full h-12 gap-2 text-sm font-semibold">
+            <Button onClick={startRound} className="w-full h-12 gap-2 text-sm font-semibold bg-green-600 hover:bg-green-700 text-white">
               <Target className="w-4 h-4" /> Start Practice Round
             </Button>
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" style={{ height: '70vh', display: 'flex', flexDirection: 'column' }}>
-          <div className="px-5 py-4 border-b border-slate-100 bg-green-50 flex items-center justify-between">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-140px)]">
+          <div className="px-5 py-4 border-b border-slate-100 bg-green-50 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4 text-green-600" />
               <span className="text-sm font-bold text-green-800">Live Practice Round</span>
@@ -248,6 +331,7 @@ Provide a detailed judge's decision in this JSON format:
                 )}
               </div>
             ))}
+            <div ref={messagesEndRef} className="h-4" />
             {loading && (
               <div className="flex gap-3">
                 <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center"><Bot className="w-4 h-4 text-green-600" /></div>
@@ -268,6 +352,8 @@ Provide a detailed judge's decision in this JSON format:
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 }

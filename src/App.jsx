@@ -15,9 +15,7 @@ import ModelCongress from './pages/ModelCongress';
 import TournamentPage from './pages/TournamentPage';
 import ProfilePage from './pages/ProfilePage';
 import DebateWiki from './pages/DebateWiki';
-import EvidenceLocker from './pages/EvidenceLocker';
-import CaseVault from './pages/CaseVault';
-import FlowingTool from './pages/FlowingTool';
+
 import PracticeRound from './pages/PracticeRound';
 import AICoach from './pages/AICoach';
 import DebateFormats from './pages/DebateFormats';
@@ -102,9 +100,7 @@ const AuthenticatedApp = () => {
           <Route path="/tournament" element={<TournamentPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/wiki" element={<DebateWiki />} />
-          <Route path="/evidence-locker" element={<EvidenceLocker />} />
-          <Route path="/case-vault" element={<CaseVault />} />
-          <Route path="/flowing-tool" element={<FlowingTool />} />
+
           <Route path="/practice" element={<PracticeRound />} />
           <Route path="/ai-coach" element={<AICoach />} />
           <Route path="/coach" element={<CoachChat />} />
