@@ -4,7 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain } from "lucide-react";
 
-const doLogout = () => base44.auth.logout();
+const doLogout = async () => {
+  await base44.auth.logout();
+  window.location.href = "/login";
+};
 
 export default function Layout() {
   const location = useLocation();
