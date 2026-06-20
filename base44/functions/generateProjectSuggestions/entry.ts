@@ -4,6 +4,11 @@ Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
         
+        const user = await base44.auth.me().catch(() => null);
+        if (user?.role !== 'admin') { 
+            return Response.json({ error: 'Forbidden: Admin access required' }, { status: 403 }); 
+        }
+
         // Fetch all projects using service role to process them in the background
         const projects = await base44.asServiceRole.entities.Project.list();
         let processed = 0;

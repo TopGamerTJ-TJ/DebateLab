@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Zap, Lock, AlertTriangle } from "lucide-react";
 
 const SESSION_KEY = "dl_access_code";
-const DEFAULT_CODE = "HoraceMannDebate";
 
 export default function AccessCodeGate({ children }) {
   const [status, setStatus] = useState("loading"); // loading | checking | code_required | banned | granted
@@ -20,9 +19,9 @@ export default function AccessCodeGate({ children }) {
   const getCorrectCode = async () => {
     try {
       const settings = await base44.entities.AppSettings.filter({ key: "access_code" });
-      return settings[0]?.value || DEFAULT_CODE;
+      return settings[0]?.value || null;
     } catch {
-      return DEFAULT_CODE;
+      return null;
     }
   };
 
@@ -41,7 +40,7 @@ export default function AccessCodeGate({ children }) {
     const correctCode = await getCorrectCode();
     const storedCode = sessionStorage.getItem(SESSION_KEY);
 
-    if (storedCode === correctCode) {
+    if (!correctCode || storedCode === correctCode) {
       // Code still valid — also check if user is banned
       const user = await base44.auth.me().catch(() => null);
       if (user) {
@@ -60,7 +59,7 @@ export default function AccessCodeGate({ children }) {
     setVerifying(true);
     setError("");
     const correctCode = await getCorrectCode();
-    if (input.trim() === correctCode) {
+    if (correctCode && input.trim() === correctCode) {
       // Check if banned before granting
       const user = await base44.auth.me().catch(() => null);
       if (user) {
