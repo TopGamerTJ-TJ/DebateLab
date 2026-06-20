@@ -4,7 +4,7 @@ import { Zap } from "lucide-react";
 
 export default function AuthLayout({ icon: Icon, title, subtitle, footer, children }) {
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-900 to-blue-950">
+    <div className="min-h-[100dvh] flex bg-gradient-to-br from-slate-900 to-blue-950">
       {/* Left branding panel - hidden on mobile */}
       <div className="hidden lg:flex flex-col justify-between w-96 bg-gradient-to-br from-blue-600 to-blue-700 p-10 text-white shrink-0">
         <div>

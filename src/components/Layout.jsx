@@ -13,6 +13,7 @@ export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [debateOpen, setDebateOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [dismissedNotifs, setDismissedNotifs] = useState(() => JSON.parse(sessionStorage.getItem('dismissed_notifs') || '[]'));
   const timerRef = useRef(null);
 
@@ -39,9 +40,9 @@ export default function Layout() {
   const active = (paths) => (Array.isArray(paths) ? paths : [paths]).some(p => location.pathname.startsWith(p));
 
   return (
-    <div className="min-h-screen bg-slate-50 font-body pb-[env(safe-area-inset-bottom)]">
+    <div className="min-h-[100dvh] bg-slate-50 font-body pb-0 lg:pb-[env(safe-area-inset-bottom)]">
       {/* Desktop + Mobile top nav */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm pt-[env(safe-area-inset-top)]">
+      <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 md:h-16">
 
@@ -148,14 +149,13 @@ export default function Layout() {
       </main>
 
       {/* Mobile bottom tab bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-slate-200 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <div className="flex items-stretch">
           {[
             { to: "/home", icon: LayoutDashboard, label: "Home" },
             { to: "/projects", icon: Folder, label: "Projects" },
             { to: "/practice", icon: Brain, label: "Practice" },
             { to: "/forum", icon: MessageSquare, label: "Forum" },
-            { to: "/profile", icon: User, label: "Profile" },
           ].map(({ to, icon: Icon, label }) => {
             const isActive = to === "/home" ? location.pathname === "/home" : location.pathname.startsWith(to);
             return (
@@ -165,8 +165,65 @@ export default function Layout() {
               </Link>
             );
           })}
+          <button 
+            onClick={() => setMobileOpen(true)} 
+            className={`flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 select-none transition-colors text-slate-400 hover:text-slate-600`}
+          >
+            <Menu className="w-5 h-5" />
+            <span className="text-[10px] font-medium">More</span>
+          </button>
         </div>
       </nav>
+
+      {/* Full screen mobile menu */}
+      {mobileOpen && (
+        <div className="lg:hidden fixed inset-0 z-[70] bg-[#0B1120] pt-12 pb-24 px-4 overflow-y-auto flex flex-col">
+          <div className="flex items-center justify-between mb-8 mt-2">
+            <h2 className="text-xl font-bold text-white tracking-tight">Navigation</h2>
+            <button onClick={() => setMobileOpen(false)} className="p-2 -mr-2 text-slate-400 hover:text-white transition-colors">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              ["/home", LayoutDashboard, "Home"],
+              ["/projects", Folder, "Projects"],
+              ["/practice", Brain, "Practice"],
+              ["/forum", MessageSquare, "Forum"],
+              ["/profile", User, "Profile"],
+              ["/parliamentary", BookOpen, "Parliamentary"],
+              ["/public-forum", BookOpen, "Public Forum"],
+              ["/model-un", Globe, "Model UN"],
+              ["/model-congress", FileText, "Congress"],
+              ["/formats", LayoutGrid, "Formats"],
+              ["/office-hours", MessageSquare, "Office Hours"],
+              ["/tournament", Trophy, "Tournament"],
+            ].map(([to, Icon, label]) => {
+              const isActive = to === "/home" ? location.pathname === "/home" : location.pathname.startsWith(to);
+              return (
+                <Link 
+                  key={to} 
+                  to={to} 
+                  onClick={() => setMobileOpen(false)} 
+                  className={`flex flex-col items-center justify-center p-4 rounded-2xl gap-2 transition-colors ${isActive ? 'bg-primary text-white' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-300'}`}
+                >
+                  <Icon className="w-6 h-6" />
+                  <span className="text-[11px] font-medium text-center leading-tight">{label}</span>
+                </Link>
+              );
+            })}
+            
+            <button 
+              onClick={() => { setMobileOpen(false); doLogout(); }}
+              className="flex flex-col items-center justify-center p-4 rounded-2xl gap-2 transition-colors bg-slate-800/50 text-slate-400 hover:bg-red-900/30 hover:text-red-400"
+            >
+              <LogOut className="w-6 h-6" />
+              <span className="text-[11px] font-medium text-center leading-tight">Log out</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
