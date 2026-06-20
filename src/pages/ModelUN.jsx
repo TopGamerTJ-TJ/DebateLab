@@ -462,10 +462,25 @@ export default function ModelUN() {
 
   const createDoc = useMutation({
     mutationFn: (data) => base44.entities.MUNDocument.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['mun_docs'] });
-      toast({ title: "Document saved to library!" });
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: ['mun_docs'] });
+      const previousDocs = queryClient.getQueryData(['mun_docs']);
+      queryClient.setQueryData(['mun_docs'], old => [
+        { id: 'temp-' + Date.now(), ...newData, created_date: new Date().toISOString() },
+        ...(old || [])
+      ]);
       setForm({ title: "", type: "position_paper", country: "", committee: "", topic: "", content: "" });
+      return { previousDocs };
+    },
+    onError: (err, newData, context) => {
+      queryClient.setQueryData(['mun_docs'], context.previousDocs);
+      toast({ title: "Error saving document", variant: "destructive" });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['mun_docs'] });
+    },
+    onSuccess: () => {
+      toast({ title: "Document saved to library!" });
     }
   });
 
@@ -505,7 +520,7 @@ export default function ModelUN() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-8">
       <div className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-3xl p-8 mb-8 text-white shadow-lg">
         <div className="flex items-center gap-2 mb-3 text-teal-200 text-sm"><span>🌍</span> Model United Nations</div>
         <h1 className="text-3xl font-bold font-heading mb-2">Model UN Hub</h1>
@@ -629,12 +644,12 @@ export default function ModelUN() {
                 <div key={doc.id} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => setViewDoc(doc)}>
                   <div className="flex items-start justify-between mb-3">
                     <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full font-medium capitalize">{doc.type?.replace(/_/g, ' ')}</span>
-                    <div className="flex gap-1" onClick={e => e.stopPropagation()}>
-                      <button onClick={() => toggleFavorite.mutate({ id: doc.id, val: !doc.isFavorite })} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
-                        <Star className={`w-3.5 h-3.5 ${doc.isFavorite ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
+                    <div className="flex gap-2" onClick={e => e.stopPropagation()}>
+                      <button onClick={() => toggleFavorite.mutate({ id: doc.id, val: !doc.isFavorite })} className="min-w-[44px] min-h-[44px] -m-2 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors">
+                        <Star className={`w-4 h-4 ${doc.isFavorite ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
                       </button>
-                      <button onClick={() => deleteDoc.mutate(doc.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 transition-colors">
-                        <Trash2 className="w-3.5 h-3.5" />
+                      <button onClick={() => deleteDoc.mutate(doc.id)} className="min-w-[44px] min-h-[44px] -m-2 flex items-center justify-center rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors">
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>

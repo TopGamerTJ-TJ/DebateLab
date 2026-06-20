@@ -24,7 +24,26 @@ export default function ModelCongress() {
 
   const createBill = useMutation({
     mutationFn: (data) => base44.entities.CongressBill.create(data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['congress_bills'] }); toast({ title: "Document saved!" }); setForm({ title: "", type: "bill", sponsor: "", topic: "", policyArea: "", content: "", status: "draft" }); }
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: ['congress_bills'] });
+      const previousBills = queryClient.getQueryData(['congress_bills']);
+      queryClient.setQueryData(['congress_bills'], old => [
+        { id: 'temp-' + Date.now(), ...newData, created_date: new Date().toISOString() },
+        ...(old || [])
+      ]);
+      setForm({ title: "", type: "bill", sponsor: "", topic: "", policyArea: "", content: "", status: "draft" });
+      return { previousBills };
+    },
+    onError: (err, newData, context) => {
+      queryClient.setQueryData(['congress_bills'], context.previousBills);
+      toast({ title: "Error saving document", variant: "destructive" });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['congress_bills'] });
+    },
+    onSuccess: () => { 
+      toast({ title: "Document saved!" }); 
+    }
   });
 
   const deleteBill = useMutation({
@@ -61,7 +80,7 @@ Write in proper legislative format. For bills: include WHEREAS clauses, BE IT EN
   const statusColors = { draft: "bg-slate-100 text-slate-600", submitted: "bg-blue-100 text-blue-700", passed: "bg-green-100 text-green-700", failed: "bg-red-100 text-red-600" };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-8">
       <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-3xl p-8 mb-8 text-white shadow-lg">
         <div className="flex items-center gap-2 mb-3 text-purple-200 text-sm"><span>🏛</span> Model Congress</div>
         <h1 className="text-3xl font-bold font-heading mb-2">Model Congress Hub</h1>
@@ -159,10 +178,14 @@ Write in proper legislative format. For bills: include WHEREAS clauses, BE IT EN
                 <div key={bill.id} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-medium px-2 py-0.5 rounded-full capitalize" style={{ backgroundColor: '#f3f4f6', color: '#374151' }}>{bill.type?.replace(/_/g, ' ')}</span>
-                    <div className="flex gap-1">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[bill.status] || statusColors.draft}`}>{bill.status}</span>
-                      <button onClick={() => toggleFav.mutate({ id: bill.id, val: !bill.isFavorite })} className="p-1.5 rounded-lg hover:bg-slate-100"><Star className={`w-3.5 h-3.5 ${bill.isFavorite ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} /></button>
-                      <button onClick={() => deleteBill.mutate(bill.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
+                    <div className="flex gap-2 items-center">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[bill.status] || statusColors.draft} mr-1`}>{bill.status}</span>
+                      <button onClick={() => toggleFav.mutate({ id: bill.id, val: !bill.isFavorite })} className="min-w-[44px] min-h-[44px] -m-2 flex items-center justify-center rounded-lg hover:bg-slate-100">
+                        <Star className={`w-4 h-4 ${bill.isFavorite ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
+                      </button>
+                      <button onClick={() => deleteBill.mutate(bill.id)} className="min-w-[44px] min-h-[44px] -m-2 flex items-center justify-center rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                   <h4 className="font-semibold text-slate-900 text-sm mb-1 line-clamp-2">{bill.title}</h4>

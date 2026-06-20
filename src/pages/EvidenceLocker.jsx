@@ -84,7 +84,7 @@ Separate each piece with ---`,
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-8">
       <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-3xl p-8 mb-8 text-white shadow-lg">
         <div className="flex items-center gap-2 mb-3 text-amber-100 text-sm"><span>🔒</span> Evidence Locker</div>
         <h1 className="text-3xl font-bold font-heading mb-2">Evidence Locker</h1>
@@ -134,12 +134,12 @@ Separate each piece with ---`,
             <div key={ev.id} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-3">
                 <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">{ev.category}</span>
-                <div className="flex gap-1">
-                  <button onClick={() => toggleFav.mutate({ id: ev.id, val: !ev.isFavorite })} className="p-1.5 rounded-lg hover:bg-slate-100">
-                    <Star className={`w-3.5 h-3.5 ${ev.isFavorite ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
+                <div className="flex gap-2">
+                  <button onClick={() => toggleFav.mutate({ id: ev.id, val: !ev.isFavorite })} className="min-w-[44px] min-h-[44px] -m-2 flex items-center justify-center rounded-lg hover:bg-slate-100">
+                    <Star className={`w-4 h-4 ${ev.isFavorite ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
                   </button>
-                  <button onClick={() => del.mutate(ev.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500">
-                    <Trash2 className="w-3.5 h-3.5" />
+                  <button onClick={() => del.mutate(ev.id)} className="min-w-[44px] min-h-[44px] -m-2 flex items-center justify-center rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500">
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -165,9 +165,9 @@ Separate each piece with ---`,
 
       {/* Add form dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle className="font-heading">Add Evidence</DialogTitle></DialogHeader>
-          <div className="space-y-3 mt-2">
+          <div className="space-y-3 mt-2 pb-24 lg:pb-2">
             <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Evidence title / headline" />
             <Textarea value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} placeholder="Evidence content, quote, or statistic..." rows={4} className="resize-none text-sm" />
             <div className="grid grid-cols-2 gap-3">

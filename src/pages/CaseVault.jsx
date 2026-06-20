@@ -96,7 +96,7 @@ export default function CaseVault() {
   return (
     <AnimatedPage>
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-8">
       <div className="bg-gradient-to-br from-rose-500 to-pink-600 rounded-3xl p-8 mb-8 text-white shadow-lg">
         <div className="flex items-center gap-2 mb-3 text-rose-200 text-sm"><span>🗂️</span> Case Vault</div>
         <h1 className="text-3xl font-bold font-heading mb-2">Case Vault</h1>
@@ -161,9 +161,9 @@ export default function CaseVault() {
       )}
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle className="font-heading">{editId ? "Edit Case" : "New Case"}</DialogTitle></DialogHeader>
-          <div className="space-y-3 mt-2">
+          <div className="space-y-3 mt-2 pb-24 lg:pb-2">
             <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Case name (e.g., Aff Case – Jan/Feb Resolution)" />
             <div className="grid grid-cols-2 gap-3">
               <Select value={form.format} onValueChange={v => setForm({ ...form, format: v })}>

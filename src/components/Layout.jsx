@@ -128,34 +128,11 @@ export default function Layout() {
               </button>
               {/* Mobile: page title on sub-routes */}
               {isSubRoute && <span className="lg:hidden font-semibold text-slate-900 text-sm truncate max-w-[140px]">{location.pathname.split('/').filter(Boolean).map(s => s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ')).pop()}</span>}
-              <button className="lg:hidden p-2 rounded-xl hover:bg-slate-100 select-none" onClick={() => setMobileOpen(!mobileOpen)}>
-                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
+              {/* Hidden top nav menu button since we moved it to the bottom bar */}
             </div>
           </div>
 
-          {mobileOpen && (
-            <div className="lg:hidden border-t border-slate-100 py-2 space-y-0.5">
-              {[
-                ["/parliamentary", "🏛️ Parliamentary Debate"],
-                ["/public-forum", "🎤 Public Forum Debate"],
-                ["/model-un", "🌍 Model UN"],
-                ["/model-congress", "🏛 Model Congress"],
-                ["/forum", "💬 Forum"],
-                ["/office-hours", "🤖 Office Hours"],
-                ["/projects", "📁 Projects"],
-                ["/formats", "📚 Debate Formats"],
-                ["/tournament", "🏆 Tournament"],
-                ["/profile", "👤 Profile"],
-              ].map(([to, label]) => (
-                <Link key={to} to={to} onClick={() => setMobileOpen(false)} className={`block px-3 py-2 text-sm rounded-lg transition-colors ${active(to) ? 'bg-blue-50 text-primary font-medium' : 'hover:bg-slate-50 text-slate-700'}`}>{label}</Link>
-              ))}
-              <button onClick={() => { setMobileOpen(false); doLogout(); }}
-                className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-red-50 text-red-500 transition-colors flex items-center gap-2 select-none">
-                <LogOut className="w-4 h-4" /> Log out
-              </button>
-            </div>
-          )}
+          {/* Removed old dropdown mobile menu */}
         </div>
       </nav>
       {activeNotif && (
