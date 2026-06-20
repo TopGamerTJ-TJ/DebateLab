@@ -64,7 +64,7 @@ export default function AICoach() {
       ) : (
         <div className="space-y-6">
           {/* Stats row */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { label: "Practice Sessions", value: sessions.length, icon: Target, color: "text-blue-600", bg: "bg-blue-50" },
               { label: "Win Rate", value: `${winRate}%`, icon: TrendingUp, color: "text-green-600", bg: "bg-green-50" },

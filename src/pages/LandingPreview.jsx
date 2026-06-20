@@ -124,14 +124,14 @@ export default function LandingPreview() {
             AI-powered contentions, practice rounds, MUN documents, and coaching — all in one place.
           </p>
 
-          <div className="flex items-center gap-3 mb-16">
-            <Link to="/register">
-              <button className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all text-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16">
+            <Link to="/register" className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all text-sm">
                 Get Started Free <span>→</span>
               </button>
             </Link>
-            <Link to="/login">
-              <button className="px-6 py-3 text-sm text-white border border-white border-opacity-20 rounded-xl hover:border-opacity-40 transition-all">
+            <Link to="/login" className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto px-6 py-3 text-sm text-white border border-white border-opacity-20 rounded-xl hover:border-opacity-40 transition-all">
                 Sign In
               </button>
             </Link>

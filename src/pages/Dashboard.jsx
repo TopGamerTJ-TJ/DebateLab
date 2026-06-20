@@ -58,7 +58,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <StatCard label="Practice Sessions" value={sessions.length} color="text-blue-600" />
         <StatCard label="Contentions Saved" value={contentions.length} color="text-blue-600" />
         <StatCard label="Tournaments" value={tournaments.length} color="text-blue-600" />

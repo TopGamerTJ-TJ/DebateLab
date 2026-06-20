@@ -49,8 +49,8 @@ Student: ${userMessage}`,
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-4rem)] flex flex-col">
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 mb-6 text-white shadow-md shrink-0">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20 shrink-0">
             <Brain className="w-6 h-6 text-white" />
           </div>
           <div>

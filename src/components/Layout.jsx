@@ -47,7 +47,7 @@ export default function Layout() {
           <div className="flex items-center justify-between h-14 md:h-16">
 
             {/* Mobile: back button on sub-routes, logo on root */}
-            <div className="md:hidden flex items-center gap-2">
+            <div className="lg:hidden flex items-center gap-2">
               {isSubRoute ? (
                 <button onClick={() => navigate(-1)} className="p-2 -ml-1 rounded-xl hover:bg-slate-100 active:bg-slate-200 transition-colors select-none">
                   <ChevronDown className="w-5 h-5 text-slate-600 rotate-90" />
@@ -63,14 +63,14 @@ export default function Layout() {
             </div>
 
             {/* Desktop logo */}
-            <Link to="/home" className="hidden md:flex items-center gap-2.5 shrink-0">
+            <Link to="/home" className="hidden lg:flex items-center gap-2.5 shrink-0">
               <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
                 <Zap className="w-4 h-4 text-white" />
               </div>
               <span className="font-bold text-lg tracking-tight text-slate-900 font-heading">DebateLab</span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-0">
+            <div className="hidden lg:flex items-center gap-1 flex-wrap justify-center">
               <div
                 className="relative"
                 onMouseEnter={() => { clearTimeout(timerRef.current); setDebateOpen(true); }}
@@ -119,22 +119,22 @@ export default function Layout() {
             <div className="flex items-center gap-1">
               <button
                 onClick={doLogout}
-                className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all select-none"
+                className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all select-none"
                 title="Log out"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span className="hidden lg:inline">Log out</span>
               </button>
               {/* Mobile: page title on sub-routes */}
-              {isSubRoute && <span className="md:hidden font-semibold text-slate-900 text-sm truncate max-w-[140px]">{location.pathname.split('/').filter(Boolean).map(s => s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ')).pop()}</span>}
-              <button className="md:hidden p-2 rounded-xl hover:bg-slate-100 select-none" onClick={() => setMobileOpen(!mobileOpen)}>
+              {isSubRoute && <span className="lg:hidden font-semibold text-slate-900 text-sm truncate max-w-[140px]">{location.pathname.split('/').filter(Boolean).map(s => s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ')).pop()}</span>}
+              <button className="lg:hidden p-2 rounded-xl hover:bg-slate-100 select-none" onClick={() => setMobileOpen(!mobileOpen)}>
                 {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
           </div>
 
           {mobileOpen && (
-            <div className="md:hidden border-t border-slate-100 py-2 space-y-0.5">
+            <div className="lg:hidden border-t border-slate-100 py-2 space-y-0.5">
               {[
                 ["/parliamentary", "🏛️ Parliamentary Debate"],
                 ["/public-forum", "🎤 Public Forum Debate"],
@@ -165,12 +165,12 @@ export default function Layout() {
           <button onClick={() => dismissNotif(activeNotif.id)} className="text-white/70 hover:text-white shrink-0 text-lg leading-none">×</button>
         </div>
       )}
-      <main className="min-h-[calc(100vh-4rem)] pb-20 md:pb-0">
+      <main className="min-h-[calc(100vh-4rem)] pb-20 lg:pb-0">
         <Outlet />
       </main>
 
       {/* Mobile bottom tab bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-stretch">
           {[
             { to: "/home", icon: LayoutDashboard, label: "Home" },
