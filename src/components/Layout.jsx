@@ -13,12 +13,11 @@ export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [debateOpen, setDebateOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [dismissedNotifs, setDismissedNotifs] = useState(() => JSON.parse(sessionStorage.getItem('dismissed_notifs') || '[]'));
   const timerRef = useRef(null);
 
   // Detect if we're on a sub-route (not a root tab) for mobile back button
-  const rootPaths = ["/home", "/projects", "/practice", "/profile"];
+  const rootPaths = ["/home", "/projects", "/practice", "/forum", "/profile"];
   const isSubRoute = !rootPaths.includes(location.pathname);
 
   const { data: notifications = [] } = useQuery({
@@ -147,6 +146,27 @@ export default function Layout() {
       <main className="min-h-[calc(100vh-4rem)] pb-8">
         <Outlet />
       </main>
+
+      {/* Mobile bottom tab bar */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white/95 backdrop-blur border-t border-slate-200 pb-[env(safe-area-inset-bottom)]">
+        <div className="flex items-stretch">
+          {[
+            { to: "/home", icon: LayoutDashboard, label: "Home" },
+            { to: "/projects", icon: Folder, label: "Projects" },
+            { to: "/practice", icon: Brain, label: "Practice" },
+            { to: "/forum", icon: MessageSquare, label: "Forum" },
+            { to: "/profile", icon: User, label: "Profile" },
+          ].map(({ to, icon: Icon, label }) => {
+            const isActive = to === "/home" ? location.pathname === "/home" : location.pathname.startsWith(to);
+            return (
+              <Link key={to} to={to} className={`flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 select-none transition-colors ${isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"}`}>
+                <Icon className="w-5 h-5" />
+                <span className="text-[10px] font-medium">{label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }
