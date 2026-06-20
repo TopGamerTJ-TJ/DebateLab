@@ -47,20 +47,21 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      return (
-        <Routes>
-          <Route path="/terms" element={<TermsAndPrivacy />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="*" element={<LandingPreview />} />
-        </Routes>
-      );
+    return (
+      <Routes>
+        <Route path="/terms" element={<TermsAndPrivacy />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/landing" element={<LandingPreview />} />
+        <Route path="*" element={<Login />} />
+      </Routes>
+    );
     }
   }
 
-  // Not authenticated → show landing/auth pages only
+  // Not authenticated → show auth pages, redirect everything else to login
   if (!isAuthenticated) {
     return (
       <Routes>
@@ -69,7 +70,8 @@ const AuthenticatedApp = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="*" element={<LandingPreview />} />
+        <Route path="/landing" element={<LandingPreview />} />
+        <Route path="*" element={<Login />} />
       </Routes>
     );
   }
