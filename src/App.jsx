@@ -31,7 +31,7 @@ import TermsAndPrivacy from './pages/TermsAndPrivacy';
 import BanGate from './components/BanGate';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -60,7 +60,21 @@ const AuthenticatedApp = () => {
     }
   }
 
-  // Render the main app
+  // Not authenticated → show landing/auth pages only
+  if (!isAuthenticated) {
+    return (
+      <Routes>
+        <Route path="/terms" element={<TermsAndPrivacy />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="*" element={<LandingPreview />} />
+      </Routes>
+    );
+  }
+
+  // Authenticated → full app
   return (
     <BanGate>
       <Routes>
