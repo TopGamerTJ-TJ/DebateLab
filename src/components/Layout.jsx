@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare } from "lucide-react";
 
 const doLogout = async () => {
   await base44.auth.logout();
@@ -104,6 +104,7 @@ export default function Layout() {
               {[
                 ["/model-un", <Globe className="w-3.5 h-3.5" />, "MUN"],
                 ["/model-congress", <FileText className="w-3.5 h-3.5" />, "Congress"],
+                ["/office-hours", <MessageSquare className="w-3.5 h-3.5" />, "Office Hours"],
                 ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
                 ["/formats", <LayoutGrid className="w-3.5 h-3.5" />, "Formats"],
                 ["/tournament", <Trophy className="w-3.5 h-3.5" />, "Tournament"],
@@ -139,6 +140,7 @@ export default function Layout() {
                 ["/public-forum", "🎤 Public Forum Debate"],
                 ["/model-un", "🌍 Model UN"],
                 ["/model-congress", "🏛 Model Congress"],
+                ["/office-hours", "💬 Office Hours"],
                 ["/projects", "📁 Projects"],
                 ["/formats", "📚 Debate Formats"],
                 ["/tournament", "🏆 Tournament"],

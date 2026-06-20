@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { BookOpen, Globe, FileText, Trophy, Brain, BarChart2, Zap, ArrowRight, Target, Layers, Archive, Columns } from "lucide-react";
+import TourModal from "@/components/TourModal";
 
 const StatCard = ({ label, value, color }) => (
   <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
@@ -24,6 +26,7 @@ const QuickAction = ({ to, icon, title, desc, color }) => (
 );
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const { data: sessions = [] } = useQuery({ queryKey: ['practice_sessions'], queryFn: () => base44.entities.PracticeSession.list('-created_date', 50) });
   const { data: contentions = [] } = useQuery({ queryKey: ['contentions'], queryFn: () => base44.entities.Contention.list('-created_date', 100) });
   const { data: tournaments = [] } = useQuery({ queryKey: ['tournaments'], queryFn: () => base44.entities.Tournament.list('-created_date', 100) });
@@ -36,12 +39,13 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <TourModal />
       {/* Hero */}
       <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-8 mb-8 text-white shadow-lg">
         <div className="flex items-center gap-2 mb-2 text-blue-200 text-sm font-medium">
           <Zap className="w-4 h-4" /> DebateLab
         </div>
-        <h1 className="text-3xl font-bold font-heading mb-2">Welcome back, Debater.</h1>
+        <h1 className="text-3xl font-bold font-heading mb-2">Welcome back, {user?.full_name?.split(" ")[0] || 'Debater'}.</h1>
         <p className="text-blue-100 max-w-xl">Your complete competitive debate preparation platform. Generate contentions, practice rounds, and manage tournaments — all powered by AI.</p>
         <div className="flex flex-wrap gap-3 mt-6">
           <Link to="/parliamentary" className="bg-white text-blue-700 px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-50 transition-colors">

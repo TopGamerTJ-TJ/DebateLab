@@ -21,6 +21,7 @@ import PracticeRound from './pages/PracticeRound';
 import AICoach from './pages/AICoach';
 import DebateFormats from './pages/DebateFormats';
 import LandingPreview from './pages/LandingPreview';
+import OfficeHours from './pages/OfficeHours';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -100,6 +101,7 @@ const AuthenticatedApp = () => {
           <Route path="/flowing-tool" element={<FlowingTool />} />
           <Route path="/practice" element={<PracticeRound />} />
           <Route path="/ai-coach" element={<AICoach />} />
+          <Route path="/office-hours" element={<OfficeHours />} />
           <Route path="/formats" element={<DebateFormats />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
