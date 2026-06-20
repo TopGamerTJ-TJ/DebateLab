@@ -5,6 +5,10 @@ import {
   Columns, Archive, TrendingUp, Search, MessageSquare
 } from "lucide-react";
 
+// DebateLab blue accent (matches app primary)
+const ACCENT = "#3b82f6";
+const ACCENT_HOVER = "#2563eb";
+
 const NAV_TABS = [
   { id: "home", label: "Home" },
   { id: "discover", label: "Discover" },
@@ -32,7 +36,7 @@ export default function LandingPreview() {
           {/* Logo */}
           <div className="flex items-center gap-2.5 shrink-0">
             <div className="w-8 h-8 bg-[#1c1c1e] border border-white/10 rounded-xl flex items-center justify-center">
-              <Zap className="w-4 h-4 text-[#f5c518]" />
+              <Zap className="w-4 h-4 text-blue-400" />
             </div>
             <span className="font-bold text-white text-base font-heading">DebateLab</span>
           </div>
@@ -45,11 +49,11 @@ export default function LandingPreview() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm transition-all ${
                   activeTab === tab.id
-                    ? "text-[#f5c518] font-semibold"
+                    ? "text-blue-400 font-semibold"
                     : "text-white/40 hover:text-white/70"
                 }`}
               >
-                {activeTab === tab.id && <span className="w-1.5 h-1.5 rounded-full bg-[#f5c518]" />}
+                {activeTab === tab.id && <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
                 {tab.label}
               </button>
             ))}
@@ -63,7 +67,7 @@ export default function LandingPreview() {
               </button>
             </Link>
             <Link to="/register">
-              <button className="px-4 py-1.5 text-sm font-semibold bg-[#f5c518] text-black rounded-lg hover:bg-[#f0bb00] transition-all">
+              <button className="px-4 py-1.5 text-sm font-semibold bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all">
                 Get Started
               </button>
             </Link>
@@ -76,13 +80,13 @@ export default function LandingPreview() {
         <div className="flex flex-col items-center text-center px-6">
           {/* App icon */}
           <div className="mt-16 mb-8 w-16 h-16 bg-[#1c1c1e] border border-white/10 rounded-2xl flex items-center justify-center shadow-2xl">
-            <Zap className="w-8 h-8 text-[#f5c518]" />
+            <Zap className="w-8 h-8 text-blue-400" />
           </div>
 
           {/* Headline */}
           <h1 className="text-5xl sm:text-6xl font-bold font-heading leading-tight mb-4 max-w-2xl">
             Your debate prep,{" "}
-            <span className="text-[#f5c518]">supercharged.</span>
+            <span className="text-blue-400">supercharged.</span>
           </h1>
 
           <p className="text-white/40 text-lg max-w-lg mx-auto mb-10 leading-relaxed">
@@ -92,7 +96,7 @@ export default function LandingPreview() {
           {/* CTAs */}
           <div className="flex items-center gap-3 mb-16">
             <Link to="/register">
-              <button className="flex items-center gap-2 px-6 py-3 bg-[#f5c518] text-black font-semibold rounded-xl hover:bg-[#f0bb00] transition-all text-sm">
+              <button className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all text-sm">
                 Get Started Free <span>→</span>
               </button>
             </Link>
@@ -111,7 +115,7 @@ export default function LandingPreview() {
               { icon: MessageSquare, label: "Practice Rounds", desc: "Debate against an AI opponent and receive a full judge decision." },
             ].map(({ icon: Icon, label, desc }) => (
               <div key={label} className="bg-[#1c1c1e] border border-white/[0.07] rounded-2xl p-6 text-left hover:border-white/15 transition-all">
-                <Icon className="w-5 h-5 text-[#f5c518] mb-3" />
+                <Icon className="w-5 h-5 text-blue-400 mb-3" />
                 <div className="font-semibold text-white text-sm mb-1.5">{label}</div>
                 <p className="text-xs text-white/35 leading-relaxed">{desc}</p>
               </div>
@@ -125,12 +129,12 @@ export default function LandingPreview() {
         <div className="max-w-3xl mx-auto px-6 pt-6 pb-20">
           {/* Demo banner */}
           <div className="bg-[#1c1c1e] border border-white/[0.07] rounded-2xl p-12 text-center mb-8">
-            <div className="inline-block bg-[#f5c518] text-black text-xs font-bold px-3 py-1 rounded-md mb-6 tracking-wide uppercase">
+            <div className="inline-block bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-md mb-6 tracking-wide uppercase">
               Demo Mode
             </div>
             <h2 className="text-4xl font-bold font-heading mb-4">
               Prepare your next{" "}
-              <span className="text-[#f5c518]">argument.</span>
+              <span className="text-blue-400">argument.</span>
             </h2>
             <p className="text-white/40 text-sm mb-8 max-w-sm mx-auto leading-relaxed">
               AI-powered debate prep that adapts to your style.<br />
@@ -138,7 +142,7 @@ export default function LandingPreview() {
             </p>
             <div className="flex items-center justify-center gap-3">
               <Link to="/register">
-                <button className="flex items-center gap-2 px-6 py-2.5 bg-[#f5c518] text-black font-semibold rounded-xl hover:bg-[#f0bb00] transition-all text-sm">
+                <button className="flex items-center gap-2 px-6 py-2.5 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all text-sm">
                   Get Started Free <Sparkles className="w-3.5 h-3.5" />
                 </button>
               </Link>
@@ -162,7 +166,7 @@ export default function LandingPreview() {
                 className="flex-1 bg-transparent text-sm text-white placeholder-white/25 outline-none py-3"
               />
             </div>
-            <button className="px-5 py-3 bg-[#f5c518] text-black font-semibold rounded-xl hover:bg-[#f0bb00] transition-all text-sm">
+            <button className="px-5 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all text-sm">
               Search
             </button>
           </div>
@@ -170,7 +174,7 @@ export default function LandingPreview() {
           {/* Trending */}
           <div>
             <div className="flex items-center gap-2 text-white font-semibold mb-4">
-              <TrendingUp className="w-4 h-4 text-[#f5c518]" />
+              <TrendingUp className="w-4 h-4 text-blue-400" />
               Trending Topics
             </div>
             <div className="bg-[#1c1c1e] border border-white/[0.07] rounded-2xl p-12 text-center">
@@ -207,7 +211,7 @@ export default function LandingPreview() {
           </div>
           <div className="text-center mt-10">
             <Link to="/register">
-              <button className="px-8 py-3 bg-[#f5c518] text-black font-semibold rounded-xl hover:bg-[#f0bb00] transition-all text-sm">
+              <button className="px-8 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all text-sm">
                 Get Started Free →
               </button>
             </Link>
@@ -219,7 +223,7 @@ export default function LandingPreview() {
       {activeTab === "about" && (
         <div className="max-w-2xl mx-auto px-6 pt-16 pb-20 text-center">
           <div className="w-16 h-16 bg-[#1c1c1e] border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
-            <Zap className="w-8 h-8 text-[#f5c518]" />
+            <Zap className="w-8 h-8 text-blue-400" />
           </div>
           <h2 className="text-3xl font-bold font-heading mb-4">Built for serious debaters</h2>
           <p className="text-white/40 leading-relaxed mb-6">
