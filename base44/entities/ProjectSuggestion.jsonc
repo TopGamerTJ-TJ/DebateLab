@@ -1,0 +1,36 @@
+{
+  "name": "ProjectSuggestion",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string"
+    },
+    "projectName": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "projectId",
+    "title",
+    "description",
+    "userId"
+  ]
+}
