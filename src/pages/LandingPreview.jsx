@@ -100,9 +100,9 @@ export default function LandingPreview() {
               </button>
             </Link>
             <Link to="/home" className="hidden md:block">
-              <button className="px-4 py-1.5 text-sm font-semibold bg-white text-black rounded-lg hover:bg-gray-200 transition-all hidden">
-                Dashboard
-              </button>
+              
+
+              
             </Link>
           </div>
         </div>
