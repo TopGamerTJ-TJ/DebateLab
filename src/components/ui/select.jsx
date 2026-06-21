@@ -24,15 +24,15 @@ const Select = ({ children, value, onValueChange, defaultValue, ...props }) => {
 
   return (
     <SelectContext.Provider value={{ isMobile, open, setOpen, value: selectedValue, onValueChange: handleValueChange }}>
-      {isMobile ? (
-        <Drawer open={open} onOpenChange={setOpen}>
-          {children}
-        </Drawer>
-      ) : (
-        <SelectPrimitive.Root value={selectedValue} onValueChange={handleValueChange} open={open} onOpenChange={setOpen} {...props}>
-          {children}
-        </SelectPrimitive.Root>
-      )}
+      <SelectPrimitive.Root value={selectedValue} onValueChange={handleValueChange} open={open} onOpenChange={setOpen} {...props}>
+        {isMobile ? (
+          <Drawer open={open} onOpenChange={setOpen}>
+            {children}
+          </Drawer>
+        ) : (
+          children
+        )}
+      </SelectPrimitive.Root>
     </SelectContext.Provider>
   )
 }
