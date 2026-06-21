@@ -147,8 +147,8 @@ export default function Layout() {
 
       {/* Mobile bottom tab bar */}
       <nav 
-        className="lg:hidden fixed bottom-0 left-0 right-0 w-full z-[60] bg-white border-t border-slate-200 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] transform-gpu"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className="lg:hidden fixed left-0 right-0 w-full z-[60] bg-white border-t border-slate-200 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] transform-gpu"
+        style={{ bottom: 'calc(-1 * env(safe-area-inset-bottom))', paddingBottom: 'calc(env(safe-area-inset-bottom) * 2)' }}
       >
         <div className="flex items-stretch h-14">
           {[
