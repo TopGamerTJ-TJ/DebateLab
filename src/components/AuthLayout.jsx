@@ -47,7 +47,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
             <h1 className="text-2xl font-bold text-white font-heading">{title}</h1>
             {subtitle && <p className="text-slate-400 mt-1.5 text-sm">{subtitle}</p>}
           </div>
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 [&_.google-btn]:border-slate-300 [&_.google-btn]:text-slate-700 [&_.google-btn]:hover:bg-slate-50 [&_.or-divider]:border-slate-300 [&_.or-label]:bg-white [&_.or-label]:text-slate-500">
+          <div className="bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-200 p-8 [&_.google-btn]:border-slate-300 [&_.google-btn]:text-slate-900 [&_.google-btn]:hover:bg-slate-50 [&_.or-divider]:border-slate-300 [&_.or-label]:bg-white [&_.or-label]:text-slate-500 [&_label]:text-slate-900 [&_input]:text-slate-900 [&_input]:dark:text-slate-900 [&_a]:text-blue-600">
             {children}
           </div>
           {footer && (
