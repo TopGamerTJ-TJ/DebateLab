@@ -189,11 +189,11 @@ export default function Layout() {
 
       {/* Full screen menu (Mobile + Desktop) */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[70] bg-[#0B1120] pt-12 pb-24 px-4 overflow-y-auto flex flex-col items-center">
+        <div className="fixed inset-0 z-[70] bg-slate-50/95 backdrop-blur-xl pt-12 pb-24 px-4 overflow-y-auto flex flex-col items-center">
           <div className="w-full max-w-2xl">
           <div className="flex items-center justify-between mb-8 mt-2">
-            <h2 className="text-xl font-bold text-white tracking-tight">Navigation</h2>
-            <button onClick={() => setMobileOpen(false)} className="p-2 -mr-2 text-slate-400 hover:text-white transition-colors">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Navigation</h2>
+            <button onClick={() => setMobileOpen(false)} className="p-2 -mr-2 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 rounded-xl transition-colors">
               <X className="w-6 h-6" />
             </button>
           </div>
@@ -222,7 +222,7 @@ export default function Layout() {
                   key={to} 
                   to={to} 
                   onClick={() => setMobileOpen(false)} 
-                  className={`flex flex-col items-center justify-center p-4 rounded-2xl gap-2 transition-colors ${isActive ? 'bg-primary text-white' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-300'}`}
+                  className={`flex flex-col items-center justify-center p-4 rounded-2xl gap-2 transition-all border ${isActive ? 'bg-primary text-white border-primary shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-700 shadow-sm'}`}
                 >
                   <Icon className="w-6 h-6" />
                   <span className="text-[11px] font-medium text-center leading-tight">{label}</span>
@@ -232,7 +232,7 @@ export default function Layout() {
             
             <button 
               onClick={() => { setMobileOpen(false); doLogout(); }}
-              className="flex flex-col items-center justify-center p-4 rounded-2xl gap-2 transition-colors bg-slate-800/50 text-slate-400 hover:bg-red-900/30 hover:text-red-400"
+              className="flex flex-col items-center justify-center p-4 rounded-2xl gap-2 transition-all border bg-white text-slate-600 border-slate-200 hover:border-red-300 hover:text-red-600 shadow-sm"
             >
               <LogOut className="w-6 h-6" />
               <span className="text-[11px] font-medium text-center leading-tight">Log out</span>

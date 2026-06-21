@@ -240,7 +240,7 @@ export default function CoachChat() {
                     <span className="ml-2 font-semibold text-slate-800 font-heading">AI Coach</span>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8 scroll-smooth">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-32 pt-20 lg:pt-8 scroll-smooth">
                     <div className="max-w-3xl mx-auto space-y-8">
                         {messages.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center px-4">
@@ -265,7 +265,7 @@ export default function CoachChat() {
                 </div>
 
                 <div className="p-4 bg-white border-t border-slate-200 shrink-0">
-                    <div className="max-w-3xl mx-auto">
+                    <div className="max-w-3xl mx-auto pb-14 lg:pb-0">
                         <form onSubmit={handleSubmit} className="relative flex items-end">
                             <Textarea 
                                 value={input} 
