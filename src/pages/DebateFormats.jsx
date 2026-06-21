@@ -517,7 +517,7 @@ export default function DebateFormats() {
 
       {/* Content */}
       {activeTab === "guide" ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm prose prose-slate max-w-none prose-headings:font-heading prose-h2:text-xl prose-h3:text-base prose-h3:font-semibold">
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm prose prose-slate max-w-none text-black prose-p:text-black prose-li:text-black prose-strong:text-black prose-headings:text-black prose-headings:font-heading prose-h2:text-xl prose-h3:text-base prose-h3:font-semibold">
           <ReactMarkdown>{GUIDES[activeFormat]}</ReactMarkdown>
         </div>
       ) : (

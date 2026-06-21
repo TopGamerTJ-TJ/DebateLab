@@ -69,7 +69,7 @@ export default function Projects() {
         </div>
         <div className="flex gap-2">
           {archivedProjects.length > 0 && (
-            <Button variant="outline" size="sm" onClick={() => setShowArchived(!showArchived)} className="gap-1.5 text-xs">
+            <Button variant="outline" size="sm" onClick={() => setShowArchived(!showArchived)} className="gap-1.5 text-xs text-slate-900">
               <Archive className="w-3.5 h-3.5" />{showArchived ? "Hide Archived" : `Archived (${archivedProjects.length})`}
             </Button>
           )}
