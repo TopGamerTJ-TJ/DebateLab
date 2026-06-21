@@ -224,7 +224,7 @@ Provide a detailed judge's decision in this JSON format:
       {/* Sidebar */}
       <div className={cn("fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 flex flex-col", isSidebarOpen ? "translate-x-0" : "-translate-x-full")}>
           <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-              <Button onClick={handleNewChat} className="w-full gap-2 font-medium" variant="outline">
+              <Button onClick={handleNewChat} className="w-full gap-2 font-medium text-slate-700 bg-white border-slate-300 hover:bg-slate-50 hover:text-slate-900" variant="outline">
                   <Plus className="w-4 h-4" /> New Practice Round
               </Button>
           </div>
