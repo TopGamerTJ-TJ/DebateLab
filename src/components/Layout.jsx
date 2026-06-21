@@ -2,6 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import Dashboard from "@/pages/Dashboard";
+import Projects from "@/pages/Projects";
+import CoachChat from "@/pages/CoachChat";
+import Forum from "@/pages/Forum";
 import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target } from "lucide-react";
 
 const doLogout = async () => {
@@ -50,9 +54,9 @@ export default function Layout() {
           <div className="flex items-center justify-between h-14 md:h-16">
 
             {/* Mobile: back button on sub-routes, logo on root */}
-            <div className="lg:hidden flex items-center gap-2">
+            <div className="lg:hidden flex items-center gap-2 min-w-0 shrink-0">
               {isSubRoute && location.pathname !== "/coach" ? (
-                <button onClick={() => navigate(-1)} className="p-2 -ml-1 rounded-xl hover:bg-slate-100 active:bg-slate-200 transition-colors select-none">
+                <button onClick={() => navigate(-1)} className="p-2 -ml-1 rounded-xl hover:bg-slate-100 active:bg-slate-200 transition-colors select-none shrink-0">
                   <ChevronDown className="w-5 h-5 text-slate-600 rotate-90" />
                 </button>
               ) : (
@@ -122,9 +126,9 @@ export default function Layout() {
               </button>
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 min-w-0 justify-end ml-2">
               {/* Mobile: page title on sub-routes */}
-              {isSubRoute && <span className="lg:hidden font-semibold text-slate-900 text-sm truncate max-w-[140px]">{location.pathname.split('/').filter(Boolean).map(s => s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ')).pop()}</span>}
+              {isSubRoute && <span className="lg:hidden font-semibold text-slate-900 text-sm truncate">{location.pathname.split('/').filter(Boolean).map(s => s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ')).pop()}</span>}
               {/* Hidden top nav menu button since we moved it to the bottom bar */}
             </div>
           </div>
@@ -141,8 +145,14 @@ export default function Layout() {
           <button onClick={() => dismissNotif(activeNotif.id)} className="text-white/70 hover:text-white shrink-0 text-lg leading-none">×</button>
         </div>
       )}
-      <main className="flex-1 w-full pb-24 lg:pb-8">
-        <Outlet />
+      <main className="flex-1 w-full pb-24 lg:pb-8 relative">
+        <div className={location.pathname === '/home' ? 'block' : 'hidden'}><Dashboard /></div>
+        <div className={location.pathname === '/projects' ? 'block' : 'hidden'}><Projects /></div>
+        <div className={location.pathname.startsWith('/coach') ? 'block' : 'hidden'}><CoachChat /></div>
+        <div className={location.pathname === '/forum' ? 'block' : 'hidden'}><Forum /></div>
+        {(!['/home', '/projects', '/forum'].includes(location.pathname) && !location.pathname.startsWith('/coach')) && (
+          <Outlet />
+        )}
       </main>
 
       {/* Mobile bottom tab bar */}

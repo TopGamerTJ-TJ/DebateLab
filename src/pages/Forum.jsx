@@ -54,31 +54,49 @@ export default function Forum() {
     
     if (existingVote) {
       if (existingVote.voteValue === voteValue) {
-        // Remove vote
-        await base44.entities.ForumVote.delete(existingVote.id);
         if (voteValue === 1) newUpvotes--;
         if (voteValue === -1) newDownvotes--;
       } else {
-        // Change vote
-        await base44.entities.ForumVote.update(existingVote.id, { voteValue });
         if (voteValue === 1) { newUpvotes++; newDownvotes--; }
         if (voteValue === -1) { newDownvotes++; newUpvotes--; }
       }
     } else {
-      // New vote
-      await base44.entities.ForumVote.create({
-        itemId: post.id,
-        itemType: 'post',
-        voteValue,
-        user_id: user.id
-      });
       if (voteValue === 1) newUpvotes++;
       if (voteValue === -1) newDownvotes++;
     }
     
-    await base44.entities.ForumPost.update(post.id, { upvotes: newUpvotes, downvotes: newDownvotes });
-    queryClient.invalidateQueries({ queryKey: ['forum_posts'] });
-    queryClient.invalidateQueries({ queryKey: ['forum_votes'] });
+    // Optimistic UI updates
+    queryClient.setQueryData(['forum_posts'], (old = []) => 
+      old.map(p => p.id === post.id ? { ...p, upvotes: newUpvotes, downvotes: newDownvotes } : p)
+    );
+    queryClient.setQueryData(['forum_votes', user?.id], (old = []) => {
+      if (existingVote) {
+        if (existingVote.voteValue === voteValue) return old.filter(v => v.id !== existingVote.id);
+        return old.map(v => v.id === existingVote.id ? { ...v, voteValue } : v);
+      }
+      return [...old, { id: 'temp-'+Date.now(), itemId: post.id, itemType: 'post', voteValue, user_id: user.id }];
+    });
+
+    try {
+      if (existingVote) {
+        if (existingVote.voteValue === voteValue) {
+          await base44.entities.ForumVote.delete(existingVote.id);
+        } else {
+          await base44.entities.ForumVote.update(existingVote.id, { voteValue });
+        }
+      } else {
+        await base44.entities.ForumVote.create({
+          itemId: post.id,
+          itemType: 'post',
+          voteValue,
+          user_id: user.id
+        });
+      }
+      await base44.entities.ForumPost.update(post.id, { upvotes: newUpvotes, downvotes: newDownvotes });
+    } finally {
+      queryClient.invalidateQueries({ queryKey: ['forum_posts'] });
+      queryClient.invalidateQueries({ queryKey: ['forum_votes'] });
+    }
   };
 
   const sortedPosts = [...posts].sort((a, b) => {

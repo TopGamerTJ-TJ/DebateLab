@@ -92,7 +92,7 @@ const AuthenticatedApp = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<Layout />}>
-          <Route path="/home" element={<Dashboard />} />
+          <Route path="/home" element={null} />
           <Route path="/parliamentary" element={<ParliamentaryDebate />} />
           <Route path="/public-forum" element={<PublicForum />} />
           <Route path="/model-un" element={<ModelUN />} />
@@ -103,12 +103,12 @@ const AuthenticatedApp = () => {
 
           <Route path="/practice" element={<PracticeRound />} />
           <Route path="/ai-coach" element={<AICoach />} />
-          <Route path="/coach" element={<CoachChat />} />
+          <Route path="/coach" element={null} />
           <Route path="/office-hours" element={<OfficeHours />} />
-          <Route path="/forum" element={<Forum />} />
+          <Route path="/forum" element={null} />
           <Route path="/forum/:id" element={<ForumPostDetail />} />
           <Route path="/formats" element={<DebateFormats />} />
-          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects" element={null} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />

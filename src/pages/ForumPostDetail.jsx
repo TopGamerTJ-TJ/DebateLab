@@ -57,33 +57,62 @@ export default function ForumPostDetail() {
     
     if (existingVote) {
       if (existingVote.voteValue === voteValue) {
-        await base44.entities.ForumVote.delete(existingVote.id);
         if (voteValue === 1) newUpvotes--;
         if (voteValue === -1) newDownvotes--;
       } else {
-        await base44.entities.ForumVote.update(existingVote.id, { voteValue });
         if (voteValue === 1) { newUpvotes++; newDownvotes--; }
         if (voteValue === -1) { newDownvotes++; newUpvotes--; }
       }
     } else {
-      await base44.entities.ForumVote.create({
-        itemId: item.id,
-        itemType,
-        voteValue,
-        user_id: user.id
-      });
       if (voteValue === 1) newUpvotes++;
       if (voteValue === -1) newDownvotes++;
     }
     
+    // Optimistic UI updates
     if (itemType === 'post') {
-      await base44.entities.ForumPost.update(item.id, { upvotes: newUpvotes, downvotes: newDownvotes });
-      queryClient.invalidateQueries({ queryKey: ['forum_post', id] });
+      queryClient.setQueryData(['forum_post', id], old => old ? { ...old, upvotes: newUpvotes, downvotes: newDownvotes } : old);
     } else {
-      await base44.entities.ForumComment.update(item.id, { upvotes: newUpvotes, downvotes: newDownvotes });
-      queryClient.invalidateQueries({ queryKey: ['forum_comments', id] });
+      queryClient.setQueryData(['forum_comments', id], (old = []) => 
+        old.map(c => c.id === item.id ? { ...c, upvotes: newUpvotes, downvotes: newDownvotes } : c)
+      );
     }
-    queryClient.invalidateQueries({ queryKey: ['forum_votes'] });
+    queryClient.setQueryData(['forum_votes', user?.id], (old = []) => {
+      if (existingVote) {
+        if (existingVote.voteValue === voteValue) return old.filter(v => v.id !== existingVote.id);
+        return old.map(v => v.id === existingVote.id ? { ...v, voteValue } : v);
+      }
+      return [...old, { id: 'temp-'+Date.now(), itemId: item.id, itemType, voteValue, user_id: user.id }];
+    });
+
+    try {
+      if (existingVote) {
+        if (existingVote.voteValue === voteValue) {
+          await base44.entities.ForumVote.delete(existingVote.id);
+        } else {
+          await base44.entities.ForumVote.update(existingVote.id, { voteValue });
+        }
+      } else {
+        await base44.entities.ForumVote.create({
+          itemId: item.id,
+          itemType,
+          voteValue,
+          user_id: user.id
+        });
+      }
+      
+      if (itemType === 'post') {
+        await base44.entities.ForumPost.update(item.id, { upvotes: newUpvotes, downvotes: newDownvotes });
+      } else {
+        await base44.entities.ForumComment.update(item.id, { upvotes: newUpvotes, downvotes: newDownvotes });
+      }
+    } finally {
+      if (itemType === 'post') {
+        queryClient.invalidateQueries({ queryKey: ['forum_post', id] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['forum_comments', id] });
+      }
+      queryClient.invalidateQueries({ queryKey: ['forum_votes'] });
+    }
   };
 
   if (!post) return <div className="p-8 text-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-primary rounded-full animate-spin mx-auto"></div></div>;
