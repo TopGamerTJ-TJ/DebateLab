@@ -26,8 +26,9 @@ export default function Forum() {
 
   const { data: votes = [] } = useQuery({ 
     queryKey: ['forum_votes', user?.id], 
-    queryFn: () => base44.entities.ForumVote.filter({ user_id: user?.id }) 
-  }, { enabled: !!user });
+    queryFn: () => base44.entities.ForumVote.filter({ user_id: user?.id }),
+    enabled: !!user,
+  });
 
   const createPost = useMutation({
     mutationFn: (data) => base44.entities.ForumPost.create({ 
