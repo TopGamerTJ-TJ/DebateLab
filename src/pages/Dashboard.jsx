@@ -48,10 +48,11 @@ export default function Dashboard() {
   const recentSessions = sessions.slice(0, 5);
 
   return (
+    <>
+    <TourModal />
     <AnimatedPage>
     <PullToRefresh onRefresh={handleRefresh}>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <TourModal />
       <ProjectSuggestionsWidget />
       
       {/* Hero */}
@@ -137,5 +138,6 @@ export default function Dashboard() {
     </div>
     </PullToRefresh>
     </AnimatedPage>
+    </>
   );
 }

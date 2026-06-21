@@ -56,7 +56,7 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
 
   if (ctx?.isMobile) {
     return (
-      <DrawerTrigger ref={ref} className={classes} {...props}>
+      <DrawerTrigger ref={ref} className={classes} data-placeholder={!ctx?.value ? "" : undefined} {...props}>
         {children}
         <ChevronDown className="h-4 w-4 opacity-50" />
       </DrawerTrigger>
