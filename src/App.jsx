@@ -32,6 +32,8 @@ import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 import TermsAndPrivacy from './pages/TermsAndPrivacy';
 import BanGate from './components/BanGate';
+import Friends from './pages/Friends';
+import AIEditor from './pages/AIEditor';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -110,6 +112,8 @@ const AuthenticatedApp = () => {
           <Route path="/formats" element={<DebateFormats />} />
           <Route path="/projects" element={null} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
+          <Route path="/friends" element={<Friends />} />
+          <Route path="/ai-editor" element={<AIEditor />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>

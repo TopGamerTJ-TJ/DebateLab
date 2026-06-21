@@ -1,0 +1,64 @@
+{
+  "name": "Friendship",
+  "type": "object",
+  "properties": {
+    "requesterId": {
+      "type": "string"
+    },
+    "requesterName": {
+      "type": "string"
+    },
+    "recipientId": {
+      "type": "string"
+    },
+    "recipientName": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "rejected"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "requesterId",
+    "recipientId"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "data.requesterId": "{{user.id}}"
+        },
+        {
+          "data.recipientId": "{{user.id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.requesterId": "{{user.id}}"
+        },
+        {
+          "data.recipientId": "{{user.id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.requesterId": "{{user.id}}"
+        },
+        {
+          "data.recipientId": "{{user.id}}"
+        }
+      ]
+    }
+  }
+}

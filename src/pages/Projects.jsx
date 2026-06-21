@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Folder, Plus, Trash2, ArrowRight, BookOpen, Archive, ArchiveRestore } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
+import AnimatedPage from "@/components/AnimatedPage";
+import PullToRefresh from "@/components/PullToRefresh";
 
 const FORMATS = [
   { v: "parliamentary", l: "Parliamentary" },
@@ -60,8 +62,14 @@ export default function Projects() {
     onSuccess: (_, { val }) => { queryClient.invalidateQueries({ queryKey: ['projects'] }); toast({ title: val ? "Project archived" : "Project unarchived" }); }
   });
 
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['projects'] });
+  };
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-8">
+    <AnimatedPage>
+      <PullToRefresh onRefresh={handleRefresh}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 font-heading">Projects</h1>
@@ -156,6 +164,8 @@ export default function Projects() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+        </div>
+      </PullToRefresh>
+    </AnimatedPage>
   );
 }

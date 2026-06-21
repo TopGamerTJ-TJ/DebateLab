@@ -1,0 +1,57 @@
+{
+  "name": "ProjectCollaborator",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "string"
+    },
+    "userName": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "viewer",
+        "contributor",
+        "editor"
+      ],
+      "default": "viewer"
+    }
+  },
+  "required": [
+    "projectId",
+    "userId",
+    "role"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

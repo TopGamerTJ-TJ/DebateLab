@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/AuthContext";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const FunctionDisplay = ({ toolCall }) => {
     const [expanded, setExpanded] = useState(false);
@@ -195,6 +196,7 @@ export default function CoachChat() {
     };
 
     return (
+        <AnimatedPage>
         <div className="flex h-[calc(100dvh-56px)] lg:h-[calc(100vh-64px)] bg-slate-50 overflow-hidden relative">
             {/* Sidebar Overlay (Mobile) */}
             {isSidebarOpen && (
@@ -283,5 +285,6 @@ export default function CoachChat() {
                 </div>
             </div>
         </div>
+        </AnimatedPage>
     );
 }

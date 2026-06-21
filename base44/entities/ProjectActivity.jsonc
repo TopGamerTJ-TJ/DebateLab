@@ -1,0 +1,32 @@
+{
+  "name": "ProjectActivity",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "string"
+    },
+    "userName": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "details": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "projectId",
+    "userId",
+    "action"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {},
+    "delete": {}
+  }
+}

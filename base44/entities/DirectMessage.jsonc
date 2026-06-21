@@ -1,0 +1,35 @@
+{
+  "name": "DirectMessage",
+  "type": "object",
+  "properties": {
+    "senderId": {
+      "type": "string"
+    },
+    "receiverId": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "senderId",
+    "receiverId",
+    "content"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "data.senderId": "{{user.id}}"
+        },
+        {
+          "data.receiverId": "{{user.id}}"
+        }
+      ]
+    },
+    "update": {},
+    "delete": {}
+  }
+}

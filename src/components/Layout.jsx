@@ -6,7 +6,7 @@ import Dashboard from "@/pages/Dashboard";
 import Projects from "@/pages/Projects";
 import CoachChat from "@/pages/CoachChat";
 import Forum from "@/pages/Forum";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles } from "lucide-react";
 
 const doLogout = async () => {
   await base44.auth.logout();
@@ -113,6 +113,8 @@ export default function Layout() {
                 ["/model-congress", <FileText className="w-3.5 h-3.5" />, "Congress"],
                 ["/forum", <MessageSquare className="w-3.5 h-3.5" />, "Forum"],
                 ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
+                ["/friends", <Users className="w-3.5 h-3.5" />, "Friends"],
+                ["/ai-editor", <Sparkles className="w-3.5 h-3.5" />, "AI Editor"],
                 ["/formats", <LayoutGrid className="w-3.5 h-3.5" />, "Formats"],
               ].map(([to, icon, label]) => (
                 <Link key={to} to={to} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${active(to) ? 'bg-primary text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}>
@@ -203,6 +205,8 @@ export default function Layout() {
               ["/coach", Brain, "Coach"],
               ["/practice", Target, "Practice Rounds"],
               ["/forum", MessageSquare, "Forum"],
+              ["/friends", Users, "Friends"],
+              ["/ai-editor", Sparkles, "AI Editor"],
               ["/profile", User, "Profile"],
               ["/parliamentary", BookOpen, "Parliamentary"],
               ["/public-forum", BookOpen, "Public Forum"],

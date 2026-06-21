@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ContentionGenerator from "@/components/ContentionGenerator";
 import AIAssistant from "@/components/AIAssistant";
 import { BookOpen, Target, Archive, Layers, Columns, Brain, FileText, Lightbulb, Users, Shield, Zap, ArrowRight } from "lucide-react";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const ToolCard = ({ icon, title, desc, to, tag }) => (
   <Link to={to} className="group bg-white rounded-xl border border-slate-200 p-5 hover:border-primary/40 hover:shadow-md transition-all">
@@ -37,6 +38,7 @@ const InfoCard = ({ icon, title, items }) => (
 
 export default function ParliamentaryDebate() {
   return (
+    <AnimatedPage>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 rounded-3xl p-8 mb-8 text-white shadow-lg">
@@ -115,5 +117,6 @@ export default function ParliamentaryDebate() {
         </TabsContent>
       </Tabs>
     </div>
+    </AnimatedPage>
   );
 }

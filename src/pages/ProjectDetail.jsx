@@ -5,9 +5,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText } from "lucide-react";
+import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText, Users, Activity, Check } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ReactMarkdown from "react-markdown";
+import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const DIFF_COLORS = { beginner: "bg-green-100 text-green-700", intermediate: "bg-blue-100 text-blue-700", advanced: "bg-purple-100 text-purple-700", expert: "bg-red-100 text-red-700" };
 
@@ -17,6 +19,8 @@ export default function ProjectDetail() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState("contentions");
+  const [collabUserId, setCollabUserId] = useState("");
+  const [collabRole, setCollabRole] = useState("viewer");
   const [speakingMode, setSpeakingMode] = useState(false);
   const [speakIdx, setSpeakIdx] = useState(0);
   const [note, setNote] = useState("");
@@ -43,9 +47,51 @@ export default function ProjectDetail() {
     queryFn: () => base44.entities.Contention.filter({ projectId: id }, '-created_date'),
   });
 
+  const { data: collaborators = [] } = useQuery({
+    queryKey: ['project_collaborators', id],
+    queryFn: () => base44.entities.ProjectCollaborator.filter({ projectId: id })
+  });
+
+  const { data: activityLog = [] } = useQuery({
+    queryKey: ['project_activity', id],
+    queryFn: () => base44.entities.ProjectActivity.filter({ projectId: id }, '-created_date', 50)
+  });
+
+  const addCollaborator = useMutation({
+    mutationFn: async () => {
+      const u = await base44.entities.User.get(collabUserId);
+      if(!u) throw new Error("User not found");
+      return base44.entities.ProjectCollaborator.create({
+        projectId: id,
+        userId: u.id,
+        userName: u.full_name,
+        role: collabRole
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['project_collaborators', id]);
+      setCollabUserId("");
+      toast({ title: "Collaborator added" });
+    },
+    onError: () => toast({ title: "User not found or error", variant: "destructive" })
+  });
+
+  const logActivity = (action, details) => {
+    base44.entities.ProjectActivity.create({
+      projectId: id,
+      userId: base44.auth?.user?.id || 'unknown',
+      userName: base44.auth?.user?.full_name || 'Anonymous',
+      action,
+      details
+    });
+  };
+
   const deleteContention = useMutation({
     mutationFn: (cid) => base44.entities.Contention.delete(cid),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['project_contentions', id] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['project_contentions', id] });
+      logActivity("Deleted Contention", "Removed a contention from the project.");
+    }
   });
 
   const deleteSelected = async () => {
@@ -237,9 +283,11 @@ Provide specific, actionable coaching advice tailored to this project's contenti
     { id: "notes", icon: StickyNote, label: "Notes" },
     { id: "chat", icon: MessageSquare, label: "AI Coach" },
     { id: "agent", icon: Globe, label: "Research Agent" },
+    { id: "collab", icon: Users, label: "Collab & Activity" },
   ];
 
   return (
+    <AnimatedPage>
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
@@ -277,6 +325,9 @@ Provide specific, actionable coaching advice tailored to this project's contenti
           <span><strong>Archived project</strong> — this project is frozen. Unarchive to make edits or use the Research Agent.</span>
         </div>
       )}
+
+      {/* Daily Suggestions */}
+      <ProjectSuggestionsWidget projectId={id} />
 
       {/* Tabs */}
       <div className="flex border-b border-slate-200 mb-6 gap-1 overflow-x-auto">
@@ -526,6 +577,55 @@ Provide specific, actionable coaching advice tailored to this project's contenti
           </div>
         </div>
       )}
+
+      {/* Collab Tab */}
+      {tab === "collab" && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <h3 className="font-bold text-slate-900 font-heading flex items-center gap-2 mb-4"><Users className="w-5 h-5 text-primary" /> Collaborators</h3>
+            <div className="flex gap-2 mb-6">
+              <Input placeholder="User ID / Friend Code" value={collabUserId} onChange={e=>setCollabUserId(e.target.value)} className="text-sm"/>
+              <select value={collabRole} onChange={e=>setCollabRole(e.target.value)} className="border border-input rounded-md px-3 text-sm">
+                <option value="viewer">Viewer</option>
+                <option value="contributor">Contributor</option>
+                <option value="editor">Editor</option>
+              </select>
+              <Button size="sm" onClick={()=>addCollaborator.mutate()} disabled={addCollaborator.isPending || !collabUserId.trim()}>Invite</Button>
+            </div>
+            
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold uppercase text-slate-400 mb-2">Team</h4>
+              {collaborators.map(c => (
+                <div key={c.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <span className="font-medium text-sm text-slate-800">{c.userName}</span>
+                  <span className="text-xs px-2 py-1 bg-slate-200 text-slate-700 rounded capitalize">{c.role}</span>
+                </div>
+              ))}
+              {collaborators.length === 0 && <p className="text-sm text-slate-500 italic">No collaborators yet. Add friends using their ID.</p>}
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm overflow-hidden flex flex-col h-[500px]">
+            <h3 className="font-bold text-slate-900 font-heading flex items-center gap-2 mb-4 shrink-0"><Activity className="w-5 h-5 text-blue-500" /> Activity Log</h3>
+            <div className="flex-1 overflow-y-auto space-y-4">
+              {activityLog.length === 0 ? (
+                <p className="text-sm text-slate-500 italic">No activity recorded yet.</p>
+              ) : activityLog.map(log => (
+                <div key={log.id} className="relative pl-6 pb-2 border-l-2 border-slate-100 last:border-0 last:pb-0">
+                  <div className="absolute w-3 h-3 bg-blue-500 rounded-full -left-[7px] top-1"></div>
+                  <div className="text-xs text-slate-400 mb-0.5">{new Date(log.created_date).toLocaleString()}</div>
+                  <div className="text-sm">
+                    <span className="font-semibold text-slate-800">{log.userName}</span>{' '}
+                    <span className="text-slate-600">{log.action}</span>
+                  </div>
+                  {log.details && <div className="text-xs text-slate-500 mt-1">{log.details}</div>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    </AnimatedPage>
   );
 }
