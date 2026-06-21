@@ -2,52 +2,52 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Zap, Sparkles, Brain, Trophy, FileText, Globe,
-  TrendingUp, Search, MessageSquare
-} from "lucide-react";
+  TrendingUp, Search, MessageSquare } from
+"lucide-react";
 
 const NAV_TABS = [
-  { id: "home", label: "Home" },
-  { id: "discover", label: "Discover" },
-  { id: "formats", label: "Formats" },
-  { id: "about", label: "About" },
-];
+{ id: "home", label: "Home" },
+{ id: "discover", label: "Discover" },
+{ id: "formats", label: "Formats" },
+{ id: "about", label: "About" }];
+
 
 const FORMATS = [
-  {
-    name: "Parliamentary",
-    tag: "Parli",
-    desc: "British Parliamentary, American Parliamentary, and MSPDP formats with government/opposition roles, POIs, and prep time management.",
-    tools: ["AI Contentions", "Practice Rounds", "Flow Sheet", "Case Vault"],
-    dotClass: "bg-blue-400",
-  },
-  {
-    name: "Public Forum",
-    tag: "PF",
-    desc: "NSDA Public Forum with crossfire prep, weighing mechanisms, summary/final focus strategy, and evidence pairing for both sides.",
-    tools: ["Contentions", "Crossfire Prep", "Evidence", "Flow Sheet"],
-    dotClass: "bg-violet-400",
-  },
-  {
-    name: "Model UN",
-    tag: "MUN",
-    desc: "Complete MUN toolkit — position papers, draft resolutions, working papers, bloc strategy memos, and speech scripts for any committee.",
-    tools: ["Position Papers", "Resolutions", "Country Profiles", "Speeches"],
-    dotClass: "bg-teal-400",
-  },
-  {
-    name: "Model Congress",
-    tag: "Congress",
-    desc: "Draft bills and resolutions, write authorship and floor debate speeches, and prepare legislative strategy for any chamber.",
-    tools: ["Bill Drafting", "Speeches", "Floor Strategy", "Committee Prep"],
-    dotClass: "bg-amber-400",
-  },
-];
+{
+  name: "Parliamentary",
+  tag: "Parli",
+  desc: "British Parliamentary, American Parliamentary, and MSPDP formats with government/opposition roles, POIs, and prep time management.",
+  tools: ["AI Contentions", "Practice Rounds", "Flow Sheet", "Case Vault"],
+  dotClass: "bg-blue-400"
+},
+{
+  name: "Public Forum",
+  tag: "PF",
+  desc: "NSDA Public Forum with crossfire prep, weighing mechanisms, summary/final focus strategy, and evidence pairing for both sides.",
+  tools: ["Contentions", "Crossfire Prep", "Evidence", "Flow Sheet"],
+  dotClass: "bg-violet-400"
+},
+{
+  name: "Model UN",
+  tag: "MUN",
+  desc: "Complete MUN toolkit — position papers, draft resolutions, working papers, bloc strategy memos, and speech scripts for any committee.",
+  tools: ["Position Papers", "Resolutions", "Country Profiles", "Speeches"],
+  dotClass: "bg-teal-400"
+},
+{
+  name: "Model Congress",
+  tag: "Congress",
+  desc: "Draft bills and resolutions, write authorship and floor debate speeches, and prepare legislative strategy for any chamber.",
+  tools: ["Bill Drafting", "Speeches", "Floor Strategy", "Committee Prep"],
+  dotClass: "bg-amber-400"
+}];
+
 
 const FEATURES = [
-  { icon: Sparkles, label: "AI Contentions", desc: "Generate tournament-ready arguments for any resolution in seconds." },
-  { icon: Brain, label: "AI Coaching", desc: "Get personalized performance insights and a custom prep plan." },
-  { icon: MessageSquare, label: "Practice Rounds", desc: "Debate against an AI opponent and receive a full judge decision." },
-];
+{ icon: Sparkles, label: "AI Contentions", desc: "Generate tournament-ready arguments for any resolution in seconds." },
+{ icon: Brain, label: "AI Coaching", desc: "Get personalized performance insights and a custom prep plan." },
+{ icon: MessageSquare, label: "Practice Rounds", desc: "Debate against an AI opponent and receive a full judge decision." }];
+
 
 export default function LandingPreview() {
   const [activeTab, setActiveTab] = useState("home");
@@ -69,22 +69,22 @@ export default function LandingPreview() {
 
           {/* Center tabs */}
           <div className="hidden md:flex items-center gap-0.5">
-            {NAV_TABS.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm transition-all ${
-                  activeTab === tab.id
-                    ? "text-blue-400 font-semibold"
-                    : "text-white text-opacity-40 hover:text-opacity-70"
-                }`}
-              >
-                {activeTab === tab.id && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
-                )}
+            {NAV_TABS.map((tab) =>
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm transition-all ${
+              activeTab === tab.id ?
+              "text-blue-400 font-semibold" :
+              "text-white text-opacity-40 hover:text-opacity-70"}`
+              }>
+              
+                {activeTab === tab.id &&
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
+              }
                 {tab.label}
               </button>
-            ))}
+            )}
           </div>
 
           {/* Auth buttons */}
@@ -100,7 +100,7 @@ export default function LandingPreview() {
               </button>
             </Link>
             <Link to="/home" className="hidden md:block">
-              <button className="px-4 py-1.5 text-sm font-semibold bg-white text-black rounded-lg hover:bg-gray-200 transition-all">
+              <button className="px-4 py-1.5 text-sm font-semibold bg-white text-black rounded-lg hover:bg-gray-200 transition-all hidden">
                 Dashboard
               </button>
             </Link>
@@ -109,8 +109,8 @@ export default function LandingPreview() {
       </nav>
 
       {/* HOME */}
-      {activeTab === "home" && (
-        <div className="flex flex-col items-center text-center px-6">
+      {activeTab === "home" &&
+      <div className="flex flex-col items-center text-center px-6">
           <div className="mt-16 mb-8 w-16 h-16 bg-neutral-900 border border-white border-opacity-10 rounded-2xl flex items-center justify-center shadow-2xl">
             <Zap className="w-8 h-8 text-blue-400" />
           </div>
@@ -138,20 +138,20 @@ export default function LandingPreview() {
           </div>
 
           <div className="grid sm:grid-cols-3 gap-4 max-w-3xl w-full mb-20">
-            {FEATURES.map(({ icon: Icon, label, desc }) => (
-              <div key={label} className="bg-neutral-900 border border-white border-opacity-10 rounded-2xl p-6 text-left hover:border-opacity-20 transition-all">
+            {FEATURES.map(({ icon: Icon, label, desc }) =>
+          <div key={label} className="bg-neutral-900 border border-white border-opacity-10 rounded-2xl p-6 text-left hover:border-opacity-20 transition-all">
                 <Icon className="w-5 h-5 text-blue-400 mb-3" />
                 <div className="font-semibold text-white text-sm mb-1.5">{label}</div>
                 <p className="text-xs text-white text-opacity-40 leading-relaxed">{desc}</p>
               </div>
-            ))}
+          )}
           </div>
         </div>
-      )}
+      }
 
       {/* DISCOVER */}
-      {activeTab === "discover" && (
-        <div className="max-w-4xl mx-auto px-6 pt-12 pb-20">
+      {activeTab === "discover" &&
+      <div className="max-w-4xl mx-auto px-6 pt-12 pb-20">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold font-heading mb-3">Discover powerful features.</h2>
             <p className="text-white text-opacity-40 text-base max-w-md mx-auto">
@@ -225,11 +225,11 @@ export default function LandingPreview() {
             </div>
           </div>
         </div>
-      )}
+      }
 
       {/* FORMATS */}
-      {activeTab === "formats" && (
-        <div className="max-w-3xl mx-auto px-6 pt-12 pb-20">
+      {activeTab === "formats" &&
+      <div className="max-w-3xl mx-auto px-6 pt-12 pb-20">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold font-heading mb-3">Every format, covered.</h2>
             <p className="text-white text-opacity-40 text-base max-w-md mx-auto">
@@ -237,8 +237,8 @@ export default function LandingPreview() {
             </p>
           </div>
           <div className="space-y-4">
-            {FORMATS.map(f => (
-              <div key={f.name} className="bg-neutral-900 border border-white border-opacity-10 rounded-2xl p-6 hover:border-opacity-20 transition-all">
+            {FORMATS.map((f) =>
+          <div key={f.name} className="bg-neutral-900 border border-white border-opacity-10 rounded-2xl p-6 hover:border-opacity-20 transition-all">
                 <div className="flex items-center gap-3 mb-2">
                   <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${f.dotClass}`} />
                   <h3 className="font-bold text-white font-heading">{f.name}</h3>
@@ -246,12 +246,12 @@ export default function LandingPreview() {
                 </div>
                 <p className="text-white text-opacity-40 text-sm leading-relaxed mb-4 ml-5">{f.desc}</p>
                 <div className="flex flex-wrap gap-2 ml-5">
-                  {f.tools.map(t => (
-                    <span key={t} className="text-xs text-white text-opacity-50 bg-white bg-opacity-5 border border-white border-opacity-10 px-2.5 py-1 rounded-full">{t}</span>
-                  ))}
+                  {f.tools.map((t) =>
+              <span key={t} className="text-xs text-white text-opacity-50 bg-white bg-opacity-5 border border-white border-opacity-10 px-2.5 py-1 rounded-full">{t}</span>
+              )}
                 </div>
               </div>
-            ))}
+          )}
           </div>
           <div className="text-center mt-10">
             <Link to="/register">
@@ -261,11 +261,11 @@ export default function LandingPreview() {
             </Link>
           </div>
         </div>
-      )}
+      }
 
       {/* ABOUT */}
-      {activeTab === "about" && (
-        <div className="max-w-2xl mx-auto px-6 pt-16 pb-20 text-center">
+      {activeTab === "about" &&
+      <div className="max-w-2xl mx-auto px-6 pt-16 pb-20 text-center">
           <div className="w-16 h-16 bg-neutral-900 border border-white border-opacity-10 rounded-2xl flex items-center justify-center mx-auto mb-8">
             <Zap className="w-8 h-8 text-blue-400" />
           </div>
@@ -282,7 +282,7 @@ export default function LandingPreview() {
             <a href="mailto:DebateLab@outlook.com" className="hover:text-opacity-50 transition-colors">DebateLab@outlook.com</a>
           </div>
         </div>
-      )}
+      }
 
       {/* Footer */}
       <div className="border-t border-white border-opacity-10 py-6 px-6 text-center text-xs text-white text-opacity-20 flex items-center justify-center gap-5">
@@ -291,6 +291,6 @@ export default function LandingPreview() {
         <a href="mailto:DebateLab@outlook.com" className="hover:text-opacity-40 transition-colors">Contact</a>
         <span>© 2026 DebateLab</span>
       </div>
-    </div>
-  );
+    </div>);
+
 }
