@@ -1,0 +1,48 @@
+{
+  "name": "UserFriendCode",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "string"
+    },
+    "userName": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "code",
+    "userId",
+    "userName"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -26,6 +26,28 @@ export default function Friends() {
     enabled: !!user
   });
 
+  const { data: myFriendCodes = [] } = useQuery({
+    queryKey: ['myFriendCode', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const codes = await base44.entities.UserFriendCode.filter({ userId: user.id });
+      if (codes.length === 0) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let newCode = '';
+        for (let i = 0; i < 6; i++) newCode += chars.charAt(Math.floor(Math.random() * chars.length));
+        const created = await base44.entities.UserFriendCode.create({
+          code: newCode,
+          userId: user.id,
+          userName: user.full_name || "Debater"
+        });
+        return [created];
+      }
+      return codes;
+    },
+    enabled: !!user
+  });
+  const myCode = myFriendCodes[0]?.code || "Loading...";
+
   const { data: directMessages = [], isLoading: loadingMsgs } = useQuery({
     queryKey: ['dms', user?.id, selectedFriend],
     queryFn: () => {
@@ -42,14 +64,25 @@ export default function Friends() {
   });
 
   const sendFriendRequest = useMutation({
-    mutationFn: async (recipientId) => {
-      const recipient = await base44.entities.User.get(recipientId);
-      if(!recipient) throw new Error("User not found");
+    mutationFn: async (code) => {
+      const results = await base44.entities.UserFriendCode.filter({ code: code.toUpperCase().trim() });
+      if(results.length === 0) throw new Error("Friend code not found");
+      const targetUser = results[0];
+      if(targetUser.userId === user.id) throw new Error("You cannot add yourself");
+      
+      const existing = await base44.entities.Friendship.filter({
+        $or: [
+          { requesterId: user.id, recipientId: targetUser.userId },
+          { requesterId: targetUser.userId, recipientId: user.id }
+        ]
+      });
+      if(existing.length > 0) throw new Error("Friendship already exists or pending");
+
       return base44.entities.Friendship.create({
         requesterId: user.id,
-        requesterName: user.full_name,
-        recipientId: recipient.id,
-        recipientName: recipient.full_name,
+        requesterName: user.full_name || "Debater",
+        recipientId: targetUser.userId,
+        recipientName: targetUser.userName,
         status: "pending"
       });
     },
@@ -58,7 +91,7 @@ export default function Friends() {
       toast({ title: "Friend request sent!" });
       queryClient.invalidateQueries(['friendships']);
     },
-    onError: () => toast({ title: "User not found or error sending request", variant: "destructive" })
+    onError: (err) => toast({ title: err.message || "Error sending request", variant: "destructive" })
   });
 
   const respondRequest = useMutation({
@@ -96,8 +129,8 @@ export default function Friends() {
             <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
               <h2 className="font-bold text-slate-900 font-heading mb-4 flex items-center gap-2"><Users className="w-5 h-5 text-primary"/> Friends & Collab</h2>
               <div className="bg-slate-50 p-3 rounded-xl mb-4 border border-slate-100 text-center">
-                <div className="text-xs text-slate-500 mb-1">Your Friend Code (User ID)</div>
-                <div className="font-mono text-xs font-bold text-slate-700 bg-white p-2 rounded border border-slate-200 select-all">{user?.id}</div>
+                <div className="text-xs text-slate-500 mb-1">Your Friend Code</div>
+                <div className="font-mono text-lg font-bold text-slate-700 bg-white p-2 rounded border border-slate-200 tracking-widest select-all">{myCode}</div>
               </div>
               
               <div className="flex gap-2">
