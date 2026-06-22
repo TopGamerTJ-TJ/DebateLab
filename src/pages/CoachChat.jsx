@@ -272,7 +272,7 @@ export default function CoachChat() {
                                 onChange={e => setInput(e.target.value)} 
                                 onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }}
                                 placeholder="Message AI Coach..." 
-                                className="min-h-[60px] max-h-48 resize-none rounded-2xl pr-14 py-4 text-[15px] bg-slate-50 border-slate-200 focus-visible:ring-blue-500 shadow-sm"
+                                className="min-h-[60px] max-h-48 resize-none rounded-2xl pr-[64px] py-4 text-[15px] bg-slate-50 border-slate-200 focus-visible:ring-blue-500 shadow-sm"
                             />
                             <Button type="submit" disabled={!input.trim()} size="icon" className="absolute right-2 bottom-2 h-10 w-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-transform active:scale-95 disabled:opacity-50 disabled:active:scale-100">
                                 <Send className="w-5 h-5 ml-0.5" />

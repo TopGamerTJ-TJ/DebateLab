@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, Loader2, MessageSquare, BookOpen, ChevronRight, Save } from "lucide-react";
 import AnimatedPage from "@/components/AnimatedPage";
-import PullToRefresh from "@/components/PullToRefresh";
 import { useToast } from "@/components/ui/use-toast";
 import ReactMarkdown from "react-markdown";
 
@@ -73,9 +72,9 @@ Provide a comprehensive, directly usable response.`
 
   return (
     <AnimatedPage>
-      <PullToRefresh onRefresh={handleRefresh}>
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden flex flex-col h-[80vh]">
+      <div className="flex flex-col h-[calc(100dvh-56px)] lg:h-[calc(100vh-64px)] bg-slate-50 overflow-hidden relative">
+        <div className="flex-1 flex flex-col max-w-5xl w-full mx-auto p-4 md:p-6 overflow-hidden">
+          <div className="bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full w-full">
             <div className="p-6 bg-gradient-to-r from-violet-600 to-purple-700 text-white flex items-center justify-between shrink-0">
               <div>
                 <h1 className="text-2xl font-bold font-heading flex items-center gap-2"><Sparkles className="w-6 h-6"/> AI Editor</h1>
@@ -125,23 +124,22 @@ Provide a comprehensive, directly usable response.`
             </div>
 
             <div className="p-4 bg-white border-t border-slate-200 shrink-0">
-              <div className="flex gap-2 max-w-3xl mx-auto">
+              <div className="max-w-3xl mx-auto relative flex items-end">
                 <Textarea 
                   value={prompt} 
                   onChange={e=>setPrompt(e.target.value)} 
                   placeholder="E.g. Write a 3-point contention affirming universal basic income focusing on economic stimulus..."
-                  rows={2}
-                  className="resize-none bg-slate-50"
-                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), runAgent())}
+                  className="min-h-[60px] max-h-48 resize-none rounded-2xl pr-[100px] py-4 text-[15px] bg-slate-50 border-slate-200 shadow-sm focus-visible:ring-primary"
+                  onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runAgent(); } }}
                 />
-                <Button onClick={runAgent} disabled={loading || !prompt.trim()} className="h-auto px-6 rounded-xl">
-                  Send <ChevronRight className="w-4 h-4 ml-1"/>
+                <Button onClick={runAgent} disabled={loading || !prompt.trim()} className="absolute right-2 bottom-2 h-10 px-4 rounded-xl shadow-md transition-transform active:scale-95 disabled:opacity-50 disabled:active:scale-100 gap-1 bg-primary text-white hover:bg-primary/90">
+                  Send <ChevronRight className="w-4 h-4"/>
                 </Button>
               </div>
             </div>
           </div>
         </div>
-      </PullToRefresh>
+      </div>
     </AnimatedPage>
   );
 }

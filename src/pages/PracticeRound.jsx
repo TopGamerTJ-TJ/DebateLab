@@ -259,7 +259,7 @@ Provide a detailed judge's decision in this JSON format:
             <span className="ml-2 font-semibold text-slate-800 font-heading">Practice Rounds</span>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8 scroll-smooth">
+        <div className={cn("flex-1 flex flex-col min-h-0", phase === "round" ? "pt-14 lg:pt-0" : "overflow-y-auto p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8 scroll-smooth")}>
           {phase === "result" ? renderResult() : phase === "setup" ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm max-w-2xl mx-auto">
           <h3 className="font-bold text-slate-900 font-heading text-lg mb-6">Round Setup</h3>
@@ -305,8 +305,8 @@ Provide a detailed judge's decision in this JSON format:
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-140px)]">
-          <div className="px-5 py-4 border-b border-slate-100 bg-green-50 flex items-center justify-between shrink-0">
+        <div className="bg-slate-50 flex flex-col h-full w-full">
+          <div className="px-5 py-4 border-b border-slate-200 bg-white shadow-sm flex items-center justify-between shrink-0 z-10">
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4 text-green-600" />
               <span className="text-sm font-bold text-green-800">Live Practice Round</span>
@@ -342,11 +342,18 @@ Provide a detailed judge's decision in this JSON format:
               </div>
             )}
           </div>
-          <div className="p-4 border-t border-slate-100">
-            <div className="flex gap-2">
-              <Textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendSpeech(); } }} placeholder="Type your speech or argument..." className="resize-none text-sm" rows={3} disabled={loading} />
-              <Button onClick={sendSpeech} disabled={loading || !input.trim()} size="icon" className="h-auto aspect-square shrink-0 self-end">
-                <Send className="w-4 h-4" />
+          <div className="p-4 bg-white border-t border-slate-200 shrink-0">
+            <div className="relative flex items-end max-w-4xl mx-auto w-full">
+              <Textarea 
+                value={input} 
+                onChange={e => setInput(e.target.value)} 
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendSpeech(); } }} 
+                placeholder="Type your speech or argument..." 
+                className="min-h-[60px] max-h-48 resize-none rounded-2xl pr-[64px] py-4 text-[15px] bg-slate-50 border-slate-200 shadow-sm focus-visible:ring-primary" 
+                disabled={loading} 
+              />
+              <Button onClick={sendSpeech} disabled={loading || !input.trim()} size="icon" className="absolute right-2 bottom-2 h-10 w-10 rounded-xl shadow-md transition-transform active:scale-95 disabled:opacity-50 disabled:active:scale-100 bg-primary hover:bg-primary/90 text-white">
+                <Send className="w-4 h-4 ml-0.5" />
               </Button>
             </div>
           </div>
