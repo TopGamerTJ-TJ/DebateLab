@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import ReactMarkdown from "react-markdown";
 import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
 import AnimatedPage from "@/components/AnimatedPage";
+import ProjectAIChats from "@/components/ProjectAIChats";
 
 const DIFF_COLORS = { beginner: "bg-green-100 text-green-700", intermediate: "bg-blue-100 text-blue-700", advanced: "bg-purple-100 text-purple-700", expert: "bg-red-100 text-red-700" };
 
@@ -26,16 +27,12 @@ export default function ProjectDetail() {
   const [note, setNote] = useState("");
   const [savingNote, setSavingNote] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
-  const [messages, setMessages] = useState([]);
-  const [chatInput, setChatInput] = useState("");
-  const [chatLoading, setChatLoading] = useState(false);
   const [agentQuery, setAgentQuery] = useState("");
   const [agentLoading, setAgentLoading] = useState(false);
   const [agentResults, setAgentResults] = useState(null);
   const [rebuttalInput, setRebuttalInput] = useState("");
   const [rebuttalLoading, setRebuttalLoading] = useState(false);
   const [rebuttals, setRebuttals] = useState([]);
-  const chatRef = useRef(null);
 
   const { data: project, isLoading: projLoading } = useQuery({
     queryKey: ['project', id],
@@ -55,6 +52,11 @@ export default function ProjectDetail() {
   const { data: activityLog = [] } = useQuery({
     queryKey: ['project_activity', id],
     queryFn: () => base44.entities.ProjectActivity.filter({ projectId: id }, '-created_date', 50)
+  });
+
+  const { data: chatSessions = [] } = useQuery({
+    queryKey: ['project_chat_sessions', id],
+    queryFn: () => base44.entities.AIChatSession.filter({ projectId: id }, '-created_date', 50)
   });
 
   const addCollaborator = useMutation({
@@ -167,7 +169,6 @@ Format clearly with headers.`,
   };
 
   useEffect(() => { if (project?.notes) setNote(project.notes || ""); }, [project]);
-  useEffect(() => { chatRef.current?.scrollTo(0, chatRef.current.scrollHeight); }, [messages]);
 
   const generateRebuttals = async () => {
     if (!rebuttalInput.trim() || rebuttalLoading) return;
@@ -189,30 +190,6 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
     setRebuttals(prev => [{ input: rebuttalInput, output: res }, ...prev]);
     setRebuttalInput("");
     setRebuttalLoading(false);
-  };
-
-  const sendChat = async () => {
-    if (!chatInput.trim() || chatLoading) return;
-    const userMsg = chatInput.trim();
-    setChatInput("");
-    setMessages(prev => [...prev, { role: "user", content: userMsg }]);
-    setChatLoading(true);
-    const context = contentions.slice(0, 5).map(c => `- ${c.title}: ${c.claim}`).join('\n');
-    const reply = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a debate coach for the project "${project?.name}" (${project?.format?.replace(/_/g, ' ') || 'debate'}).
-Project resolution: ${project?.resolution || 'not set'}. Side: ${project?.side || 'not set'}.
-Key contentions in this project:
-${context || 'No contentions yet'}
-
-Conversation history:
-${messages.map(m => `${m.role === 'user' ? 'Student' : 'Coach'}: ${m.content}`).join('\n')}
-
-Student: ${userMsg}
-
-Provide specific, actionable coaching advice tailored to this project's contentions and context. Coach:`
-    });
-    setMessages(prev => [...prev, { role: "assistant", content: reply }]);
-    setChatLoading(false);
   };
 
   const toggleSelect = (cid) => setSelectedIds(prev => {
@@ -281,7 +258,7 @@ Provide specific, actionable coaching advice tailored to this project's contenti
     { id: "contentions", icon: BookOpen, label: `Contentions (${contentions.length})` },
     { id: "rebuttals", icon: ShieldAlert, label: "Rebuttal Hub" },
     { id: "notes", icon: StickyNote, label: "Notes" },
-    { id: "chat", icon: MessageSquare, label: "AI Coach" },
+    { id: "chat", icon: MessageSquare, label: "AI Chats" },
     { id: "agent", icon: Globe, label: "Research Agent" },
     { id: "collab", icon: Users, label: "Collab & Activity" },
   ];
@@ -544,38 +521,7 @@ Provide specific, actionable coaching advice tailored to this project's contenti
 
       {/* AI Chat tab */}
       {tab === "chat" && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-100 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <div>
-              <h3 className="font-bold text-slate-900 font-heading text-sm">Project AI Coach</h3>
-              <p className="text-xs text-slate-400">Tailored to "{project.name}" — your contentions, resolution & side</p>
-            </div>
-          </div>
-          <div ref={chatRef} className="h-80 overflow-y-auto p-4 space-y-3">
-            {messages.length === 0 && (
-              <div className="text-center py-8 text-slate-400 text-sm">
-                <MessageSquare className="w-8 h-8 mx-auto mb-2 text-slate-200" />
-                Ask your AI coach anything about this project — strategy, rebuttals, crossfire prep, bloc building...
-              </div>
-            )}
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${m.role === "user" ? "bg-primary text-white" : "bg-slate-100 text-slate-800"}`}>
-                  {m.role === "assistant" ? (
-                    <ReactMarkdown className="prose prose-sm max-w-none prose-slate [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">{m.content}</ReactMarkdown>
-                  ) : m.content}
-                </div>
-              </div>
-            ))}
-            {chatLoading && <div className="flex justify-start"><div className="bg-slate-100 rounded-2xl px-4 py-2.5 text-sm text-slate-400"><Loader2 className="w-4 h-4 animate-spin" /></div></div>}
-          </div>
-          <div className="p-4 border-t border-slate-100 flex gap-2">
-            <Input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendChat()}
-              placeholder="Ask your coach..." className="text-sm" />
-            <Button onClick={sendChat} disabled={chatLoading || !chatInput.trim()} size="sm">Send</Button>
-          </div>
-        </div>
+        <ProjectAIChats project={project} contentions={contentions} />
       )}
 
       {/* Collab Tab */}

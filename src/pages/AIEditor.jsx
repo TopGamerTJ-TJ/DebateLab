@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Loader2, MessageSquare, BookOpen, ChevronRight, Save } from "lucide-react";
+import { Sparkles, Loader2, MessageSquare, BookOpen, ChevronRight, Save, History, Plus, Trash2, ChevronLeft } from "lucide-react";
 import AnimatedPage from "@/components/AnimatedPage";
 import { useToast } from "@/components/ui/use-toast";
 import ReactMarkdown from "react-markdown";
@@ -13,13 +13,60 @@ export default function AIEditor() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [prompt, setPrompt] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [sessionId, setSessionId] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.filter({ isArchived: false }, '-created_date', 50)
+  });
+
+  const { data: sessions = [] } = useQuery({
+    queryKey: ['editor_sessions'],
+    queryFn: () => base44.entities.AIChatSession.filter({ feature: "editor" }, '-created_date', 50)
+  });
+
+  const { data: messages = [] } = useQuery({
+    queryKey: ['chat_messages', sessionId],
+    queryFn: () => sessionId ? base44.entities.AIChatMessage.filter({ sessionId }, 'created_date', 100) : [],
+    enabled: !!sessionId
+  });
+
+  const createSession = useMutation({
+    mutationFn: async (firstMsg) => {
+      const title = firstMsg.slice(0, 30) + (firstMsg.length > 30 ? "..." : "");
+      return await base44.entities.AIChatSession.create({
+        title,
+        feature: "editor",
+        projectId: selectedProjectId || ""
+      });
+    },
+    onSuccess: (newSession) => {
+      setSessionId(newSession.id);
+      queryClient.invalidateQueries(['editor_sessions']);
+    }
+  });
+
+  const createMessage = useMutation({
+    mutationFn: async (msg) => {
+      return await base44.entities.AIChatMessage.create(msg);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['chat_messages', sessionId]);
+    }
+  });
+
+  const deleteSession = useMutation({
+    mutationFn: async (id) => {
+      await base44.entities.AIChatSession.delete(id);
+    },
+    onSuccess: (_, deletedId) => {
+      queryClient.invalidateQueries(['editor_sessions']);
+      if (sessionId === deletedId) setSessionId("");
+      toast({ title: "Chat session deleted" });
+    }
   });
 
   const runAgent = async () => {
@@ -27,7 +74,24 @@ export default function AIEditor() {
     setLoading(true);
     const userMsg = prompt.trim();
     setPrompt("");
-    setMessages(prev => [...prev, { role: "user", content: userMsg }]);
+
+    let currentSessionId = sessionId;
+    if (!currentSessionId) {
+      const newSession = await createSession.mutateAsync(userMsg);
+      currentSessionId = newSession.id;
+    } else {
+      // If a project is selected now and session has no project, update it
+      const sess = sessions.find(s => s.id === currentSessionId);
+      if (sess && !sess.projectId && selectedProjectId) {
+        await base44.entities.AIChatSession.update(currentSessionId, { projectId: selectedProjectId });
+      }
+    }
+
+    // Save user message
+    await createMessage.mutateAsync({ sessionId: currentSessionId, role: "user", content: userMsg });
+
+    // Re-fetch current messages for history context
+    const currentMessages = await base44.entities.AIChatMessage.filter({ sessionId: currentSessionId }, 'created_date', 100);
 
     const context = selectedProjectId ? `The user is focused on the project "${projects.find(p=>p.id===selectedProjectId)?.name}".` : "No specific project selected.";
     
@@ -35,12 +99,12 @@ export default function AIEditor() {
       const res = await base44.integrations.Core.InvokeLLM({
         prompt: `You are an expert Debate AI Editor. You can help draft, edit, suggest improvements, and format contentions or documents.
 Context: ${context}
-History: ${messages.map(m => m.role+": "+m.content).join('\n')}
-User: ${userMsg}
+History: ${currentMessages.map(m => m.role+": "+m.content).join('\n')}
 
 Provide a comprehensive, directly usable response.`
       });
-      setMessages(prev => [...prev, { role: "assistant", content: res }]);
+      // Save assistant message
+      await createMessage.mutateAsync({ sessionId: currentSessionId, role: "assistant", content: res });
     } catch (e) {
       toast({ title: "Failed to generate response", variant: "destructive" });
     }
@@ -72,18 +136,47 @@ Provide a comprehensive, directly usable response.`
 
   return (
     <AnimatedPage>
-      <div className="flex flex-col h-[calc(100dvh-56px)] lg:h-[calc(100vh-64px)] bg-slate-50 overflow-hidden relative">
-        <div className="flex-1 flex flex-col max-w-5xl w-full mx-auto p-4 md:p-6 overflow-hidden">
-          <div className="bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full w-full">
-            <div className="p-6 bg-gradient-to-r from-violet-600 to-purple-700 text-white flex items-center justify-between shrink-0">
-              <div>
-                <h1 className="text-2xl font-bold font-heading flex items-center gap-2"><Sparkles className="w-6 h-6"/> AI Editor</h1>
-                <p className="text-violet-100 text-sm opacity-90 mt-1">Chat to generate, edit, and save debate documents directly.</p>
+      <div className="absolute inset-0 flex flex-col bg-slate-50 overflow-hidden">
+        <div className="flex-1 flex flex-row max-w-6xl w-full mx-auto p-4 md:p-6 gap-4 md:gap-6 overflow-hidden">
+          {/* Sidebar */}
+          <div className={`${showHistory ? 'flex' : 'hidden'} md:flex flex-col w-full md:w-64 shrink-0 bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden`}>
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+              <h2 className="font-bold text-slate-900 flex items-center gap-2">
+                <button className="md:hidden p-1 -ml-1 mr-1 hover:bg-slate-100 rounded-md transition-colors" onClick={() => setShowHistory(false)}><ChevronLeft className="w-4 h-4"/></button>
+                <History className="w-4 h-4"/> Chat History
+              </h2>
+              <Button size="icon" variant="ghost" onClick={() => { setSessionId(""); setShowHistory(false); setSelectedProjectId(""); }} className="h-8 w-8 text-slate-500 hover:text-primary"><Plus className="w-4 h-4"/></Button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 space-y-1">
+              {sessions.map(s => (
+                <div key={s.id} className={`group flex items-center justify-between p-2 rounded-xl text-sm cursor-pointer transition-colors ${sessionId === s.id ? 'bg-primary/10 text-primary font-medium' : 'text-slate-600 hover:bg-slate-50'}`} onClick={() => { setSessionId(s.id); setSelectedProjectId(s.projectId || ""); setShowHistory(false); }}>
+                  <div className="truncate flex-1 pr-2">{s.title || "New Chat"}</div>
+                  <button onClick={(e) => { e.stopPropagation(); deleteSession.mutate(s.id); }} className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-red-500 rounded-md transition-opacity">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+              {sessions.length === 0 && <div className="p-4 text-center text-slate-400 text-xs italic">No past chats.</div>}
+            </div>
+          </div>
+
+          <div className={`${showHistory ? 'hidden md:flex' : 'flex'} flex-1 bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex-col h-full`}>
+            <div className="p-6 bg-gradient-to-r from-violet-600 to-purple-700 text-white flex flex-col shrink-0">
+              <div className="flex items-center justify-between w-full mb-4">
+                <h1 className="text-2xl font-bold font-heading flex items-center gap-2">
+                  <button className="md:hidden p-1 -ml-1 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onClick={() => setShowHistory(true)}>
+                    <History className="w-5 h-5"/>
+                  </button>
+                  <Sparkles className="w-6 h-6"/> AI Editor
+                </h1>
+                <select className="bg-white/20 border border-white/30 text-white text-sm rounded-xl px-3 py-2 outline-none appearance-none font-medium" value={selectedProjectId} onChange={e=>setSelectedProjectId(e.target.value)}>
+                  <option value="" className="text-slate-800">Select Project (Optional)</option>
+                  {projects.map(p => <option key={p.id} value={p.id} className="text-slate-800">{p.name}</option>)}
+                </select>
               </div>
-              <select className="bg-white/20 border border-white/30 text-white text-sm rounded-xl px-3 py-2 outline-none appearance-none font-medium" value={selectedProjectId} onChange={e=>setSelectedProjectId(e.target.value)}>
-                <option value="" className="text-slate-800">Select Project (Optional)</option>
-                {projects.map(p => <option key={p.id} value={p.id} className="text-slate-800">{p.name}</option>)}
-              </select>
+              <p className="text-violet-100 text-sm opacity-90 max-w-[200px] leading-snug">
+                Chat to generate, edit, and save<br/>debate documents directly.
+              </p>
             </div>
             
             <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50">
@@ -128,7 +221,7 @@ Provide a comprehensive, directly usable response.`
                 <Textarea 
                   value={prompt} 
                   onChange={e=>setPrompt(e.target.value)} 
-                  placeholder="E.g. Write a 3-point contention affirming universal basic income focusing on economic stimulus..."
+                  placeholder="How can I help you prep today?"
                   className="min-h-[60px] max-h-48 resize-none rounded-2xl pr-[100px] py-4 text-[15px] bg-slate-50 border-slate-200 shadow-sm focus-visible:ring-primary"
                   onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runAgent(); } }}
                 />
