@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useMemo, useState, useContext, createContext, forwardRef } from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -15,15 +16,31 @@ const Select = ({ children, value, onValueChange, defaultValue, ...props }) => {
   const isMobile = useIsMobile();
   const [open, setOpen] = React.useState(false);
   const [internalValue, setInternalValue] = React.useState(defaultValue || "");
-  
   const selectedValue = value !== undefined ? value : internalValue;
   const handleValueChange = (v) => {
     setInternalValue(v);
     if (onValueChange) onValueChange(v);
   };
 
+  const itemLabels = React.useMemo(() => {
+    const options = {};
+    const traverse = (node) => {
+      React.Children.forEach(node, child => {
+        if (!React.isValidElement(child)) return;
+        if (child.props.value !== undefined && child.props.children !== undefined) {
+          options[child.props.value] = child.props.children;
+        }
+        if (child.props.children) {
+          traverse(child.props.children);
+        }
+      });
+    };
+    traverse(children);
+    return options;
+  }, [children]);
+
   return (
-    <SelectContext.Provider value={{ isMobile, open, setOpen, value: selectedValue, onValueChange: handleValueChange }}>
+    <SelectContext.Provider value={{ isMobile, open, setOpen, value: selectedValue, onValueChange: handleValueChange, itemLabels }}>
       <SelectPrimitive.Root value={selectedValue} onValueChange={handleValueChange} open={open} onOpenChange={setOpen} {...props}>
         {isMobile ? (
           <Drawer open={open} onOpenChange={setOpen}>
@@ -44,7 +61,19 @@ const SelectGroup = React.forwardRef(({ ...props }, ref) => {
 })
 SelectGroup.displayName = "SelectGroup"
 
-const SelectValue = SelectPrimitive.Value
+const SelectValue = React.forwardRef(({ className, children, placeholder, ...props }, ref) => {
+  const ctx = React.useContext(SelectContext)
+  if (ctx?.isMobile) {
+    const label = ctx.value ? ctx.itemLabels[ctx.value] : null;
+    return (
+      <span className={className} {...props}>
+        {label ? label : <span className="text-[#616161] dark:text-[#616161]">{placeholder || children}</span>}
+      </span>
+    )
+  }
+  return <SelectPrimitive.Value ref={ref} className={className} placeholder={placeholder} {...props}>{children}</SelectPrimitive.Value>
+})
+SelectValue.displayName = "SelectValue"
 
 const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) => {
   const ctx = React.useContext(SelectContext)
