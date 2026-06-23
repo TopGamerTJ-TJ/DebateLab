@@ -136,10 +136,10 @@ Provide a comprehensive, directly usable response.`
 
   return (
     <AnimatedPage>
-      <div className="absolute inset-0 flex flex-col bg-slate-50 overflow-hidden">
-        <div className="flex-1 flex flex-row max-w-6xl w-full mx-auto p-4 md:p-6 gap-4 md:gap-6 overflow-hidden">
+      <div className="flex flex-col h-[calc(100dvh-56px)] md:h-[calc(100vh-64px)] bg-slate-50 overflow-hidden -mb-8 relative">
+        <div className="flex-1 flex flex-row max-w-6xl w-full mx-auto p-4 md:p-6 gap-4 md:gap-6 overflow-hidden min-h-0">
           {/* Sidebar */}
-          <div className={`${showHistory ? 'flex' : 'hidden'} md:flex flex-col w-full md:w-64 shrink-0 bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden`}>
+          <div className={`${showHistory ? 'flex' : 'hidden'} md:flex flex-col w-full md:w-64 shrink-0 bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden min-h-0`}>
             <div className="p-4 border-b border-slate-100 flex items-center justify-between">
               <h2 className="font-bold text-slate-900 flex items-center gap-2">
                 <button className="md:hidden p-1 -ml-1 mr-1 hover:bg-slate-100 rounded-md transition-colors" onClick={() => setShowHistory(false)}><ChevronLeft className="w-4 h-4"/></button>
@@ -160,7 +160,7 @@ Provide a comprehensive, directly usable response.`
             </div>
           </div>
 
-          <div className={`${showHistory ? 'hidden md:flex' : 'flex'} flex-1 bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex-col h-full`}>
+          <div className={`${showHistory ? 'hidden md:flex' : 'flex'} flex-1 bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex-col min-h-0`}>
             <div className="p-6 bg-gradient-to-r from-violet-600 to-purple-700 text-white flex flex-col shrink-0">
               <div className="flex items-center justify-between w-full mb-4">
                 <h1 className="text-2xl font-bold font-heading flex items-center gap-2">
