@@ -73,32 +73,59 @@ export default function Dashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <StatCard label="Practice Sessions" value={sessions.length} color="text-blue-600" />
-        <StatCard label="Contentions Saved" value={contentions.length} color="text-blue-600" />
-        <StatCard label="Tournaments" value={tournaments.length} color="text-blue-600" />
-      </div>
+      {widgets.stats !== false && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <StatCard label="Practice Sessions" value={sessions.length} color="text-blue-600" />
+          <StatCard label="Contentions Saved" value={contentions.length} color="text-blue-600" />
+          <StatCard label="Tournaments" value={tournaments.length} color="text-blue-600" />
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Quick Actions */}
         <div className="lg:col-span-2">
-          <h2 className="text-lg font-bold text-slate-900 font-heading mb-4">Quick Actions</h2>
-          <div className="grid sm:grid-cols-2 gap-3">
-            <QuickAction to="/parliamentary" icon={<BookOpen className="w-5 h-5 text-blue-600" />} title="Parliamentary Debate" desc="Generate contentions, practice rounds, and AI coaching" color="bg-blue-50" />
-            <QuickAction to="/public-forum" icon={<BookOpen className="w-5 h-5 text-indigo-600" />} title="Public Forum" desc="PF resolution analysis, contentions, and crossfire prep" color="bg-indigo-50" />
-            <QuickAction to="/model-un" icon={<Globe className="w-5 h-5 text-teal-600" />} title="Model UN" desc="Country research, position papers, and resolutions" color="bg-teal-50" />
-            <QuickAction to="/model-congress" icon={<FileText className="w-5 h-5 text-purple-600" />} title="Model Congress" desc="Bill writing, committee prep, and speeches" color="bg-purple-50" />
+          {widgets.quickActions !== false && (
+            <div className="mb-8">
+              <h2 className="text-lg font-bold text-slate-900 font-heading mb-4">Quick Actions</h2>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <QuickAction to="/parliamentary" icon={<BookOpen className="w-5 h-5 text-blue-600" />} title="Parliamentary Debate" desc="Generate contentions, practice rounds, and AI coaching" color="bg-blue-50" />
+                <QuickAction to="/public-forum" icon={<BookOpen className="w-5 h-5 text-indigo-600" />} title="Public Forum" desc="PF resolution analysis, contentions, and crossfire prep" color="bg-indigo-50" />
+                <QuickAction to="/model-un" icon={<Globe className="w-5 h-5 text-teal-600" />} title="Model UN" desc="Country research, position papers, and resolutions" color="bg-teal-50" />
+                <QuickAction to="/model-congress" icon={<FileText className="w-5 h-5 text-purple-600" />} title="Model Congress" desc="Bill writing, committee prep, and speeches" color="bg-purple-50" />
+                <QuickAction to="/practice" icon={<Target className="w-5 h-5 text-green-600" />} title="Practice Round" desc="AI-powered debate simulation with judge feedback" color="bg-green-50" />
+                <QuickAction to="/ai-coach" icon={<Brain className="w-5 h-5 text-violet-600" />} title="AI Coach" desc="Performance analytics and personalized recommendations" color="bg-violet-50" />
+                <QuickAction to="/tournament" icon={<Trophy className="w-5 h-5 text-yellow-600" />} title="Tournament" desc="Manage tournaments, rounds, and results" color="bg-yellow-50" />
+              </div>
+            </div>
+          )}
 
-            <QuickAction to="/practice" icon={<Target className="w-5 h-5 text-green-600" />} title="Practice Round" desc="AI-powered debate simulation with judge feedback" color="bg-green-50" />
-            <QuickAction to="/ai-coach" icon={<Brain className="w-5 h-5 text-violet-600" />} title="AI Coach" desc="Performance analytics and personalized recommendations" color="bg-violet-50" />
-            <QuickAction to="/tournament" icon={<Trophy className="w-5 h-5 text-yellow-600" />} title="Tournament" desc="Manage tournaments, rounds, and results" color="bg-yellow-50" />
-          </div>
+          {/* Custom Quick Links */}
+          {widgets.customLinks !== false && customLinks.length > 0 && (
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 font-heading mb-4">My Quick Links</h2>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {customLinks.map((link, i) => (
+                  <a key={i} href={link.url} target={link.url.startsWith('/') ? '_self' : '_blank'} rel="noreferrer" className="group bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md hover:border-primary/30 transition-all flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                        <LinkIcon className="w-4 h-4 text-slate-500" />
+                      </div>
+                      <span className="font-medium text-slate-800 text-sm">{link.title}</span>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Recent Activity */}
         <div>
-          <h2 className="text-lg font-bold text-slate-900 font-heading mb-4">Recent Practice</h2>
-          <div className="space-y-3">
+          {widgets.recentPractice !== false && (
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-slate-900 font-heading mb-4">Recent Practice</h2>
+              <div className="space-y-3">
             {recentSessions.length === 0 ? (
               <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
                 <Target className="w-8 h-8 text-slate-300 mx-auto mb-3" />
@@ -122,10 +149,13 @@ export default function Dashboard() {
                 </div>
               </div>
             ))}
-          </div>
+              </div>
+            </div>
+          )}
 
           {/* AI Coach tip */}
-          <div className="mt-4 bg-blue-50 rounded-2xl border border-blue-100 p-5">
+          {widgets.aiTip !== false && (
+            <div className="mt-4 bg-blue-50 rounded-2xl border border-blue-100 p-5">
             <div className="flex items-center gap-2 mb-2">
               <Brain className="w-4 h-4 text-primary" />
               <span className="text-sm font-semibold text-primary">AI Coach Tip</span>
@@ -133,6 +163,7 @@ export default function Dashboard() {
             <p className="text-sm text-slate-600 leading-relaxed">Practice crossfire by generating contentions and drilling the crossfire questions section. Strong crossfire wins rounds.</p>
             <Link to="/ai-coach" className="text-primary text-xs font-medium hover:underline mt-2 block">View full analysis →</Link>
           </div>
+          )}
         </div>
       </div>
     </div>

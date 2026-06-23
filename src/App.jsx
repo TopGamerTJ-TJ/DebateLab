@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -123,11 +124,63 @@ const AuthenticatedApp = () => {
 };
 
 
+function ThemeManager() {
+  useEffect(() => {
+    const applyTheme = () => {
+      const mode = localStorage.getItem('theme_mode') || 'light';
+      if (mode === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+
+      const colors = JSON.parse(localStorage.getItem('custom_colors') || '{}');
+      const root = document.documentElement;
+      
+      const hexToHsl = (hex) => {
+        if (!hex) return null;
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        if (!result) return null;
+        var r = parseInt(result[1], 16) / 255;
+        var g = parseInt(result[2], 16) / 255;
+        var b = parseInt(result[3], 16) / 255;
+        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var h, s, l = (max + min) / 2;
+        if (max == min) { h = s = 0; }
+        else {
+          var d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+          }
+          h /= 6;
+        }
+        return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+      };
+
+      if (colors.primary) root.style.setProperty('--primary', hexToHsl(colors.primary));
+      else root.style.removeProperty('--primary');
+      
+      if (colors.secondary) root.style.setProperty('--secondary', hexToHsl(colors.secondary));
+      else root.style.removeProperty('--secondary');
+      
+      if (colors.accent) root.style.setProperty('--accent', hexToHsl(colors.accent));
+      else root.style.removeProperty('--accent');
+    };
+    
+    applyTheme();
+    window.addEventListener('theme-changed', applyTheme);
+    return () => window.removeEventListener('theme-changed', applyTheme);
+  }, []);
+  
+  return null;
+}
+
 function App() {
 
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
+        <ThemeManager />
         <Router>
           <AuthenticatedApp />
         </Router>

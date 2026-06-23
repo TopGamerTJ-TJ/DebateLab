@@ -4,8 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Save, Target, BookOpen, Trophy, Brain, Settings, CheckCircle, Shield, Trash2, AlertTriangle, LogOut } from "lucide-react";
+import { User, Save, Target, BookOpen, Trophy, Brain, Settings, CheckCircle, Shield, Trash2, AlertTriangle, LogOut, Moon, Sun, Palette, PlayCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import AdminPanel from "@/components/AdminPanel";
@@ -13,7 +12,7 @@ import ContactForm from "@/components/ContactForm";
 
 const FORMATS = ["Parliamentary Debate", "Public Forum", "Model UN", "Model Congress"];
 const LEVELS = ["beginner", "intermediate", "advanced", "expert"];
-const GRADES = ["6th Grade", "7th Grade", "8th Grade", "9th Grade", "10th Grade", "11th Grade", "12th Grade", "Freshman", "Sophomore", "Junior", "Senior", "Graduate"];
+const GRADES = ["6th Grade", "7th Grade", "8th Grade", "9th Grade", "10th Grade", "11th Grade", "12th Grade", "Freshman", "Sophomore", "Junior", "Senior", "Graduate", "Other"];
 
 export default function ProfilePage() {
   const [form, setForm] = useState({ displayName: "", school: "", gradeLevel: "", preferredFormat: "", skillLevel: "intermediate", bio: "" });
@@ -25,8 +24,35 @@ export default function ProfilePage() {
   const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  const [themeMode, setThemeMode] = useState(localStorage.getItem('theme_mode') || 'light');
+  const [customColors, setCustomColors] = useState(() => JSON.parse(localStorage.getItem('custom_colors') || '{}'));
 
   useEffect(() => { base44.auth.me().then(u => setCurrentUser(u)).catch(() => {}); }, []);
+
+  const handleThemeChange = (mode) => {
+    setThemeMode(mode);
+    localStorage.setItem('theme_mode', mode);
+    window.dispatchEvent(new Event('theme-changed'));
+  };
+
+  const handleColorChange = (key, value) => {
+    const next = { ...customColors, [key]: value };
+    setCustomColors(next);
+    localStorage.setItem('custom_colors', JSON.stringify(next));
+    window.dispatchEvent(new Event('theme-changed'));
+  };
+
+  const handleResetColors = () => {
+    setCustomColors({});
+    localStorage.removeItem('custom_colors');
+    window.dispatchEvent(new Event('theme-changed'));
+  };
+
+  const handleRetakeTour = () => {
+    localStorage.removeItem("debatelab_tour_seen");
+    window.location.href = "/home";
+  };
 
   const { data: profiles = [] } = useQuery({ queryKey: ['user_profiles'], queryFn: () => base44.entities.UserProfile.list() });
   const { data: sessions = [] } = useQuery({ queryKey: ['practice_sessions'], queryFn: () => base44.entities.PracticeSession.list('-created_date', 100) });
@@ -96,14 +122,18 @@ export default function ProfilePage() {
       </div>
 
       {/* Section tabs */}
-      <div className="flex gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit mb-6 shadow-sm">
+      <div className="flex gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit mb-6 shadow-sm overflow-x-auto">
         <button onClick={() => setActiveSection("profile")}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeSection === "profile" ? "bg-primary text-white" : "text-slate-600 hover:bg-slate-50"}`}>
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all shrink-0 ${activeSection === "profile" ? "bg-primary text-white" : "text-slate-600 hover:bg-slate-50"}`}>
           <Settings className="w-3.5 h-3.5" /> Profile
+        </button>
+        <button onClick={() => setActiveSection("theme")}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all shrink-0 ${activeSection === "theme" ? "bg-primary text-white" : "text-slate-600 hover:bg-slate-50"}`}>
+          <Palette className="w-3.5 h-3.5" /> Theme & UI
         </button>
         {isAdmin && (
           <button onClick={() => setActiveSection("admin")}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeSection === "admin" ? "bg-red-600 text-white" : "text-red-600 hover:bg-red-50"}`}>
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all shrink-0 ${activeSection === "admin" ? "bg-red-600 text-white" : "text-red-600 hover:bg-red-50"}`}>
             <Shield className="w-3.5 h-3.5" /> Admin Panel
           </button>
         )}
@@ -111,6 +141,48 @@ export default function ProfilePage() {
 
       {activeSection === "admin" && isAdmin && (
         <div className="mb-6"><AdminPanel /></div>
+      )}
+      
+      {activeSection === "theme" && (
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm mb-6 max-w-2xl">
+          <div className="flex items-center gap-2 mb-6">
+            <Palette className="w-5 h-5 text-primary" />
+            <h3 className="font-bold text-slate-900 font-heading">Theme & UI Settings</h3>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="text-sm font-medium text-slate-700 mb-3 block">Color Mode</label>
+              <div className="flex gap-3">
+                <Button variant={themeMode === 'light' ? 'default' : 'outline'} onClick={() => handleThemeChange('light')} className="flex-1 gap-2">
+                  <Sun className="w-4 h-4" /> Light Mode
+                </Button>
+                <Button variant={themeMode === 'dark' ? 'default' : 'outline'} onClick={() => handleThemeChange('dark')} className="flex-1 gap-2">
+                  <Moon className="w-4 h-4" /> Dark Mode
+                </Button>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100">
+              <label className="text-sm font-medium text-slate-700 mb-3 block">Custom Colors</label>
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div>
+                  <span className="text-xs text-slate-500 mb-1 block">Primary</span>
+                  <input type="color" value={customColors.primary || '#3b82f6'} onChange={(e) => handleColorChange('primary', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer" />
+                </div>
+                <div>
+                  <span className="text-xs text-slate-500 mb-1 block">Secondary</span>
+                  <input type="color" value={customColors.secondary || '#eff6ff'} onChange={(e) => handleColorChange('secondary', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer" />
+                </div>
+                <div>
+                  <span className="text-xs text-slate-500 mb-1 block">Accent</span>
+                  <input type="color" value={customColors.accent || '#dbeafe'} onChange={(e) => handleColorChange('accent', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer" />
+                </div>
+              </div>
+              <Button variant="outline" size="sm" onClick={handleResetColors} className="text-xs">Reset to Defaults</Button>
+            </div>
+          </div>
+        </div>
       )}
 
       {activeSection === "profile" && (
@@ -136,25 +208,24 @@ export default function ProfilePage() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-slate-700 mb-1.5 block">Grade / Year</label>
-                    <Select value={form.gradeLevel} onValueChange={v => setForm({ ...form, gradeLevel: v })}>
-                      <SelectTrigger><SelectValue placeholder="Select grade" /></SelectTrigger>
-                      <SelectContent>{GRADES.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
-                    </Select>
+                    <select value={form.gradeLevel} onChange={e => setForm({ ...form, gradeLevel: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none">
+                      <option value="" disabled>Select grade</option>
+                      {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
+                    </select>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-slate-700 mb-1.5 block">Skill Level</label>
-                    <Select value={form.skillLevel} onValueChange={v => setForm({ ...form, skillLevel: v })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>{LEVELS.map(l => <SelectItem key={l} value={l} className="capitalize">{l.charAt(0).toUpperCase() + l.slice(1)}</SelectItem>)}</SelectContent>
-                    </Select>
+                    <select value={form.skillLevel} onChange={e => setForm({ ...form, skillLevel: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none capitalize">
+                      {LEVELS.map(l => <option key={l} value={l} className="capitalize">{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
+                    </select>
                   </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-slate-700 mb-1.5 block">Preferred Format</label>
-                  <Select value={form.preferredFormat} onValueChange={v => setForm({ ...form, preferredFormat: v })}>
-                    <SelectTrigger><SelectValue placeholder="Select your main format" /></SelectTrigger>
-                    <SelectContent>{FORMATS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <select value={form.preferredFormat} onChange={e => setForm({ ...form, preferredFormat: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none">
+                    <option value="" disabled>Select your main format</option>
+                    {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
+                  </select>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-slate-700 mb-1.5 block">Bio / Goals</label>
@@ -212,6 +283,19 @@ export default function ProfilePage() {
 
       {/* Contact form on all subpages */}
       <ContactForm />
+
+      {/* App Tour */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 mt-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="font-bold text-slate-900 text-sm font-heading">Welcome Tour</h4>
+            <p className="text-slate-500 text-xs mt-0.5">Need a refresher? Retake the welcome tour to learn about DebateLab's features.</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleRetakeTour} className="gap-1.5 shrink-0">
+            <PlayCircle className="w-3.5 h-3.5" /> Retake Tour
+          </Button>
+        </div>
+      </div>
 
       {/* Delete Account */}
       <div className="bg-red-50 border border-red-200 rounded-2xl p-5 mt-6">
