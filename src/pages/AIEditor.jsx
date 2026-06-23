@@ -175,7 +175,7 @@ Provide a comprehensive, directly usable response.`
                 </select>
               </div>
               <p className="text-violet-100 text-sm opacity-90 max-w-[200px] leading-snug">
-                Chat to generate, edit, and save<br/>debate documents directly.
+                Chat to generate, edit, and save debate documents directly.
               </p>
             </div>
             
