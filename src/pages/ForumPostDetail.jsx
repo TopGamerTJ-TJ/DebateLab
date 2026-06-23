@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, ThumbsUp, ThumbsDown, ArrowLeft, CornerDownRight } from "lucide-react";
+import { MessageSquare, ThumbsUp, ThumbsDown, ArrowLeft, Trash2 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import AnimatedPage from "@/components/AnimatedPage";
@@ -29,14 +29,27 @@ export default function ForumPostDetail() {
 
   const { data: votes = [] } = useQuery({ 
     queryKey: ['forum_votes', user?.id], 
-    queryFn: () => base44.entities.ForumVote.filter({ user_id: user?.id }) 
-  }, { enabled: !!user });
+    queryFn: () => base44.entities.ForumVote.filter({ user_id: user?.id }),
+    enabled: !!user
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+      return res[0] || null;
+    },
+    enabled: !!user
+  });
+
+  const isProfileComplete = profile && profile.displayName && profile.skillLevel && profile.preferredFormat;
 
   const createComment = useMutation({
     mutationFn: (data) => base44.entities.ForumComment.create({ 
       ...data, 
       postId: id,
-      authorName: user?.full_name || 'Anonymous',
+      authorName: profile?.displayName || user?.full_name || 'Anonymous',
       upvotes: 0,
       downvotes: 0
     }),
@@ -45,6 +58,22 @@ export default function ForumPostDetail() {
       setCommentText("");
       setReplyTo(null);
       toast({ title: "Comment posted!" });
+    }
+  });
+
+  const deletePost = useMutation({
+    mutationFn: (postId) => base44.entities.ForumPost.delete(postId),
+    onSuccess: () => {
+      toast({ title: "Post deleted" });
+      window.location.href = "/forum";
+    }
+  });
+
+  const deleteComment = useMutation({
+    mutationFn: (commentId) => base44.entities.ForumComment.delete(commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['forum_comments', id] });
+      toast({ title: "Comment deleted" });
     }
   });
 
@@ -121,8 +150,8 @@ export default function ForumPostDetail() {
   const postScore = (post.upvotes || 0) - (post.downvotes || 0);
 
   // Group comments by parent
-  const topLevelComments = comments.filter(c => !c.parentCommentId).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
-  const getReplies = (parentId) => comments.filter(c => c.parentCommentId === parentId).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+  const topLevelComments = comments ? comments.filter(c => !c.parentCommentId).sort((a, b) => new Date(a.created_date || 0) - new Date(b.created_date || 0)) : [];
+  const getReplies = (parentId) => comments ? comments.filter(c => c.parentCommentId === parentId).sort((a, b) => new Date(a.created_date || 0) - new Date(b.created_date || 0)) : [];
 
   const CommentNode = ({ comment, depth = 0 }) => {
     const commentVote = votes.find(v => v.itemId === comment.id && v.itemType === 'comment')?.voteValue;
@@ -155,6 +184,14 @@ export default function ForumPostDetail() {
               >
                 <MessageSquare className="w-3.5 h-3.5" /> Reply
               </button>
+              {user?.id === comment.created_by_id && (
+                <button 
+                  onClick={() => deleteComment.mutate(comment.id)} 
+                  className="text-xs font-medium text-red-400 hover:text-red-600 flex items-center gap-1.5 p-2 -m-2 rounded-lg hover:bg-red-50 transition-colors ml-2"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                </button>
+              )}
             </div>
             
             {replyTo === comment.id && (
@@ -168,7 +205,13 @@ export default function ForumPostDetail() {
                 />
                 <div className="flex justify-end gap-2">
                   <Button variant="ghost" size="sm" onClick={() => { setReplyTo(null); setCommentText(""); }}>Cancel</Button>
-                  <Button size="sm" onClick={() => createComment.mutate({ content: commentText, parentCommentId: comment.id })} disabled={!commentText || createComment.isPending}>Reply</Button>
+                  <Button size="sm" onClick={() => {
+                    if (!isProfileComplete) {
+                      toast({ title: "Profile Incomplete", description: "Please complete your Display Name, Skill Level, and Preferred Format in Profile to comment.", variant: "destructive" });
+                      return;
+                    }
+                    createComment.mutate({ content: commentText, parentCommentId: comment.id });
+                  }} disabled={!commentText || createComment.isPending}>Reply</Button>
                 </div>
               </div>
             )}
@@ -223,8 +266,18 @@ export default function ForumPostDetail() {
               </div>
             )}
             
-            <div className="flex items-center gap-2 text-sm text-slate-500 font-medium mt-6 pt-4 border-t border-slate-100">
-              <MessageSquare className="w-4 h-4" /> {comments.length} Comments
+            <div className="flex items-center justify-between text-sm text-slate-500 font-medium mt-6 pt-4 border-t border-slate-100">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" /> {comments.length} Comments
+              </div>
+              {user?.id === post.created_by_id && (
+                <button 
+                  onClick={() => deletePost.mutate(post.id)} 
+                  className="text-red-400 hover:text-red-600 flex items-center gap-1.5 p-2 -m-2 rounded-lg hover:bg-red-50 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" /> Delete Post
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -241,7 +294,13 @@ export default function ForumPostDetail() {
             onFocus={() => setReplyTo(null)}
           />
           <div className="flex justify-end">
-            <Button onClick={() => createComment.mutate({ content: commentText, parentCommentId: null })} disabled={replyTo !== null || !commentText || createComment.isPending}>
+            <Button onClick={() => {
+              if (!isProfileComplete) {
+                toast({ title: "Profile Incomplete", description: "Please complete your Display Name, Skill Level, and Preferred Format in Profile to comment.", variant: "destructive" });
+                return;
+              }
+              createComment.mutate({ content: commentText, parentCommentId: null });
+            }} disabled={replyTo !== null || !commentText || createComment.isPending}>
               Post Comment
             </Button>
           </div>

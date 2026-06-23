@@ -154,8 +154,8 @@ export default function Layout() {
         <div className={location.pathname === '/home' ? 'block' : 'hidden'}><Dashboard /></div>
         <div className={location.pathname === '/projects' ? 'block' : 'hidden'}><Projects /></div>
         <div className={location.pathname.startsWith('/coach') ? 'block' : 'hidden'}><CoachChat /></div>
-        <div className={location.pathname === '/forum' ? 'block' : 'hidden'}><Forum /></div>
-        {(!['/home', '/projects', '/forum'].includes(location.pathname) && !location.pathname.startsWith('/coach')) && (
+        <div className={location.pathname === '/forum' || location.pathname === '/forum/' ? 'block' : 'hidden'}><Forum /></div>
+        {(!['/home', '/projects', '/forum', '/forum/'].includes(location.pathname) && !location.pathname.startsWith('/coach')) && (
           <Outlet />
         )}
       </main>

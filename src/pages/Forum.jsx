@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MessageSquare, ThumbsUp, ThumbsDown, Image as ImageIcon, Plus, Flame, Clock } from "lucide-react";
+import { MessageSquare, ThumbsUp, ThumbsDown, Image as ImageIcon, Plus, Flame, Clock, Trash2 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import AnimatedPage from "@/components/AnimatedPage";
@@ -30,10 +30,22 @@ export default function Forum() {
     enabled: !!user,
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+      return res[0] || null;
+    },
+    enabled: !!user
+  });
+
+  const isProfileComplete = profile && profile.displayName && profile.skillLevel && profile.preferredFormat;
+
   const createPost = useMutation({
     mutationFn: (data) => base44.entities.ForumPost.create({ 
       ...data, 
-      authorName: user?.full_name || 'Anonymous',
+      authorName: profile?.displayName || user?.full_name || 'Anonymous',
       upvotes: 0,
       downvotes: 0
     }),
@@ -42,6 +54,14 @@ export default function Forum() {
       setShowForm(false);
       setForm({ title: "", content: "", imageUrl: "", format: "" });
       toast({ title: "Post created!" });
+    }
+  });
+
+  const deletePost = useMutation({
+    mutationFn: (postId) => base44.entities.ForumPost.delete(postId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['forum_posts'] });
+      toast({ title: "Post deleted" });
     }
   });
 
@@ -132,7 +152,17 @@ export default function Forum() {
                   <Input value={form.imageUrl} onChange={e => setForm({...form, imageUrl: e.target.value})} placeholder="Image URL (optional)" />
                 </div>
                 <Input value={form.format} onChange={e => setForm({...form, format: e.target.value})} placeholder="Format tags (e.g. PF, LD, Policy) (optional)" />
-                <Button onClick={() => createPost.mutate(form)} disabled={!form.title || !form.content || createPost.isPending} className="w-full">
+                <Button 
+                  onClick={() => {
+                    if (!isProfileComplete) {
+                      toast({ title: "Profile Incomplete", description: "Please complete your Display Name, Skill Level, and Preferred Format in Profile to post.", variant: "destructive" });
+                      return;
+                    }
+                    createPost.mutate(form);
+                  }} 
+                  disabled={!form.title || !form.content || createPost.isPending} 
+                  className="w-full"
+                >
                   Post
                 </Button>
               </div>
@@ -190,10 +220,18 @@ export default function Forum() {
                       </div>
                     )}
                     
-                    <div className="flex items-center gap-4 text-xs text-slate-500 font-medium mt-2">
+                    <div className="flex items-center justify-between text-xs text-slate-500 font-medium mt-2">
                       <div className="flex items-center gap-1.5 hover:bg-slate-100 p-2 -m-2 rounded-lg transition-colors">
                         <MessageSquare className="w-4 h-4" /> Discuss
                       </div>
+                      {user?.id === post.created_by_id && (
+                        <button 
+                          onClick={(e) => { e.preventDefault(); deletePost.mutate(post.id); }}
+                          className="flex items-center gap-1.5 p-2 -m-2 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" /> Delete
+                        </button>
+                      )}
                     </div>
                   </Link>
                 </div>

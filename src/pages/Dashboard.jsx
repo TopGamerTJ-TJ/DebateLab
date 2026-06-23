@@ -2,11 +2,12 @@ import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { BookOpen, Globe, FileText, Trophy, Brain, BarChart2, Zap, ArrowRight, Target, Layers, Archive, Columns } from "lucide-react";
+import { BookOpen, Globe, FileText, Trophy, Brain, BarChart2, Zap, ArrowRight, Target, Layers, Archive, Columns, Link as LinkIcon, Settings } from "lucide-react";
 import TourModal from "@/components/TourModal";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
 import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
+import { useState, useEffect } from "react";
 
 const StatCard = ({ label, value, color }) => (
   <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
@@ -31,6 +32,17 @@ const QuickAction = ({ to, icon, title, desc, color }) => (
 export default function Dashboard() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [widgets, setWidgets] = useState({});
+  const [customLinks, setCustomLinks] = useState([]);
+
+  useEffect(() => {
+    const savedWidgets = localStorage.getItem('dashboard_widgets');
+    if (savedWidgets) setWidgets(JSON.parse(savedWidgets));
+
+    const savedLinks = localStorage.getItem('custom_quick_links');
+    if (savedLinks) setCustomLinks(JSON.parse(savedLinks));
+  }, []);
+
   const { data: sessions = [] } = useQuery({ queryKey: ['practice_sessions'], queryFn: () => base44.entities.PracticeSession.list('-created_date', 50) });
   const { data: contentions = [] } = useQuery({ queryKey: ['contentions'], queryFn: () => base44.entities.Contention.list('-created_date', 100) });
   const { data: tournaments = [] } = useQuery({ queryKey: ['tournaments'], queryFn: () => base44.entities.Tournament.list('-created_date', 100) });

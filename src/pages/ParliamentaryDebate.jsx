@@ -104,7 +104,7 @@ export default function ParliamentaryDebate() {
         <TabsContent value="tools">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <ToolCard to="/practice" icon={<Target className="w-5 h-5 text-blue-600" />} title="Practice Rounds" desc="AI simulates opponents and judges for realistic round practice" tag="AI Powered" />
-            <ToolCard to="/evidence-locker" icon={<Archive className="w-5 h-5 text-amber-600" />} title="Evidence Locker" desc="Save, tag, and organize your research and evidence cards" />
+
             <ToolCard to="/case-vault" icon={<Layers className="w-5 h-5 text-rose-600" />} title="Case Vault" desc="Store and manage complete government and opposition cases" />
             <ToolCard to="/flowing-tool" icon={<Columns className="w-5 h-5 text-cyan-600" />} title="Flowing Tool" desc="Digital flow sheet for tracking arguments and responses" />
             <ToolCard to="/ai-coach" icon={<Brain className="w-5 h-5 text-violet-600" />} title="AI Performance Coach" desc="Analytics, weakness detection, and practice recommendations" tag="Analytics" />

@@ -26,6 +26,18 @@ export default function Friends() {
     enabled: !!user
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+      return res[0] || null;
+    },
+    enabled: !!user
+  });
+
+  const isProfileComplete = profile && profile.displayName && profile.skillLevel && profile.preferredFormat;
+
   const { data: myFriendCodes = [] } = useQuery({
     queryKey: ['myFriendCode', user?.id],
     queryFn: async () => {
@@ -135,7 +147,13 @@ export default function Friends() {
               
               <div className="flex gap-2">
                 <Input value={friendCodeInput} onChange={e=>setFriendCodeInput(e.target.value)} placeholder="Enter Friend Code" className="text-xs" />
-                <Button size="sm" onClick={() => sendFriendRequest.mutate(friendCodeInput)} disabled={!friendCodeInput.trim() || sendFriendRequest.isPending}>
+                <Button size="sm" onClick={() => {
+                  if (!isProfileComplete) {
+                    toast({ title: "Profile Incomplete", description: "Please complete your Display Name, Skill Level, and Preferred Format in Profile to add friends.", variant: "destructive" });
+                    return;
+                  }
+                  sendFriendRequest.mutate(friendCodeInput);
+                }} disabled={!friendCodeInput.trim() || sendFriendRequest.isPending}>
                   <UserPlus className="w-4 h-4" />
                 </Button>
               </div>

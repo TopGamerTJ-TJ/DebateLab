@@ -102,7 +102,7 @@ export default function PublicForum() {
         <TabsContent value="tools">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <ToolCard to="/practice" icon={<Target className="w-5 h-5 text-blue-600" />} title="Practice Rounds" desc="AI simulates PF opponents for full-round practice with judge feedback" tag="AI Powered" />
-            <ToolCard to="/evidence-locker" icon={<Archive className="w-5 h-5 text-amber-600" />} title="Evidence Locker" desc="Save, organize, and cite your PF research evidence" />
+
             <ToolCard to="/case-vault" icon={<Layers className="w-5 h-5 text-rose-600" />} title="Case Vault" desc="Store and manage aff and neg cases for current resolution" />
             <ToolCard to="/flowing-tool" icon={<Columns className="w-5 h-5 text-cyan-600" />} title="Flowing Tool" desc="Digital flow sheet for tracking arguments across all speeches" />
             <ToolCard to="/ai-coach" icon={<Brain className="w-5 h-5 text-violet-600" />} title="AI Performance Coach" desc="Track progress, detect weaknesses, and get practice plans" tag="Analytics" />

@@ -268,7 +268,7 @@ export default function ProfilePage() {
                   ["/practice", "Start Practice Round"],
                   ["/ai-coach", "AI Performance Coach"],
                   ["/projects", "My Projects"],
-                  ["/evidence-locker", "Evidence Locker"],
+
                   ["/wiki", "Debate Wiki"],
                 ].map(([to, label]) => (
                   <Link key={to} to={to} className="flex items-center justify-between text-sm text-primary hover:text-blue-700 hover:underline py-1">
