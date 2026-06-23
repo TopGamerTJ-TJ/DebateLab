@@ -129,9 +129,12 @@ export default function Layout() {
             </div>
 
             <div className="flex items-center gap-1 min-w-0 justify-end ml-2">
-              {/* Mobile: page title on sub-routes */}
-              {isSubRoute && <span className="lg:hidden font-semibold text-slate-900 text-sm truncate">{location.pathname.split('/').filter(Boolean).map(s => s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ')).pop()}</span>}
-              {/* Hidden top nav menu button since we moved it to the bottom bar */}
+              <button 
+                onClick={() => setMobileOpen(true)} 
+                className="lg:hidden p-2 -mr-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
@@ -147,7 +150,7 @@ export default function Layout() {
           <button onClick={() => dismissNotif(activeNotif.id)} className="text-white/70 hover:text-white shrink-0 text-lg leading-none">×</button>
         </div>
       )}
-      <main className="flex-1 w-full pb-24 lg:pb-8 relative">
+      <main className="flex-1 w-full pb-8 relative">
         <div className={location.pathname === '/home' ? 'block' : 'hidden'}><Dashboard /></div>
         <div className={location.pathname === '/projects' ? 'block' : 'hidden'}><Projects /></div>
         <div className={location.pathname.startsWith('/coach') ? 'block' : 'hidden'}><CoachChat /></div>
@@ -156,36 +159,6 @@ export default function Layout() {
           <Outlet />
         )}
       </main>
-
-      {/* Mobile bottom tab bar */}
-      <nav 
-        className="lg:hidden fixed left-0 right-0 w-full z-[60] bg-white border-t border-slate-200 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] transform-gpu"
-        style={{ bottom: 'calc(-1 * env(safe-area-inset-bottom))', paddingBottom: 'calc(env(safe-area-inset-bottom) * 2)' }}
-      >
-        <div className="flex items-stretch h-14">
-          {[
-            { to: "/home", icon: LayoutDashboard, label: "Home" },
-            { to: "/projects", icon: Folder, label: "Projects" },
-            { to: "/coach", icon: Brain, label: "Coach" },
-            { to: "/forum", icon: MessageSquare, label: "Forum" },
-          ].map(({ to, icon: Icon, label }) => {
-            const isActive = to === "/home" ? location.pathname === "/home" : location.pathname.startsWith(to);
-            return (
-              <Link key={to} to={to} className={`flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 select-none transition-colors ${isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"}`}>
-                <Icon className="w-5 h-5" />
-                <span className="text-[10px] font-medium">{label}</span>
-              </Link>
-            );
-          })}
-          <button 
-            onClick={() => setMobileOpen(true)} 
-            className={`flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 select-none transition-colors text-slate-400 hover:text-slate-600`}
-          >
-            <Menu className="w-5 h-5" />
-            <span className="text-[10px] font-medium">More</span>
-          </button>
-        </div>
-      </nav>
 
       {/* Full screen menu (Mobile + Desktop) */}
       {mobileOpen && (
