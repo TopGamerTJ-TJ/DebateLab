@@ -50,7 +50,7 @@ export default function TourModal() {
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+      const res = await base44.entities.UserProfile.list();
       return res[0] || null;
     },
     enabled: !!user

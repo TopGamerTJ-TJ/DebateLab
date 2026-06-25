@@ -54,7 +54,11 @@ export default function ProfilePage() {
     window.location.href = "/home";
   };
 
-  const { data: profiles = [] } = useQuery({ queryKey: ['user_profiles'], queryFn: () => base44.entities.UserProfile.list() });
+  const { data: profiles = [] } = useQuery({ 
+    queryKey: ['userProfile', currentUser?.id], 
+    queryFn: () => base44.entities.UserProfile.list(),
+    enabled: !!currentUser
+  });
   const { data: sessions = [] } = useQuery({ queryKey: ['practice_sessions'], queryFn: () => base44.entities.PracticeSession.list('-created_date', 100) });
   const { data: contentions = [] } = useQuery({ queryKey: ['contentions'], queryFn: () => base44.entities.Contention.list() });
   const { data: tournaments = [] } = useQuery({ queryKey: ['tournaments'], queryFn: () => base44.entities.Tournament.list() });
@@ -77,7 +81,7 @@ export default function ProfilePage() {
   const save = useMutation({
     mutationFn: (data) => profile ? base44.entities.UserProfile.update(profile.id, data) : base44.entities.UserProfile.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user_profiles'] });
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
       setSaved(true);
       toast({ title: "Profile saved!" });
       setTimeout(() => setSaved(false), 2000);

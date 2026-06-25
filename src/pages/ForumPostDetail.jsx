@@ -37,13 +37,13 @@ export default function ForumPostDetail() {
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+      const res = await base44.entities.UserProfile.list();
       return res[0] || null;
     },
     enabled: !!user
   });
 
-  const isProfileComplete = profile && profile.displayName && profile.skillLevel && profile.preferredFormat;
+  const isProfileComplete = profile && profile.displayName;
 
   const createComment = useMutation({
     mutationFn: (data) => base44.entities.ForumComment.create({ 
@@ -207,7 +207,7 @@ export default function ForumPostDetail() {
                   <Button variant="ghost" size="sm" onClick={() => { setReplyTo(null); setCommentText(""); }}>Cancel</Button>
                   <Button size="sm" onClick={() => {
                     if (!isProfileComplete) {
-                      toast({ title: "Profile Incomplete", description: "Please complete your Display Name, Skill Level, and Preferred Format in Profile to comment.", variant: "destructive" });
+                      toast({ title: "Profile Incomplete", description: "Please set a Display Name in your Profile to comment.", variant: "destructive" });
                       return;
                     }
                     createComment.mutate({ content: commentText, parentCommentId: comment.id });
@@ -296,7 +296,7 @@ export default function ForumPostDetail() {
           <div className="flex justify-end">
             <Button onClick={() => {
               if (!isProfileComplete) {
-                toast({ title: "Profile Incomplete", description: "Please complete your Display Name, Skill Level, and Preferred Format in Profile to comment.", variant: "destructive" });
+                toast({ title: "Profile Incomplete", description: "Please set a Display Name in your Profile to comment.", variant: "destructive" });
                 return;
               }
               createComment.mutate({ content: commentText, parentCommentId: null });
