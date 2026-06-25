@@ -155,7 +155,7 @@ export default function Forum() {
                 <Button 
                   onClick={() => {
                     if (!isProfileComplete) {
-                      toast({ title: "Profile Incomplete", description: "Please complete your Display Name, Skill Level, and Preferred Format in Profile to post.", variant: "destructive" });
+                      toast({ title: "Profile Incomplete", description: "Please set a Display Name in your Profile to post.", variant: "destructive" });
                       return;
                     }
                     createPost.mutate(form);
