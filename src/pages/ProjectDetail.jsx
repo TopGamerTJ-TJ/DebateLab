@@ -39,6 +39,19 @@ export default function ProjectDetail() {
     queryFn: () => base44.entities.Project.filter({ id }).then(r => r[0]),
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ['userProfile', base44.auth?.user?.id],
+    queryFn: async () => {
+      const res = await base44.entities.UserProfile.list();
+      return res[0] || null;
+    }
+  });
+
+  const getActiveAiMode = () => {
+    if (project?.aiMode && project.aiMode !== "default") return project.aiMode;
+    return profile?.defaultAiMode || "full";
+  };
+
   const { data: contentions = [] } = useQuery({
     queryKey: ['project_contentions', id],
     queryFn: () => base44.entities.Contention.filter({ projectId: id }, '-created_date'),
@@ -121,15 +134,26 @@ export default function ProjectDetail() {
     setAgentResults(null);
     const q = agentQuery.trim();
     const context = [project?.resolution, project?.format, project?.side].filter(Boolean).join(', ');
-    const res = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a research agent for the debate project "${project?.name}". Context: ${context}.
+    const activeAiMode = getActiveAiMode();
+    
+    let promptText = `You are a research agent for the debate project "${project?.name}". Context: ${context}.
 The user wants to research: "${q}"
 Search the web and provide:
 1. A concise summary of key findings (3-5 bullet points)
 2. 2-3 specific facts/statistics that could be used as debate evidence
 3. 2-3 suggested contention titles this research could support
-4. Any counterarguments found in the research
-Format clearly with headers.`,
+4. Any counterarguments found in the research`;
+
+    if (activeAiMode === "dampened") {
+      promptText += `\n\nCRITICAL: The user has Dampened AI enabled. 
+- You MUST NOT write their arguments or contentions for them. 
+- Focus ONLY on providing objective evidence, statistics, and high-level structural suggestions.
+- Do NOT provide fully written paragraphs that they can just copy-paste.
+- Keep the summary brief and objective.`;
+    }
+
+    const res = await base44.integrations.Core.InvokeLLM({
+      prompt: promptText,
       add_context_from_internet: true,
       model: "gemini_3_flash",
       response_json_schema: {
@@ -174,7 +198,9 @@ Format clearly with headers.`,
     if (!rebuttalInput.trim() || rebuttalLoading) return;
     setRebuttalLoading(true);
     const context = contentions.slice(0, 5).map(c => `- ${c.title}: ${c.claim}`).join('\n');
-    const prompt = `You are an expert debater representing the ${project?.side || 'Affirmative'} side for the resolution "${project?.resolution || 'not set'}".
+    const activeAiMode = getActiveAiMode();
+    
+    let promptText = `You are an expert debater representing the ${project?.side || 'Affirmative'} side for the resolution "${project?.resolution || 'not set'}".
     
 Your opponent just made the following arguments:
 """
@@ -186,7 +212,15 @@ ${context || 'No contentions yet'}
 
 Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a clean list of concise, punchy rebuttals. Do NOT include pleasantries, just the rebuttals.`;
 
-    const res = await base44.integrations.Core.InvokeLLM({ prompt });
+    if (activeAiMode === "dampened") {
+      promptText += `\n\nCRITICAL: The user has Dampened AI enabled. 
+- You MUST NOT write their exact rebuttal speeches for them. 
+- INSTEAD, provide strategic bullet points outlining the *angles* they should attack.
+- E.g. "Focus on how their evidence is outdated" or "Point out the logical flaw in their impact mechanism."
+- Give them guidance, NOT the final script.`;
+    }
+
+    const res = await base44.integrations.Core.InvokeLLM({ prompt: promptText });
     setRebuttals(prev => [{ input: rebuttalInput, output: res }, ...prev]);
     setRebuttalInput("");
     setRebuttalLoading(false);

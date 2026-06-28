@@ -37,11 +37,11 @@ const SCHEMA = {
   required: ["contentions"]
 };
 
-async function generateBatch(count, form, format) {
+async function generateBatch(count, form, format, aiMode) {
   const fmtLabel = format === "parliamentary" ? "Parliamentary" : "Public Forum";
   const motionLabel = format === "parliamentary" ? "Motion" : "Resolution";
-  const result = await base44.integrations.Core.InvokeLLM({
-    prompt: `Generate ${count} complete tournament-ready contentions for ${fmtLabel} debate.
+  
+  let promptText = `Generate ${count} complete tournament-ready contentions for ${fmtLabel} debate.
 
 ${motionLabel}: "${form.resolution}"
 Side: ${form.side}
@@ -50,7 +50,18 @@ Evidence preference: ${form.evidencePreference}
 
 Create comprehensive, tournament-quality contentions with real academic evidence, statistics, and expert citations. Include realistic source URLs. Make each contention distinct and strategically strong.
 
-Return a JSON object with a "contentions" array. Each must include: title, claim, warrant, impact, evidence (array of {text, source, sourceUrl}), possibleRebuttals, rebuttalResponses, crossfireQuestions, crossfireAnswers, strategicNotes.`,
+Return a JSON object with a "contentions" array. Each must include: title, claim, warrant, impact, evidence (array of {text, source, sourceUrl}), possibleRebuttals, rebuttalResponses, crossfireQuestions, crossfireAnswers, strategicNotes.`;
+
+  if (aiMode === "dampened") {
+    promptText += `\n\nCRITICAL: The user has Dampened AI enabled. 
+- You MUST NOT write out the fully flushed contentions.
+- Instead, provide structural outlines. Provide bullet points for claim/warrant/impact.
+- Focus purely on evidence and high-level strategy.
+- Do NOT provide a full speech script that they can copy-paste.`;
+  }
+
+  const result = await base44.integrations.Core.InvokeLLM({
+    prompt: promptText,
     response_json_schema: SCHEMA,
   });
   return result.contentions || [];
@@ -69,6 +80,14 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
   const { data: savedContentions = [] } = useQuery({
     queryKey: ['contentions', format],
     queryFn: () => base44.entities.Contention.filter({ format }),
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ['userProfile', base44.auth?.user?.id],
+    queryFn: async () => {
+      const res = await base44.entities.UserProfile.list();
+      return res[0] || null;
+    }
   });
 
   const buildContention = (c, projectId) => ({
@@ -112,7 +131,8 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
     const total = parseInt(form.count);
     const batches = [];
     for (let i = 0; i < total; i += BATCH_SIZE) batches.push(Math.min(BATCH_SIZE, total - i));
-    const batchResults = await Promise.all(batches.map(n => generateBatch(n, form, format)));
+    const aiMode = profile?.defaultAiMode || "full";
+    const batchResults = await Promise.all(batches.map(n => generateBatch(n, form, format, aiMode)));
     const all = batchResults.flat().slice(0, total);
     setGeneratedContentions(all);
     setGenerating(false);

@@ -61,7 +61,7 @@ export default function Layout() {
     <div className="min-h-[100dvh] bg-slate-50 font-body flex flex-col">
       {/* Desktop + Mobile top nav */}
       <nav 
-        className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm"
+        className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm pt-[env(safe-area-inset-top)]"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 md:h-16">
@@ -142,12 +142,12 @@ export default function Layout() {
               </button>
             </div>
 
-            <div className="flex items-center gap-1 min-w-0 justify-end ml-2">
+            <div className="lg:hidden flex items-center gap-1 shrink-0 justify-end ml-auto">
               <button 
                 onClick={() => setMobileOpen(true)} 
-                className="lg:hidden p-2 -mr-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors"
+                className="p-2 -mr-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors"
               >
-                <Menu className="w-5 h-5" />
+                <Menu className="w-6 h-6" />
               </button>
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function Layout() {
 
       {/* Full screen menu (Mobile + Desktop) */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[70] bg-slate-50/95 backdrop-blur-xl pt-12 pb-24 px-4 overflow-y-auto flex flex-col items-center">
+        <div className="fixed inset-0 z-[70] bg-slate-50/95 backdrop-blur-xl pt-[calc(env(safe-area-inset-top)+3rem)] pb-24 px-4 overflow-y-auto flex flex-col items-center">
           <div className="w-full max-w-2xl">
           <div className="flex items-center justify-between mb-8 mt-2">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight">Navigation</h2>

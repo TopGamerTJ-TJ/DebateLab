@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Zap, Sparkles, Brain, Trophy, FileText, Globe,
-  TrendingUp, Search, MessageSquare } from
+  TrendingUp, Search, MessageSquare, Menu, X } from
 "lucide-react";
 
 const NAV_TABS = [
@@ -52,12 +52,13 @@ const FEATURES = [
 export default function LandingPreview() {
   const [activeTab, setActiveTab] = useState("home");
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white font-body">
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-neutral-950 border-b border-white border-opacity-10">
+      <nav className="sticky top-0 z-50 bg-neutral-950 border-b border-white border-opacity-10 pt-[env(safe-area-inset-top)]">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
           {/* Logo */}
           <div className="flex items-center gap-2.5 shrink-0">
@@ -88,7 +89,7 @@ export default function LandingPreview() {
           </div>
 
           {/* Auth buttons */}
-          <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2">
             <Link to="/login">
               <button className="px-4 py-1.5 text-sm text-white border border-white border-opacity-20 rounded-lg transition-all hover:border-opacity-40">
                 Sign In
@@ -99,14 +100,63 @@ export default function LandingPreview() {
                 Get Started
               </button>
             </Link>
-            <Link to="/home" className="hidden md:block">
-              
+          </div>
 
-              
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center gap-3">
+            <Link to="/login">
+              <button className="px-3 py-1.5 text-xs text-white border border-white border-opacity-20 rounded-lg">
+                Sign In
+              </button>
             </Link>
+            <button onClick={() => setMobileOpen(true)} className="p-1 text-white opacity-70 hover:opacity-100">
+              <Menu className="w-6 h-6" />
+            </button>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-[100] bg-neutral-950 flex flex-col pt-[env(safe-area-inset-top)]">
+          <div className="flex items-center justify-between px-6 h-14 border-b border-white border-opacity-10">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-neutral-900 border border-white border-opacity-10 rounded-xl flex items-center justify-center">
+                <Zap className="w-4 h-4 text-blue-400" />
+              </div>
+              <span className="font-bold text-white text-base font-heading">DebateLab</span>
+            </div>
+            <button onClick={() => setMobileOpen(false)} className="p-1 text-white opacity-70 hover:opacity-100">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          <div className="flex flex-col p-6 gap-4">
+            {NAV_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => { setActiveTab(tab.id); setMobileOpen(false); }}
+                className={`text-left text-lg font-medium py-3 border-b border-white border-opacity-5 ${
+                  activeTab === tab.id ? "text-blue-400" : "text-white opacity-70"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+            <div className="flex flex-col gap-3 mt-6">
+              <Link to="/login" onClick={() => setMobileOpen(false)}>
+                <button className="w-full py-3 text-sm text-white border border-white border-opacity-20 rounded-xl">
+                  Sign In
+                </button>
+              </Link>
+              <Link to="/register" onClick={() => setMobileOpen(false)}>
+                <button className="w-full py-3 text-sm font-semibold bg-blue-600 text-white rounded-xl">
+                  Get Started
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* HOME */}
       {activeTab === "home" &&
