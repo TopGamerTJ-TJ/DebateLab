@@ -26,7 +26,9 @@ export default function ProfilePage() {
   const queryClient = useQueryClient();
   
   const [themeMode, setThemeMode] = useState(localStorage.getItem('theme_mode') || 'light');
-  const [customColors, setCustomColors] = useState(() => JSON.parse(localStorage.getItem('custom_colors') || '{}'));
+  const [customColors, setCustomColors] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('custom_colors') || '{}'); } catch { return {}; }
+  });
 
   useEffect(() => { base44.auth.me().then(u => setCurrentUser(u)).catch(() => {}); }, []);
 
@@ -63,7 +65,7 @@ export default function ProfilePage() {
   const { data: contentions = [] } = useQuery({ queryKey: ['contentions'], queryFn: () => base44.entities.Contention.list() });
   const { data: tournaments = [] } = useQuery({ queryKey: ['tournaments'], queryFn: () => base44.entities.Tournament.list() });
 
-  const profile = profiles[0];
+  const profile = profiles && profiles.length > 0 ? profiles[0] : null;
 
   useEffect(() => {
     if (profile) {
@@ -88,9 +90,9 @@ export default function ProfilePage() {
     }
   });
 
-  const wins = sessions.filter(s => s.winner === 'user').length;
-  const losses = sessions.filter(s => s.winner === 'ai').length;
-  const winRate = sessions.length > 0 ? Math.round((wins / sessions.length) * 100) : 0;
+  const wins = (sessions || []).filter(s => s?.winner === 'user').length;
+  const losses = (sessions || []).filter(s => s?.winner === 'ai').length;
+  const winRate = (sessions || []).length > 0 ? Math.round((wins / sessions.length) * 100) : 0;
 
   const levelColors = { beginner: "bg-green-100 text-green-700", intermediate: "bg-blue-100 text-blue-700", advanced: "bg-purple-100 text-purple-700", expert: "bg-red-100 text-red-600" };
 
@@ -249,9 +251,9 @@ export default function ProfilePage() {
               <h3 className="font-bold text-slate-900 font-heading text-sm mb-4">Your Stats</h3>
               <div className="space-y-3">
                 {[
-                  { icon: Target, label: "Practice Sessions", value: sessions.length, color: "text-blue-600" },
-                  { icon: BookOpen, label: "Contentions Saved", value: contentions.length, color: "text-indigo-600" },
-                  { icon: Trophy, label: "Tournaments", value: tournaments.length, color: "text-amber-600" },
+                  { icon: Target, label: "Practice Sessions", value: (sessions || []).length, color: "text-blue-600" },
+                  { icon: BookOpen, label: "Contentions Saved", value: (contentions || []).length, color: "text-indigo-600" },
+                  { icon: Trophy, label: "Tournaments", value: (tournaments || []).length, color: "text-amber-600" },
                   { icon: Brain, label: "Win Rate", value: `${winRate}%`, color: wins >= losses ? "text-green-600" : "text-red-500" },
                 ].map(({ icon: Icon, label, value, color }) => (
                   <div key={label} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">

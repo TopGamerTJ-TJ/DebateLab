@@ -96,10 +96,15 @@ export default function TourModal() {
 
   const handleNext = async () => {
     if (TOUR_STEPS[step].id === "profile") {
-      if (formData.displayName || formData.skillLevel || formData.preferredFormat) {
-        await saveProfile.mutateAsync(formData);
+      try {
+        if (formData.displayName || formData.skillLevel || formData.preferredFormat) {
+          await saveProfile.mutateAsync(formData);
+        }
+      } catch (e) {
+        console.error("Failed to save profile:", e);
+      } finally {
+        handleClose();
       }
-      handleClose();
     } else if (step < TOUR_STEPS.length - 1) {
       setStep(step + 1);
     } else {

@@ -30,10 +30,15 @@ export default function ContactForm() {
   const handleSend = async () => {
     if (!subject || !email || !body.trim()) return;
     setSending(true);
-    // Save to DB for admin panel
-    await base44.entities.ContactRequest.create({ subject, email, body });
-    setSent(true);
-    setSending(false);
+    try {
+      // Save to DB for admin panel
+      await base44.entities.ContactRequest.create({ subject, email, body });
+      setSent(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSending(false);
+    }
   };
 
   if (sent) {

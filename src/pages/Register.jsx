@@ -141,6 +141,7 @@ export default function Register() {
     >
       <div className="flex flex-col gap-3 mb-6">
         <Button
+          type="button"
           variant="outline"
           className="w-full h-12 text-sm font-medium border-slate-300 text-black hover:bg-slate-50 bg-white"
           onClick={handleGoogle}
@@ -149,6 +150,7 @@ export default function Register() {
           Continue with Google
         </Button>
         <Button
+          type="button"
           variant="outline"
           className="w-full h-12 text-sm font-medium border-slate-300 text-white hover:bg-black/90 bg-black"
           onClick={() => base44.auth.loginWithProvider("apple", "/home")}
