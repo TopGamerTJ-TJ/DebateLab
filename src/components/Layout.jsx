@@ -2,11 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
 import Dashboard from "@/pages/Dashboard";
 import Projects from "@/pages/Projects";
 import CoachChat from "@/pages/CoachChat";
 import Forum from "@/pages/Forum";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap } from "lucide-react";
 
 const doLogout = async () => {
   await base44.auth.logout();
@@ -14,6 +15,7 @@ const doLogout = async () => {
 };
 
 export default function Layout() {
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [debateOpen, setDebateOpen] = useState(false);
@@ -24,6 +26,18 @@ export default function Layout() {
   // Detect if we're on a sub-route (not a root tab) for mobile back button
   const rootPaths = ["/home", "/projects", "/practice", "/forum", "/coach"];
   const isSubRoute = !rootPaths.includes(location.pathname);
+
+  const { data: profile } = useQuery({
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const res = await base44.entities.UserProfile.list();
+      return res[0] || null;
+    },
+    enabled: !!user
+  });
+
+  const shouldShowLearn = profile && ["new", "beginner", "intermediate"].includes(profile.skillLevel) && profile.learnTabEnabled !== false;
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['platform_notifications'],
@@ -108,6 +122,7 @@ export default function Layout() {
               </div>
 
               {[
+                ...(shouldShowLearn ? [["/learn", <GraduationCap className="w-3.5 h-3.5" />, "Learn"]] : []),
                 ["/model-un", <Globe className="w-3.5 h-3.5" />, "MUN"],
                 ["/model-congress", <FileText className="w-3.5 h-3.5" />, "Congress"],
                 ["/forum", <MessageSquare className="w-3.5 h-3.5" />, "Forum"],
@@ -173,6 +188,7 @@ export default function Layout() {
           <div className="grid grid-cols-3 gap-3">
             {[
               ["/home", LayoutDashboard, "Home"],
+              ...(shouldShowLearn ? [["/learn", GraduationCap, "Learn"]] : []),
               ["/projects", Folder, "Projects"],
               ["/coach", Brain, "Coach"],
               ["/practice", Target, "Practice Rounds"],

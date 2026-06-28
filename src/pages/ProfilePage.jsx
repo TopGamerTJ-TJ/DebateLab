@@ -11,11 +11,20 @@ import AdminPanel from "@/components/AdminPanel";
 import ContactForm from "@/components/ContactForm";
 
 const FORMATS = ["Parliamentary Debate", "Public Forum", "Model UN", "Model Congress"];
-const LEVELS = ["beginner", "intermediate", "advanced", "expert"];
+const LEVELS = ["new", "beginner", "intermediate", "advanced"];
 const GRADES = ["6th Grade", "7th Grade", "8th Grade", "9th Grade", "10th Grade", "11th Grade", "12th Grade", "Freshman", "Sophomore", "Junior", "Senior", "Graduate", "Other"];
 
 export default function ProfilePage() {
-  const [form, setForm] = useState({ displayName: "", school: "", gradeLevel: "", preferredFormat: "", skillLevel: "intermediate", bio: "" });
+  const [form, setForm] = useState({ 
+    displayName: "", 
+    school: "", 
+    gradeLevel: "", 
+    preferredFormat: "", 
+    skillLevel: "intermediate", 
+    bio: "", 
+    learnTabEnabled: true, 
+    defaultAiMode: "full" 
+  });
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState("profile");
   const [currentUser, setCurrentUser] = useState(null);
@@ -76,6 +85,8 @@ export default function ProfilePage() {
         preferredFormat: profile.preferredFormat || "",
         skillLevel: profile.skillLevel || "intermediate",
         bio: profile.bio || "",
+        learnTabEnabled: profile.learnTabEnabled !== false,
+        defaultAiMode: profile.defaultAiMode || "full"
       });
     }
   }, [profile]);
@@ -237,6 +248,46 @@ export default function ProfilePage() {
                   <label className="text-sm font-medium text-slate-700 mb-1.5 block">Bio / Goals</label>
                   <Textarea value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} placeholder="Your debate goals, experience, or anything you'd like to note..." rows={3} className="resize-none text-sm" />
                 </div>
+
+                <div className="pt-4 border-t border-slate-100">
+                  <h4 className="text-sm font-bold text-slate-900 mb-3">App Preferences</h4>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                      <div>
+                        <div className="text-sm font-semibold text-slate-900">Show Learn Tab</div>
+                        <div className="text-xs text-slate-500">Enable the personalized learning course</div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={form.learnTabEnabled}
+                          onChange={(e) => setForm({ ...form, learnTabEnabled: e.target.checked })}
+                        />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
+                    </div>
+
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                      <div className="text-sm font-semibold text-slate-900 mb-2">Global AI Preference</div>
+                      <select 
+                        value={form.defaultAiMode} 
+                        onChange={e => setForm({ ...form, defaultAiMode: e.target.value })} 
+                        className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none"
+                      >
+                        <option value="full">Full AI Assistance</option>
+                        <option value="dampened">Dampened AI (Guidance Only)</option>
+                      </select>
+                      <div className="text-xs text-slate-500 mt-2">
+                        {form.defaultAiMode === 'full' 
+                          ? "AI will generate complete speeches and arguments for you." 
+                          : "AI acts as a guide, providing outlines and evidence instead of writing for you."}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <Button onClick={() => save.mutate(form)} disabled={save.isPending} className="w-full gap-2">
                   {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
                   {saved ? "Saved!" : "Save Profile"}

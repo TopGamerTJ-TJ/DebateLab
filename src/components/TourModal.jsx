@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Brain, FileText, Target, Users, X, ChevronRight, Check } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -32,9 +33,21 @@ const TOUR_STEPS = [
     icon: <Brain className="w-10 h-10 text-violet-500" />
   },
   {
+    id: "experience",
+    title: "Debate Experience",
+    desc: "Tell us about your background so we can personalize your learning path.",
+    icon: <Users className="w-10 h-10 text-orange-500" />
+  },
+  {
+    id: "ai_mode",
+    title: "AI Preference",
+    desc: "Choose how you want DebateLab's AI to assist you.",
+    icon: <Brain className="w-10 h-10 text-violet-500" />
+  },
+  {
     id: "profile",
     title: "Complete Your Profile",
-    desc: "We need this so you can post on forums, share content, and add friends. You can skip this and do it later.",
+    desc: "Set your display name so you can post on forums, share content, and add friends.",
     icon: <Users className="w-10 h-10 text-orange-500" />
   }
 ];
@@ -44,7 +57,15 @@ export default function TourModal() {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState({ displayName: "", skillLevel: "", preferredFormat: "" });
+  const [formData, setFormData] = useState({ 
+    displayName: "", 
+    skillLevel: "", 
+    preferredFormat: "",
+    learnTabEnabled: true,
+    learningPathType: "debate",
+    learningPathFormat: "public_forum",
+    defaultAiMode: "full"
+  });
 
   const { data: profile } = useQuery({
     queryKey: ['userProfile', user?.id],
@@ -62,7 +83,11 @@ export default function TourModal() {
         ...prev,
         displayName: profile.displayName || user?.full_name || "",
         skillLevel: profile.skillLevel || "",
-        preferredFormat: profile.preferredFormat || ""
+        preferredFormat: profile.preferredFormat || "",
+        learnTabEnabled: profile.learnTabEnabled !== false,
+        learningPathType: profile.learningPathType || "debate",
+        learningPathFormat: profile.learningPathFormat || "public_forum",
+        defaultAiMode: profile.defaultAiMode || "full"
       }));
     } else if (user) {
       setFormData(prev => ({ ...prev, displayName: user.full_name || "" }));
@@ -95,11 +120,14 @@ export default function TourModal() {
   };
 
   const handleNext = async () => {
+    if (TOUR_STEPS[step].id === "experience" && !formData.skillLevel) {
+      // Must select skill level
+      return;
+    }
+
     if (TOUR_STEPS[step].id === "profile") {
       try {
-        if (formData.displayName || formData.skillLevel || formData.preferredFormat) {
-          await saveProfile.mutateAsync(formData);
-        }
+        await saveProfile.mutateAsync(formData);
       } catch (e) {
         console.error("Failed to save profile:", e);
       } finally {
@@ -138,41 +166,98 @@ export default function TourModal() {
             {currentStep.desc}
           </p>
 
-          {currentStep.id === "profile" && (
-            <div className="space-y-4 mb-8">
+          {currentStep.id === "experience" && (
+            <div className="space-y-5 mb-8">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Display Name</label>
-                <Input value={formData.displayName} onChange={e => setFormData({...formData, displayName: e.target.value})} placeholder="How you appear to others" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Skill Level</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Debate Experience Level <span className="text-red-500">*</span></label>
                 <select 
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
                   value={formData.skillLevel} 
                   onChange={e => setFormData({...formData, skillLevel: e.target.value})}
                 >
-                  <option value="" disabled>Select Level</option>
+                  <option value="" disabled>Select Experience Level</option>
+                  <option value="new">New</option>
                   <option value="beginner">Beginner</option>
                   <option value="intermediate">Intermediate</option>
                   <option value="advanced">Advanced</option>
-                  <option value="expert">Expert</option>
                 </select>
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Preferred Format</label>
-                <select 
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
-                  value={formData.preferredFormat} 
-                  onChange={e => setFormData({...formData, preferredFormat: e.target.value})}
+
+              {["new", "beginner", "intermediate"].includes(formData.skillLevel) && (
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4 animate-in fade-in slide-in-from-top-2">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Learning Path Focus</label>
+                    <select 
+                      className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+                      value={formData.learningPathType} 
+                      onChange={e => setFormData({...formData, learningPathType: e.target.value})}
+                    >
+                      <option value="debate">Debate</option>
+                      <option value="model_un">Model UN</option>
+                      <option value="model_congress">Model Congress</option>
+                    </select>
+                  </div>
+                  {formData.learningPathType === "debate" && (
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Debate Format</label>
+                      <select 
+                        className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+                        value={formData.learningPathFormat} 
+                        onChange={e => setFormData({...formData, learningPathFormat: e.target.value})}
+                      >
+                        <option value="public_forum">Public Forum</option>
+                        <option value="parliamentary">Parliamentary</option>
+                      </select>
+                    </div>
+                  )}
+                  <div className="flex items-center space-x-2 pt-2 border-t border-slate-200">
+                    <Checkbox 
+                      id="disable-learn" 
+                      checked={!formData.learnTabEnabled}
+                      onCheckedChange={(checked) => setFormData({...formData, learnTabEnabled: !checked})}
+                    />
+                    <label htmlFor="disable-learn" className="text-sm text-slate-600 font-medium cursor-pointer">
+                      Don't include the Learn tab
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentStep.id === "ai_mode" && (
+            <div className="space-y-4 mb-8">
+              <div className="grid grid-cols-1 gap-4">
+                <div 
+                  onClick={() => setFormData({...formData, defaultAiMode: "full"})}
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.defaultAiMode === "full" ? "border-primary bg-primary/5" : "border-slate-200 hover:border-slate-300"}`}
                 >
-                  <option value="" disabled>Select Format</option>
-                  <option value="parliamentary">Parliamentary</option>
-                  <option value="public_forum">Public Forum</option>
-                  <option value="model_un">Model UN</option>
-                  <option value="model_congress">Model Congress</option>
-                  <option value="lincoln_douglas">Lincoln Douglas</option>
-                  <option value="policy">Policy</option>
-                </select>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-bold text-slate-900">Full AI Assistance</h3>
+                    {formData.defaultAiMode === "full" && <Check className="w-5 h-5 text-primary" />}
+                  </div>
+                  <p className="text-sm text-slate-500">AI will generate complete speeches, cases, briefs, and arguments for you.</p>
+                </div>
+                
+                <div 
+                  onClick={() => setFormData({...formData, defaultAiMode: "dampened"})}
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.defaultAiMode === "dampened" ? "border-primary bg-primary/5" : "border-slate-200 hover:border-slate-300"}`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-bold text-slate-900">Dampened AI</h3>
+                    {formData.defaultAiMode === "dampened" && <Check className="w-5 h-5 text-primary" />}
+                  </div>
+                  <p className="text-sm text-slate-500">AI acts as a guide, providing outlines, evidence, and research directions instead of writing for you. Encourages independent thinking.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentStep.id === "profile" && (
+            <div className="space-y-4 mb-8">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Display Name</label>
+                <Input value={formData.displayName} onChange={e => setFormData({...formData, displayName: e.target.value})} placeholder="How you appear to others" />
               </div>
             </div>
           )}

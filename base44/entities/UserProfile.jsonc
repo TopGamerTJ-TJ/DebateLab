@@ -17,6 +17,7 @@
     "skillLevel": {
       "type": "string",
       "enum": [
+        "new",
         "beginner",
         "intermediate",
         "advanced",
@@ -40,6 +41,33 @@
     },
     "losses": {
       "type": "number"
+    },
+    "learnTabEnabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "learningPathType": {
+      "type": "string",
+      "enum": [
+        "debate",
+        "model_un",
+        "model_congress"
+      ]
+    },
+    "learningPathFormat": {
+      "type": "string",
+      "enum": [
+        "public_forum",
+        "parliamentary"
+      ]
+    },
+    "defaultAiMode": {
+      "type": "string",
+      "enum": [
+        "full",
+        "dampened"
+      ],
+      "default": "full"
     }
   },
   "required": [],

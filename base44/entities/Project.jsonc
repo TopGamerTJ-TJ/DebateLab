@@ -31,6 +31,15 @@
     },
     "isArchived": {
       "type": "boolean"
+    },
+    "aiMode": {
+      "type": "string",
+      "enum": [
+        "default",
+        "full",
+        "dampened"
+      ],
+      "default": "default"
     }
   },
   "required": [

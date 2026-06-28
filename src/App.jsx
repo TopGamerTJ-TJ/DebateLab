@@ -16,6 +16,7 @@ import ModelCongress from './pages/ModelCongress';
 import TournamentPage from './pages/TournamentPage';
 import ProfilePage from './pages/ProfilePage';
 import DebateWiki from './pages/DebateWiki';
+import Learn from './pages/Learn';
 
 import PracticeRound from './pages/PracticeRound';
 import AICoach from './pages/AICoach';
@@ -103,6 +104,7 @@ const AuthenticatedApp = () => {
           <Route path="/tournament" element={<TournamentPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/wiki" element={<DebateWiki />} />
+          <Route path="/learn" element={<Learn />} />
 
           <Route path="/practice" element={<PracticeRound />} />
           <Route path="/ai-coach" element={<AICoach />} />
