@@ -10,11 +10,13 @@ import { MessageSquare, ThumbsUp, ThumbsDown, Image as ImageIcon, Plus, Flame, C
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import AnimatedPage from "@/components/AnimatedPage";
+import { useBans } from "@/components/BanGate";
 
 export default function Forum() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { banForum } = useBans();
   const [showForm, setShowForm] = useState(false);
   const [sortMode, setSortMode] = useState("hot"); // hot or new
   const [form, setForm] = useState({ title: "", content: "", imageUrl: "", format: "" });
@@ -64,6 +66,17 @@ export default function Forum() {
       toast({ title: "Post deleted" });
     }
   });
+
+  if (banForum) {
+    return (
+      <AnimatedPage className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100dvh-4rem)] flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 text-red-700 p-8 rounded-2xl text-center">
+          <h2 className="text-xl font-bold mb-2">Access Restricted</h2>
+          <p>You have been banned from accessing the community forum.</p>
+        </div>
+      </AnimatedPage>
+    );
+  }
 
   const handleVote = async (post, voteValue) => {
     if (!user) return;

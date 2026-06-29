@@ -10,6 +10,18 @@
     },
     "bannedBy": {
       "type": "string"
+    },
+    "banForum": {
+      "type": "boolean",
+      "default": true
+    },
+    "banFriends": {
+      "type": "boolean",
+      "default": true
+    },
+    "banMatch": {
+      "type": "boolean",
+      "default": true
     }
   },
   "required": [

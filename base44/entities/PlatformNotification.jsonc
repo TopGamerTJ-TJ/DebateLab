@@ -22,6 +22,22 @@
     },
     "sentBy": {
       "type": "string"
+    },
+    "targetAudience": {
+      "type": "string",
+      "enum": [
+        "all",
+        "select",
+        "group"
+      ],
+      "default": "all"
+    },
+    "targetGroup": {
+      "type": "string"
+    },
+    "sendPushNotification": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

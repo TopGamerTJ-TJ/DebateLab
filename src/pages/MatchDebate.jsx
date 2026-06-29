@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { useBans } from "@/components/BanGate";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -15,6 +16,7 @@ export default function MatchDebate() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { banMatch } = useBans();
   const navigate = useNavigate();
 
   const [createOpen, setCreateOpen] = useState(false);
@@ -24,7 +26,8 @@ export default function MatchDebate() {
     timePerSide: "5",
     prepTime: "3",
     sidePreference: "random",
-    visibility: "public"
+    visibility: "public",
+    scheduledInMinutes: "0" // 0 means now
   });
 
   const { data: lobbies = [], isLoading: loadingLobbies } = useQuery({
@@ -54,6 +57,7 @@ export default function MatchDebate() {
         format: data.format,
         timePerSide: parseInt(data.timePerSide),
         prepTime: parseInt(data.prepTime),
+        scheduledTime: data.scheduledInMinutes !== "0" ? new Date(Date.now() + parseInt(data.scheduledInMinutes) * 60000).toISOString() : null,
         creatorId: user.id,
         creatorName: user.full_name || user.email,
         creatorSidePreference: data.sidePreference,
@@ -94,8 +98,19 @@ export default function MatchDebate() {
     joinLobbyMutation.mutate({ lobbyId: lobby.id, sidePreference: "random" }); // Could show a dialog to pick side
   };
 
+  if (banMatch) {
+    return (
+      <AnimatedPage className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100dvh-4rem)] flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 text-red-700 p-8 rounded-2xl text-center max-w-md">
+          <h2 className="text-xl font-bold mb-2">Access Restricted</h2>
+          <p>You have been banned from participating in live match debates.</p>
+        </div>
+      </AnimatedPage>
+    );
+  }
+
   return (
-    <AnimatedPage className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <AnimatedPage className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 font-heading tracking-tight flex items-center gap-3">
@@ -166,7 +181,7 @@ export default function MatchDebate() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2 col-span-2">
+                <div className="space-y-2">
                   <label className="text-sm font-medium">Your Side Preference</label>
                   <Select value={form.sidePreference} onValueChange={v => setForm({...form, sidePreference: v})}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
@@ -174,6 +189,19 @@ export default function MatchDebate() {
                       <SelectItem value="random">Random / Assign me</SelectItem>
                       <SelectItem value="pro">Pro (Affirmative)</SelectItem>
                       <SelectItem value="con">Con (Negative)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Schedule (adaptive to local time)</label>
+                  <Select value={form.scheduledInMinutes} onValueChange={v => setForm({...form, scheduledInMinutes: v})}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">Start Now</SelectItem>
+                      <SelectItem value="15">In 15 Minutes</SelectItem>
+                      <SelectItem value="30">In 30 Minutes</SelectItem>
+                      <SelectItem value="60">In 1 Hour</SelectItem>
+                      <SelectItem value="120">In 2 Hours</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -219,6 +247,11 @@ export default function MatchDebate() {
                       <span className="text-xs text-slate-500 flex items-center gap-1">
                         <Clock className="w-3 h-3" /> {lobby.prepTime}m prep, {lobby.timePerSide}m debate
                       </span>
+                      {lobby.scheduledTime && (
+                        <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md flex items-center gap-1">
+                           Scheduled: {new Date(lobby.scheduledTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      )}
                     </div>
                     <h3 className="font-bold text-slate-900 text-lg leading-tight mb-1">{lobby.topic}</h3>
                     <p className="text-sm text-slate-500">Hosted by <span className="font-medium text-slate-700">{lobby.creatorName}</span></p>

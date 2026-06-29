@@ -46,13 +46,39 @@ export default function ForumPostDetail() {
   const isProfileComplete = profile && profile.displayName;
 
   const createComment = useMutation({
-    mutationFn: (data) => base44.entities.ForumComment.create({ 
-      ...data, 
-      postId: id,
-      authorName: profile?.displayName || user?.full_name || 'Anonymous',
-      upvotes: 0,
-      downvotes: 0
-    }),
+    mutationFn: async (data) => {
+      const comment = await base44.entities.ForumComment.create({ 
+        ...data, 
+        postId: id,
+        authorName: profile?.displayName || user?.full_name || 'Anonymous',
+        upvotes: 0,
+        downvotes: 0
+      });
+      
+      let targetUserId = null;
+      let title = "New Reply";
+      if (data.parentCommentId) {
+         const parent = await base44.entities.ForumComment.get(data.parentCommentId);
+         if (parent && parent.created_by_id !== user.id) targetUserId = parent.created_by_id;
+      } else if (post && post.created_by_id !== user.id) {
+         targetUserId = post.created_by_id;
+         title = "New Comment on your Post";
+      }
+
+      if (targetUserId) {
+         const targetProfile = await base44.entities.UserProfile.filter({ created_by_id: targetUserId });
+         if (!targetProfile[0] || targetProfile[0].notificationsEnabled !== false) {
+             await base44.entities.UserNotification.create({
+                userId: targetUserId,
+                title,
+                message: `${profile?.displayName || "Someone"} replied: "${data.content.substring(0, 50)}..."`,
+                link: `/forum/${id}`,
+                type: "forum"
+             });
+         }
+      }
+      return comment;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['forum_comments', id] });
       setCommentText("");

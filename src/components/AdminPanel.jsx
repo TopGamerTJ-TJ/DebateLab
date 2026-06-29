@@ -13,9 +13,14 @@ export default function AdminPanel() {
   const [tab, setTab] = useState("bans");
   const [banEmail, setBanEmail] = useState("");
   const [banReason, setBanReason] = useState("");
+  const [banOptions, setBanOptions] = useState({ forum: true, friends: true, match: true });
+  
   const [notifTitle, setNotifTitle] = useState("");
   const [notifMsg, setNotifMsg] = useState("");
   const [notifType, setNotifType] = useState("info");
+  const [notifTarget, setNotifTarget] = useState("all");
+  const [notifGroup, setNotifGroup] = useState("");
+  const [sendPush, setSendPush] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -33,11 +38,18 @@ export default function AdminPanel() {
   });
 
   const addBan = useMutation({
-    mutationFn: () => base44.entities.BannedUser.create({ email: banEmail.trim().toLowerCase(), reason: banReason }),
+    mutationFn: () => base44.entities.BannedUser.create({ 
+      email: banEmail.trim().toLowerCase(), 
+      reason: banReason,
+      banForum: banOptions.forum,
+      banFriends: banOptions.friends,
+      banMatch: banOptions.match
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['banned_users'] });
       toast({ title: `${banEmail} has been banned` });
       setBanEmail(""); setBanReason("");
+      setBanOptions({ forum: true, friends: true, match: true });
     }
   });
 
@@ -47,11 +59,19 @@ export default function AdminPanel() {
   });
 
   const sendNotif = useMutation({
-    mutationFn: () => base44.entities.PlatformNotification.create({ title: notifTitle, message: notifMsg, type: notifType, isActive: true }),
+    mutationFn: () => base44.entities.PlatformNotification.create({ 
+      title: notifTitle, 
+      message: notifMsg, 
+      type: notifType, 
+      isActive: true,
+      targetAudience: notifTarget,
+      targetGroup: notifGroup,
+      sendPushNotification: sendPush
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['platform_notifications'] });
-      toast({ title: "Notification sent to all users!" });
-      setNotifTitle(""); setNotifMsg("");
+      toast({ title: sendPush ? "Push Notification Sent!" : "Notification sent!" });
+      setNotifTitle(""); setNotifMsg(""); setSendPush(false); setNotifTarget("all"); setNotifGroup("");
     }
   });
 
@@ -105,9 +125,14 @@ export default function AdminPanel() {
       <div className="p-5">
         {tab === "bans" && (
           <div className="space-y-4">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Input value={banEmail} onChange={e => setBanEmail(e.target.value)} placeholder="Email address to ban" type="email" />
               <Input value={banReason} onChange={e => setBanReason(e.target.value)} placeholder="Reason (optional)" />
+              <div className="flex items-center gap-4 text-sm px-1 py-1">
+                <label className="flex items-center gap-1.5"><input type="checkbox" checked={banOptions.forum} onChange={e=>setBanOptions({...banOptions, forum: e.target.checked})} /> Forum</label>
+                <label className="flex items-center gap-1.5"><input type="checkbox" checked={banOptions.friends} onChange={e=>setBanOptions({...banOptions, friends: e.target.checked})} /> Friends</label>
+                <label className="flex items-center gap-1.5"><input type="checkbox" checked={banOptions.match} onChange={e=>setBanOptions({...banOptions, match: e.target.checked})} /> Live Match</label>
+              </div>
               <Button onClick={() => addBan.mutate()} disabled={!banEmail.trim() || addBan.isPending} className="w-full bg-red-600 hover:bg-red-700 gap-2">
                 <Ban className="w-4 h-4" /> Ban User
               </Button>
@@ -120,7 +145,10 @@ export default function AdminPanel() {
                   <div key={b.id} className="flex items-center justify-between bg-red-50 rounded-xl px-3 py-2.5">
                     <div>
                       <div className="text-sm font-medium text-slate-900">{b.email}</div>
-                      {b.reason && <div className="text-xs text-slate-500">{b.reason}</div>}
+                      <div className="text-xs text-slate-500 font-medium mt-0.5">
+                         {[b.banForum && 'Forum', b.banFriends && 'Friends', b.banMatch && 'Match'].filter(Boolean).join(', ')} Restricted
+                      </div>
+                      {b.reason && <div className="text-xs text-slate-500 mt-0.5">{b.reason}</div>}
                     </div>
                     <button onClick={() => removeBan.mutate(b.id)} className="p-1.5 hover:bg-red-100 rounded-lg transition-colors text-red-400 hover:text-red-600">
                       <Trash2 className="w-3.5 h-3.5" />
@@ -137,17 +165,37 @@ export default function AdminPanel() {
             <div className="space-y-2">
               <Input value={notifTitle} onChange={e => setNotifTitle(e.target.value)} placeholder="Notification title" />
               <Textarea value={notifMsg} onChange={e => setNotifMsg(e.target.value)} placeholder="Message to all users..." rows={3} className="resize-none text-sm" />
-              <Select value={notifType} onValueChange={setNotifType}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="info">ℹ️ Info</SelectItem>
-                  <SelectItem value="success">✅ Success</SelectItem>
-                  <SelectItem value="warning">⚠️ Warning</SelectItem>
-                  <SelectItem value="alert">🚨 Alert</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-2 gap-2">
+                <Select value={notifType} onValueChange={setNotifType}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="info">ℹ️ Info</SelectItem>
+                    <SelectItem value="success">✅ Success</SelectItem>
+                    <SelectItem value="warning">⚠️ Warning</SelectItem>
+                    <SelectItem value="alert">🚨 Alert</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={notifTarget} onValueChange={setNotifTarget}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Users</SelectItem>
+                    <SelectItem value="select">Select Users</SelectItem>
+                    <SelectItem value="group">User Group</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {notifTarget === "group" && (
+                <Input value={notifGroup} onChange={e => setNotifGroup(e.target.value)} placeholder="e.g. parliamentary_debater, intermediate..." />
+              )}
+              {notifTarget === "select" && (
+                <Input value={notifGroup} onChange={e => setNotifGroup(e.target.value)} placeholder="Comma separated emails..." />
+              )}
+              <label className="flex items-center gap-2 text-sm text-slate-700 py-1">
+                <input type="checkbox" checked={sendPush} onChange={e => setSendPush(e.target.checked)} className="rounded" />
+                Send Push Notification on Mobile App
+              </label>
               <Button onClick={() => sendNotif.mutate()} disabled={!notifTitle || !notifMsg || sendNotif.isPending} className="w-full gap-2">
-                <Send className="w-4 h-4" /> Push Notification to All Users
+                <Send className="w-4 h-4" /> Send Notification
               </Button>
             </div>
             {notifications.length > 0 && (

@@ -21,6 +21,10 @@
       "type": "number",
       "default": 3
     },
+    "scheduledTime": {
+      "type": "string",
+      "format": "date-time"
+    },
     "creatorId": {
       "type": "string"
     },

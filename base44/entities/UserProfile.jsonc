@@ -68,6 +68,10 @@
         "dampened"
       ],
       "default": "full"
+    },
+    "notificationsEnabled": {
+      "type": "boolean",
+      "default": true
     }
   },
   "required": [],

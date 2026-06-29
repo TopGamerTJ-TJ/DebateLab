@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { useBans } from "@/components/BanGate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Users, UserPlus, MessageCircle, Check, X, Search, Clock, Loader2, Target } from "lucide-react";
@@ -13,6 +14,7 @@ export default function Friends() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { banFriends } = useBans();
   const [tab, setTab] = useState("friends");
   const [friendCodeInput, setFriendCodeInput] = useState("");
   const [selectedFriend, setSelectedFriend] = useState(null);
@@ -122,6 +124,17 @@ export default function Friends() {
       queryClient.invalidateQueries(['dms', user?.id, selectedFriend]);
     }
   });
+
+  if (banFriends) {
+    return (
+      <AnimatedPage className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100dvh-4rem)] flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 text-red-700 p-8 rounded-2xl text-center max-w-md">
+          <h2 className="text-xl font-bold mb-2">Access Restricted</h2>
+          <p>You have been banned from accessing the friends and messaging features.</p>
+        </div>
+      </AnimatedPage>
+    );
+  }
 
   const handleRefresh = async () => {
     await queryClient.invalidateQueries(['friendships']);

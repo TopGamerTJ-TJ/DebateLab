@@ -7,7 +7,7 @@ import Dashboard from "@/pages/Dashboard";
 import Projects from "@/pages/Projects";
 import CoachChat from "@/pages/CoachChat";
 import Forum from "@/pages/Forum";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords, Bell } from "lucide-react";
 
 const doLogout = async () => {
   await base44.auth.logout();
@@ -20,6 +20,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const [debateOpen, setDebateOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
   const [dismissedNotifs, setDismissedNotifs] = useState(() => JSON.parse(sessionStorage.getItem('dismissed_notifs') || '[]'));
   const timerRef = useRef(null);
 
@@ -39,13 +40,27 @@ export default function Layout() {
 
   const shouldShowLearn = profile && ["new", "beginner", "intermediate"].includes(profile.skillLevel) && profile.learnTabEnabled !== false;
 
-  const { data: notifications = [] } = useQuery({
+  const { data: platformNotifications = [] } = useQuery({
     queryKey: ['platform_notifications'],
     queryFn: () => base44.entities.PlatformNotification.filter({ isActive: true }),
     refetchInterval: 60000,
   });
 
-  const activeNotif = notifications.find(n => !dismissedNotifs.includes(n.id));
+  const { data: userNotifications = [], refetch: refetchUserNotifs } = useQuery({
+    queryKey: ['user_notifications', user?.id],
+    queryFn: () => base44.entities.UserNotification.list('-created_date', 50),
+    enabled: !!user?.id,
+    refetchInterval: 30000,
+  });
+
+  const activeNotif = platformNotifications.find(n => !dismissedNotifs.includes(n.id));
+
+  const markNotifRead = async (id) => {
+    await base44.entities.UserNotification.update(id, { isRead: true });
+    refetchUserNotifs();
+  };
+  
+  const unreadNotifCount = userNotifications.filter(n => !n.isRead).length;
 
   const dismissNotif = (id) => {
     const next = [...dismissedNotifs, id];
@@ -141,9 +156,83 @@ export default function Layout() {
               <button onClick={() => setMobileOpen(true)} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100`}>
                 <Menu className="w-3.5 h-3.5" /> More
               </button>
+              
+              {/* Notification Bell */}
+              <div className="relative ml-2">
+                <button 
+                  onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
+                  className="relative p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-600"
+                >
+                  <Bell className="w-5 h-5" />
+                  {unreadNotifCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                  )}
+                </button>
+                
+                {notifDropdownOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                      <h3 className="font-bold text-slate-900 text-sm">Notifications</h3>
+                      {unreadNotifCount > 0 && (
+                         <span className="text-xs text-primary font-medium">{unreadNotifCount} new</span>
+                      )}
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {userNotifications.length === 0 ? (
+                        <div className="p-6 text-center text-slate-500 text-sm">No notifications yet.</div>
+                      ) : (
+                        userNotifications.map(n => (
+                          <div 
+                            key={n.id} 
+                            onClick={() => { if (!n.isRead) markNotifRead(n.id); if(n.link) navigate(n.link); setNotifDropdownOpen(false); }}
+                            className={`p-4 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors ${!n.isRead ? 'bg-blue-50/50' : ''}`}
+                          >
+                            <h4 className={`text-sm ${!n.isRead ? 'font-bold text-slate-900' : 'font-medium text-slate-700'}`}>{n.title}</h4>
+                            <p className="text-xs text-slate-500 mt-1 line-clamp-2">{n.message}</p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="lg:hidden flex items-center gap-1 shrink-0 justify-end ml-auto">
+              <div className="relative">
+                <button 
+                  onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
+                  className="p-2 -mr-1 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors relative"
+                >
+                  <Bell className="w-5 h-5" />
+                  {unreadNotifCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-slate-50"></span>
+                  )}
+                </button>
+                {notifDropdownOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
+                      <h3 className="font-bold text-slate-900 text-sm">Notifications</h3>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {userNotifications.length === 0 ? (
+                        <div className="p-6 text-center text-slate-500 text-sm">No notifications.</div>
+                      ) : (
+                        userNotifications.map(n => (
+                          <div 
+                            key={n.id} 
+                            onClick={() => { if (!n.isRead) markNotifRead(n.id); if(n.link) navigate(n.link); setNotifDropdownOpen(false); }}
+                            className={`p-4 border-b border-slate-50 cursor-pointer ${!n.isRead ? 'bg-blue-50/50' : ''}`}
+                          >
+                            <h4 className={`text-sm ${!n.isRead ? 'font-bold text-slate-900' : 'font-medium text-slate-700'}`}>{n.title}</h4>
+                            <p className="text-xs text-slate-500 mt-1 line-clamp-2">{n.message}</p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
               <button 
                 onClick={() => setMobileOpen(true)} 
                 className="p-2 -mr-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors"
