@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Swords, Plus, Clock, Users, Globe, Trophy, PlayCircle, Eye } from "lucide-react";
+import { Swords, Plus, Clock, Users, Globe, Trophy, PlayCircle, Archive } from "lucide-react";
 import AnimatedPage from "@/components/AnimatedPage";
 
 export default function MatchDebate() {
@@ -27,8 +27,16 @@ export default function MatchDebate() {
     prepTime: "3",
     sidePreference: "random",
     visibility: "public",
-    scheduledInMinutes: "0" // 0 means now
+    scheduledTime: ""
   });
+
+  const toDateTimeLocal = (date) => {
+    const pad = (num) => String(num).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  };
+
+  const scheduleMin = toDateTimeLocal(new Date());
+  const scheduleMax = toDateTimeLocal(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
 
   const { data: lobbies = [], isLoading: loadingLobbies } = useQuery({
     queryKey: ['debateLobbies'],
@@ -49,6 +57,15 @@ export default function MatchDebate() {
     refetchInterval: 5000
   });
 
+  const { data: archivedMatches = [], isLoading: loadingArchive } = useQuery({
+    queryKey: ['matchArchive'],
+    queryFn: async () => {
+      const matches = await base44.entities.DebateMatch.filter({ status: "ended" });
+      return matches.sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+    },
+    refetchInterval: 15000
+  });
+
   const createLobbyMutation = useMutation({
     mutationFn: async (data) => {
       return await base44.entities.DebateLobby.create({
@@ -56,7 +73,7 @@ export default function MatchDebate() {
         format: data.format,
         timePerSide: parseInt(data.timePerSide),
         prepTime: parseInt(data.prepTime),
-        scheduledTime: data.scheduledInMinutes !== "0" ? new Date(Date.now() + parseInt(data.scheduledInMinutes) * 60000).toISOString() : null,
+        scheduledTime: data.scheduledTime ? new Date(data.scheduledTime).toISOString() : null,
         creatorId: user.id,
         creatorName: user.full_name || user.email,
         creatorSidePreference: data.sidePreference,
@@ -196,16 +213,14 @@ export default function MatchDebate() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Schedule</label>
-                    <Select value={form.scheduledInMinutes} onValueChange={v => setForm({...form, scheduledInMinutes: v})}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="0">Start Now</SelectItem>
-                        <SelectItem value="15">In 15 Minutes</SelectItem>
-                        <SelectItem value="30">In 30 Minutes</SelectItem>
-                        <SelectItem value="60">In 1 Hour</SelectItem>
-                        <SelectItem value="120">In 2 Hours</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      type="datetime-local"
+                      min={scheduleMin}
+                      max={scheduleMax}
+                      value={form.scheduledTime}
+                      onChange={e => setForm({...form, scheduledTime: e.target.value})}
+                    />
+                    <p className="text-xs text-slate-500">Leave blank to start now. You can schedule up to 7 days ahead.</p>
                   </div>
                 </div>
               </div>
@@ -319,19 +334,37 @@ export default function MatchDebate() {
             </div>
           </div>
 
-          {/* Spectator Mode */}
-          <button
-            onClick={() => toast({ title: "Spectator Mode coming soon!" })}
-            className="w-full flex items-center gap-4 p-5 bg-white border border-slate-200 rounded-2xl hover:shadow-md hover:border-slate-300 transition-all text-left"
-          >
-            <div className="w-11 h-11 bg-purple-50 rounded-xl flex items-center justify-center shrink-0">
-              <Eye className="w-5 h-5 text-purple-600" />
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-5">
+              <Archive className="w-5 h-5 text-purple-600" /> Match Archive
+            </h2>
+
+            <div className="space-y-3">
+              {loadingArchive ? (
+                <div className="h-24 bg-slate-100 rounded-xl animate-pulse" />
+              ) : archivedMatches.length === 0 ? (
+                <div className="bg-white border border-slate-200 border-dashed rounded-2xl p-8 text-center">
+                  <p className="text-sm text-slate-500">No completed matches yet.</p>
+                </div>
+              ) : (
+                archivedMatches.map(match => (
+                  <Link key={match.id} to={`/match/${match.id}`} className="block bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-all group">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-700">ARCHIVED</span>
+                      <span className="text-xs text-slate-400">
+                        {new Date(match.startedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <h4 className="font-semibold text-slate-900 line-clamp-2 mb-3 group-hover:text-primary transition-colors">{match.topic}</h4>
+                    <div className="flex items-center justify-between text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2">
+                      <span className="truncate">{match.proPlayerName} <span className="text-slate-400 mx-1">vs</span> {match.conPlayerName}</span>
+                      {match.winnerId && <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
-            <div>
-              <h4 className="font-semibold text-slate-900">Spectator Mode</h4>
-              <p className="text-sm text-slate-500 mt-0.5">Watch live high-ELO debates</p>
-            </div>
-          </button>
+          </div>
         </section>
       </div>
     </AnimatedPage>
