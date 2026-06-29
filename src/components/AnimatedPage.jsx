@@ -9,7 +9,7 @@ const pageVariants = {
 
 const pageTransition = { type: "tween", ease: "anticipate", duration: 0.3 };
 
-export default function AnimatedPage({ children }) {
+export default function AnimatedPage({ children, className = "" }) {
   return (
     <motion.div
       initial="initial"
@@ -17,7 +17,7 @@ export default function AnimatedPage({ children }) {
       exit="out"
       variants={pageVariants}
       transition={pageTransition}
-      className="w-full h-full"
+      className={`w-full h-full ${className}`}
     >
       {children}
     </motion.div>
