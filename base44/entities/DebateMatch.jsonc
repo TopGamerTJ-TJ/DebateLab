@@ -2,6 +2,12 @@
   "name": "DebateMatch",
   "type": "object",
   "properties": {
+    "ownerUserId": {
+      "type": "string"
+    },
+    "auditId": {
+      "type": "number"
+    },
     "lobbyId": {
       "type": "string"
     },
@@ -83,7 +89,27 @@
   "rls": {
     "create": {},
     "read": {},
-    "update": {},
+    "update": {
+      "$or": [
+        {
+          "data.proPlayerId": "{{user.id}}"
+        },
+        {
+          "data.conPlayerId": "{{user.id}}"
+        },
+        {
+          "data.ownerUserId": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
     "delete": {
       "user_condition": {
         "role": "admin"
