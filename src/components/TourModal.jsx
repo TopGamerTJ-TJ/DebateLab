@@ -71,6 +71,8 @@ export default function TourModal() {
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
       if (!user) return null;
+      const byOwner = await base44.entities.UserProfile.filter({ ownerUserId: user.id });
+      if (byOwner.length > 0) return byOwner[0];
       const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       return res[0] || null;
     },
@@ -96,10 +98,11 @@ export default function TourModal() {
 
   const saveProfile = useMutation({
     mutationFn: async (data) => {
+      const payload = { ...data, ownerUserId: user?.id };
       if (profile?.id) {
-        return base44.entities.UserProfile.update(profile.id, data);
+        return base44.entities.UserProfile.update(profile.id, payload);
       } else {
-        return base44.entities.UserProfile.create(data);
+        return base44.entities.UserProfile.create(payload);
       }
     },
     onSuccess: () => {

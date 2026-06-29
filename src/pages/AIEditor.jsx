@@ -7,11 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, Loader2, MessageSquare, BookOpen, ChevronRight, Save, History, Plus, Trash2, ChevronLeft } from "lucide-react";
 import AnimatedPage from "@/components/AnimatedPage";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/lib/AuthContext";
 import ReactMarkdown from "react-markdown";
 
 export default function AIEditor() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [prompt, setPrompt] = useState("");
   const [sessionId, setSessionId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,6 +40,7 @@ export default function AIEditor() {
     mutationFn: async (firstMsg) => {
       const title = firstMsg.slice(0, 30) + (firstMsg.length > 30 ? "..." : "");
       return await base44.entities.AIChatSession.create({
+        ownerUserId: user?.id,
         title,
         feature: "editor",
         projectId: selectedProjectId || ""
@@ -45,16 +48,16 @@ export default function AIEditor() {
     },
     onSuccess: (newSession) => {
       setSessionId(newSession.id);
-      queryClient.invalidateQueries(['editor_sessions']);
+      queryClient.invalidateQueries({ queryKey: ['editor_sessions'] });
     }
   });
 
   const createMessage = useMutation({
     mutationFn: async (msg) => {
-      return await base44.entities.AIChatMessage.create(msg);
+      return await base44.entities.AIChatMessage.create({ ...msg, ownerUserId: user?.id });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['chat_messages', sessionId]);
+      queryClient.invalidateQueries({ queryKey: ['chat_messages', sessionId] });
     }
   });
 
@@ -63,7 +66,7 @@ export default function AIEditor() {
       await base44.entities.AIChatSession.delete(id);
     },
     onSuccess: (_, deletedId) => {
-      queryClient.invalidateQueries(['editor_sessions']);
+      queryClient.invalidateQueries({ queryKey: ['editor_sessions'] });
       if (sessionId === deletedId) setSessionId("");
       toast({ title: "Chat session deleted" });
     }
@@ -112,7 +115,7 @@ Provide a comprehensive, directly usable response.`
   };
 
   const handleRefresh = async () => {
-    await queryClient.invalidateQueries(['projects']);
+    await queryClient.invalidateQueries({ queryKey: ['projects'] });
   };
 
   const saveToProject = async (content) => {
@@ -122,12 +125,15 @@ Provide a comprehensive, directly usable response.`
     }
     try {
       await base44.entities.Contention.create({
+        ownerUserId: user?.id,
         projectId: selectedProjectId,
         title: "AI Editor Document",
         claim: "Generated Content",
         warrant: content.slice(0, 500),
         format: projects.find(p=>p.id===selectedProjectId)?.format || "parliamentary"
       });
+      queryClient.invalidateQueries({ queryKey: ['contentions'] });
+      queryClient.invalidateQueries({ queryKey: ['project_contentions', selectedProjectId] });
       toast({ title: "Saved to project as contention!" });
     } catch (e) {
       toast({ title: "Failed to save", variant: "destructive" });

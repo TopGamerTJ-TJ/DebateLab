@@ -78,6 +78,16 @@
     "notificationsEnabled": {
       "type": "boolean",
       "default": true
+    },
+    "themeMode": {
+      "type": "string",
+      "enum": [
+        "light",
+        "dark"
+      ]
+    },
+    "customColors": {
+      "type": "object"
     }
   },
   "required": [],

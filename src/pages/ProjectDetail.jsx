@@ -45,6 +45,8 @@ export default function ProjectDetail() {
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
       if (!user) return null;
+      const byOwner = await base44.entities.UserProfile.filter({ ownerUserId: user.id });
+      if (byOwner.length > 0) return byOwner[0];
       const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       return res[0] || null;
     },
@@ -81,6 +83,7 @@ export default function ProjectDetail() {
       const u = await base44.entities.User.get(collabUserId);
       if(!u) throw new Error("User not found");
       return base44.entities.ProjectCollaborator.create({
+        ownerUserId: user?.id,
         projectId: id,
         userId: u.id,
         userName: u.full_name,
@@ -88,7 +91,7 @@ export default function ProjectDetail() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['project_collaborators', id]);
+      queryClient.invalidateQueries({ queryKey: ['project_collaborators', id] });
       setCollabUserId("");
       toast({ title: "Collaborator added" });
     },
@@ -97,9 +100,10 @@ export default function ProjectDetail() {
 
   const logActivity = (action, details) => {
     base44.entities.ProjectActivity.create({
+      ownerUserId: user?.id,
       projectId: id,
-      userId: base44.auth?.user?.id || 'unknown',
-      userName: base44.auth?.user?.full_name || 'Anonymous',
+      userId: user?.id || 'unknown',
+      userName: user?.full_name || 'Anonymous',
       action,
       details
     });
@@ -176,6 +180,7 @@ Search the web and provide:
 
   const addAgentContention = async (title) => {
     await base44.entities.Contention.create({
+      ownerUserId: user?.id,
       title,
       format: project?.format || "parliamentary",
       resolution: project?.resolution || "",

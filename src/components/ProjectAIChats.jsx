@@ -4,10 +4,12 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sparkles, Loader2, MessageSquare, ChevronLeft, Plus, Brain, Globe, Trash2 } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
 import ReactMarkdown from "react-markdown";
 
 export default function ProjectAIChats({ project, contentions }) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [sessionId, setSessionId] = useState("");
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
@@ -26,23 +28,23 @@ export default function ProjectAIChats({ project, contentions }) {
 
   const createSession = useMutation({
     mutationFn: async ({ title, feature }) => {
-      return await base44.entities.AIChatSession.create({ title, feature, projectId: project.id });
+      return await base44.entities.AIChatSession.create({ ownerUserId: user?.id, title, feature, projectId: project.id });
     },
     onSuccess: (newSession) => {
       setSessionId(newSession.id);
-      queryClient.invalidateQueries(['project_chat_sessions', project.id]);
+      queryClient.invalidateQueries({ queryKey: ['project_chat_sessions', project.id] });
     }
   });
 
   const createMessage = useMutation({
-    mutationFn: async (msg) => await base44.entities.AIChatMessage.create(msg),
-    onSuccess: () => queryClient.invalidateQueries(['chat_messages', sessionId])
+    mutationFn: async (msg) => await base44.entities.AIChatMessage.create({ ...msg, ownerUserId: user?.id }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['chat_messages', sessionId] })
   });
 
   const deleteSession = useMutation({
     mutationFn: async (id) => await base44.entities.AIChatSession.delete(id),
     onSuccess: (_, deletedId) => {
-      queryClient.invalidateQueries(['project_chat_sessions', project.id]);
+      queryClient.invalidateQueries({ queryKey: ['project_chat_sessions', project.id] });
       if (sessionId === deletedId) setSessionId("");
     }
   });

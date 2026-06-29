@@ -88,6 +88,8 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
       if (!user) return null;
+      const byOwner = await base44.entities.UserProfile.filter({ ownerUserId: user.id });
+      if (byOwner.length > 0) return byOwner[0];
       const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       return res[0] || null;
     },
@@ -95,6 +97,7 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
   });
 
   const buildContention = (c, projectId) => ({
+    ownerUserId: user?.id,
     title: c.title, format, resolution: form.resolution || c.resolution, side: form.side || c.side,
     claim: c.claim, warrant: c.warrant, impact: c.impact, evidence: c.evidence,
     possibleRebuttals: c.possibleRebuttals, rebuttalResponses: c.rebuttalResponses,

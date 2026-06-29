@@ -67,7 +67,11 @@ export default function ProfilePage() {
 
   const { data: profiles = [] } = useQuery({ 
     queryKey: ['userProfile', currentUser?.id], 
-    queryFn: () => base44.entities.UserProfile.filter({ created_by_id: currentUser.id }),
+    queryFn: async () => {
+      const byOwner = await base44.entities.UserProfile.filter({ ownerUserId: currentUser.id });
+      if (byOwner.length > 0) return byOwner;
+      return base44.entities.UserProfile.filter({ created_by_id: currentUser.id });
+    },
     enabled: !!currentUser
   });
   const { data: sessions = [] } = useQuery({ queryKey: ['practice_sessions'], queryFn: () => base44.entities.PracticeSession.list('-created_date', 100) });
@@ -88,11 +92,23 @@ export default function ProfilePage() {
         learnTabEnabled: profile.learnTabEnabled !== false,
         defaultAiMode: profile.defaultAiMode || "full"
       });
+      if (profile.themeMode) {
+        setThemeMode(profile.themeMode);
+        localStorage.setItem('theme_mode', profile.themeMode);
+      }
+      if (profile.customColors) {
+        setCustomColors(profile.customColors);
+        localStorage.setItem('custom_colors', JSON.stringify(profile.customColors));
+      }
+      window.dispatchEvent(new Event('theme-changed'));
     }
   }, [profile]);
 
   const save = useMutation({
-    mutationFn: (data) => profile ? base44.entities.UserProfile.update(profile.id, data) : base44.entities.UserProfile.create(data),
+    mutationFn: (data) => {
+      const payload = { ...data, ownerUserId: currentUser?.id, themeMode, customColors };
+      return profile ? base44.entities.UserProfile.update(profile.id, payload) : base44.entities.UserProfile.create(payload);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });
       setSaved(true);

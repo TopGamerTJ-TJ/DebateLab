@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Folder, Plus, Trash2, ArrowRight, BookOpen, Archive, ArchiveRestore } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/lib/AuthContext";
 import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -32,6 +33,7 @@ export default function Projects() {
   const [showArchived, setShowArchived] = useState(false);
   const [form, setForm] = useState({ name: "", description: "", format: "", resolution: "", side: "" });
   const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const { data: allProjects = [], isLoading } = useQuery({
@@ -157,7 +159,7 @@ export default function Projects() {
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={() => setShowCreate(false)}>Cancel</Button>
               <Button className="flex-1" disabled={!form.name.trim() || createProject.isPending}
-                onClick={() => createProject.mutate({ name: form.name, description: form.description, format: form.format || undefined, resolution: form.resolution })}>
+                onClick={() => createProject.mutate({ ownerUserId: user?.id, name: form.name, description: form.description, format: form.format || undefined, resolution: form.resolution })}>
                 {createProject.isPending ? "Creating..." : "Create Project"}
               </Button>
             </div>

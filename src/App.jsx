@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import { AnimatePresence, motion } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import { base44 } from '@/api/base44Client';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
@@ -173,7 +174,19 @@ function ThemeManager() {
       else root.style.removeProperty('--accent');
     };
     
+    const loadSavedTheme = async () => {
+      const user = await base44.auth.me().catch(() => null);
+      if (!user?.id) return;
+      const byOwner = await base44.entities.UserProfile.filter({ ownerUserId: user.id }).catch(() => []);
+      const profiles = byOwner.length > 0 ? byOwner : await base44.entities.UserProfile.filter({ created_by_id: user.id }).catch(() => []);
+      const profile = profiles[0];
+      if (profile?.themeMode) localStorage.setItem('theme_mode', profile.themeMode);
+      if (profile?.customColors) localStorage.setItem('custom_colors', JSON.stringify(profile.customColors));
+      if (profile?.themeMode || profile?.customColors) applyTheme();
+    };
+
     applyTheme();
+    loadSavedTheme();
     window.addEventListener('theme-changed', applyTheme);
     return () => window.removeEventListener('theme-changed', applyTheme);
   }, []);
