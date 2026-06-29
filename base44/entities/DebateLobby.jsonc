@@ -2,6 +2,12 @@
   "name": "DebateLobby",
   "type": "object",
   "properties": {
+    "ownerUserId": {
+      "type": "string"
+    },
+    "auditId": {
+      "type": "number"
+    },
     "topic": {
       "type": "string"
     },
@@ -84,11 +90,37 @@
   "rls": {
     "create": {},
     "read": {},
-    "update": {},
+    "update": {
+      "$or": [
+        {
+          "data.creatorId": "{{user.id}}"
+        },
+        {
+          "data.joinedUserId": "{{user.id}}"
+        },
+        {
+          "data.ownerUserId": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
     "delete": {
       "$or": [
         {
           "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.creatorId": "{{user.id}}"
+        },
+        {
+          "data.ownerUserId": "{{user.id}}"
         },
         {
           "user_condition": {
