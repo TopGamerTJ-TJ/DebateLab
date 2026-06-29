@@ -2,6 +2,12 @@
   "name": "DirectMessage",
   "type": "object",
   "properties": {
+    "ownerUserId": {
+      "type": "string"
+    },
+    "auditId": {
+      "type": "number"
+    },
     "senderId": {
       "type": "string"
     },
@@ -26,10 +32,31 @@
         },
         {
           "data.receiverId": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
         }
       ]
     },
-    "update": {},
-    "delete": {}
+    "update": {
+      "$or": [
+        {
+          "data.senderId": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.senderId": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    }
   }
 }
