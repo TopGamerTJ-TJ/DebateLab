@@ -2,6 +2,12 @@
   "name": "ProjectCollaborator",
   "type": "object",
   "properties": {
+    "ownerUserId": {
+      "type": "string"
+    },
+    "auditId": {
+      "type": "number"
+    },
     "projectId": {
       "type": "string"
     },
@@ -28,9 +34,29 @@
   ],
   "rls": {
     "create": {},
-    "read": {},
+    "read": {
+      "$or": [
+        {
+          "data.userId": "{{user.id}}"
+        },
+        {
+          "data.ownerUserId": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
     "update": {
       "$or": [
+        {
+          "data.ownerUserId": "{{user.id}}"
+        },
         {
           "created_by_id": "{{user.id}}"
         },
@@ -43,6 +69,9 @@
     },
     "delete": {
       "$or": [
+        {
+          "data.ownerUserId": "{{user.id}}"
+        },
         {
           "created_by_id": "{{user.id}}"
         },
