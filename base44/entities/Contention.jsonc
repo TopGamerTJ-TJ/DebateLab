@@ -2,6 +2,12 @@
   "name": "Contention",
   "type": "object",
   "properties": {
+    "ownerUserId": {
+      "type": "string"
+    },
+    "auditId": {
+      "type": "number"
+    },
     "title": {
       "type": "string"
     },
@@ -117,6 +123,9 @@
           "created_by_id": "{{user.id}}"
         },
         {
+          "data.ownerUserId": "{{user.id}}"
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -129,6 +138,9 @@
           "created_by_id": "{{user.id}}"
         },
         {
+          "data.ownerUserId": "{{user.id}}"
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -139,6 +151,9 @@
       "$or": [
         {
           "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.ownerUserId": "{{user.id}}"
         },
         {
           "user_condition": {
