@@ -16,7 +16,7 @@ export default function MatchDebate() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { banMatch } = useBans();
+  const { banMatch, reason } = useBans();
   const navigate = useNavigate();
 
   const [createOpen, setCreateOpen] = useState(false);
@@ -104,6 +104,7 @@ export default function MatchDebate() {
         <div className="bg-red-50 border border-red-200 text-red-700 p-8 rounded-2xl text-center max-w-md">
           <h2 className="text-xl font-bold mb-2">Access Restricted</h2>
           <p>You have been banned from participating in live match debates.</p>
+          {reason && <p className="mt-4 text-sm font-medium border-t border-red-200 pt-4">Reason: {reason}</p>}
         </div>
       </AnimatedPage>
     );

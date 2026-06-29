@@ -14,7 +14,7 @@ export default function Friends() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { banFriends } = useBans();
+  const { banFriends, reason } = useBans();
   const [tab, setTab] = useState("friends");
   const [friendCodeInput, setFriendCodeInput] = useState("");
   const [selectedFriend, setSelectedFriend] = useState(null);
@@ -131,6 +131,7 @@ export default function Friends() {
         <div className="bg-red-50 border border-red-200 text-red-700 p-8 rounded-2xl text-center max-w-md">
           <h2 className="text-xl font-bold mb-2">Access Restricted</h2>
           <p>You have been banned from accessing the friends and messaging features.</p>
+          {reason && <p className="mt-4 text-sm font-medium border-t border-red-200 pt-4">Reason: {reason}</p>}
         </div>
       </AnimatedPage>
     );

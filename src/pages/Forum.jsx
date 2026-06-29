@@ -16,7 +16,7 @@ export default function Forum() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { banForum } = useBans();
+  const { banForum, reason } = useBans();
   const [showForm, setShowForm] = useState(false);
   const [sortMode, setSortMode] = useState("hot"); // hot or new
   const [form, setForm] = useState({ title: "", content: "", imageUrl: "", format: "" });
@@ -73,6 +73,7 @@ export default function Forum() {
         <div className="bg-red-50 border border-red-200 text-red-700 p-8 rounded-2xl text-center">
           <h2 className="text-xl font-bold mb-2">Access Restricted</h2>
           <p>You have been banned from accessing the community forum.</p>
+          {reason && <p className="mt-4 text-sm font-medium border-t border-red-200 pt-4">Reason: {reason}</p>}
         </div>
       </AnimatedPage>
     );
