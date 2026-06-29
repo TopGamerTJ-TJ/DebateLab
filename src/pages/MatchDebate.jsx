@@ -111,22 +111,22 @@ export default function MatchDebate() {
   }
 
   return (
-    <AnimatedPage className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-6 sm:p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-heading tracking-tight flex items-center gap-4">
-            <div className="p-3 bg-primary/10 rounded-2xl">
-              <Swords className="w-8 h-8 text-primary" />
-            </div>
-            Live Match Arena
-          </h1>
-          <p className="text-slate-500 mt-2 text-lg">Create matches, set rules, and debate live against others.</p>
+    <AnimatedPage className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-primary/10 rounded-xl">
+            <Swords className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 font-heading tracking-tight">Live Match Arena</h1>
+            <p className="text-slate-500 text-sm mt-0.5">Create matches, set rules, and debate live against others.</p>
+          </div>
         </div>
         
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="gap-2 shrink-0 rounded-full px-6 shadow-md hover:shadow-lg transition-all text-base font-semibold">
-              <Plus className="w-5 h-5" /> Create Debate
+            <Button className="gap-2 shrink-0 rounded-lg shadow-sm">
+              <Plus className="w-4 h-4" /> Create Debate
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
@@ -219,57 +219,53 @@ export default function MatchDebate() {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 lg:gap-12">
-        <div className="xl:col-span-8 space-y-8">
-          <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
-               <Globe className="w-6 h-6 text-blue-600" />
-            </div>
-            <h2 className="text-2xl font-extrabold text-slate-900">Active Lobbies</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+             <Globe className="w-5 h-5 text-blue-600" />
+             <h2 className="text-lg font-bold text-slate-900">Active Lobbies</h2>
           </div>
           
-          <div className="space-y-5">
+          <div className="space-y-4">
             {loadingLobbies ? (
-              <div className="animate-pulse space-y-5">
-                {[1,2,3].map(i => <div key={i} className="h-32 bg-slate-100 rounded-3xl" />)}
+              <div className="animate-pulse space-y-4">
+                {[1,2,3].map(i => <div key={i} className="h-24 bg-slate-100 rounded-xl" />)}
               </div>
             ) : lobbies.length === 0 ? (
-              <div className="bg-slate-50/50 border border-slate-200 border-dashed rounded-3xl p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
-                <div className="w-20 h-20 bg-white rounded-full shadow-sm flex items-center justify-center mb-5">
-                  <Users className="w-10 h-10 text-slate-300" />
-                </div>
-                <h3 className="font-bold text-slate-900 text-xl mb-2">No active lobbies</h3>
-                <p className="text-slate-500 max-w-sm text-base">Be the first to create a debate lobby and invite others to join.</p>
+              <div className="bg-slate-50 border border-slate-200 border-dashed rounded-xl p-10 text-center flex flex-col items-center justify-center min-h-[200px]">
+                <Users className="w-8 h-8 text-slate-300 mb-3" />
+                <h3 className="font-bold text-slate-900 text-lg mb-1">No active lobbies</h3>
+                <p className="text-slate-500 text-sm">Be the first to create a debate lobby and invite others to join.</p>
               </div>
             ) : (
               lobbies.map(lobby => (
-                <div key={lobby.id} className="bg-white border border-slate-100 rounded-[2rem] p-6 sm:p-8 shadow-sm hover:shadow-md hover:border-primary/30 transition-all flex flex-col sm:flex-row gap-6 justify-between sm:items-center">
+                <div key={lobby.id} className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row gap-4 justify-between sm:items-center">
                   <div>
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${lobby.visibility === 'ranked' ? 'bg-amber-100 text-amber-800' : lobby.visibility === 'tournament' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${lobby.visibility === 'ranked' ? 'bg-amber-100 text-amber-800' : lobby.visibility === 'tournament' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
                         {lobby.visibility.toUpperCase()}
                       </span>
-                      <span className="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-full">
+                      <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
                         {lobby.format.toUpperCase()}
                       </span>
-                      <span className="text-sm font-medium text-slate-500 flex items-center gap-1.5 ml-1">
-                        <Clock className="w-4 h-4 text-slate-400" /> {lobby.prepTime}m prep, {lobby.timePerSide}m debate
+                      <span className="text-xs font-medium text-slate-500 flex items-center gap-1 ml-1">
+                        <Clock className="w-3 h-3 text-slate-400" /> {lobby.prepTime}m prep, {lobby.timePerSide}m debate
                       </span>
                       {lobby.scheduledTime && (
-                        <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full flex items-center gap-1.5">
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md flex items-center gap-1">
                            Scheduled: {new Date(lobby.scheduledTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       )}
                     </div>
-                    <h3 className="font-extrabold text-slate-900 text-xl sm:text-2xl leading-tight mb-2">{lobby.topic}</h3>
-                    <p className="text-base text-slate-500">Hosted by <span className="font-semibold text-slate-700">{lobby.creatorName}</span></p>
+                    <h3 className="font-bold text-slate-900 text-lg leading-tight mb-1">{lobby.topic}</h3>
+                    <p className="text-sm text-slate-500">Hosted by <span className="font-medium text-slate-700">{lobby.creatorName}</span></p>
                   </div>
                   
-                  <div className="shrink-0 flex items-center gap-2 mt-2 sm:mt-0">
+                  <div className="shrink-0 flex items-center mt-2 sm:mt-0">
                     {lobby.creatorId === user?.id ? (
-                      <Button variant="outline" disabled className="w-full sm:w-auto rounded-full px-6 bg-slate-50 border-slate-200">Waiting for opponent...</Button>
+                      <Button variant="outline" disabled className="w-full sm:w-auto text-sm">Waiting...</Button>
                     ) : (
-                      <Button onClick={() => handleJoin(lobby)} disabled={joinLobbyMutation.isPending} size="lg" className="w-full sm:w-auto rounded-full px-8 shadow-sm hover:shadow-md transition-all font-semibold">
+                      <Button onClick={() => handleJoin(lobby)} disabled={joinLobbyMutation.isPending} className="w-full sm:w-auto text-sm">
                         Join Match
                       </Button>
                     )}
@@ -280,42 +276,40 @@ export default function MatchDebate() {
           </div>
         </div>
 
-        <div className="xl:col-span-4 space-y-10">
-          <div className="space-y-6">
-            <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-              <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
-                <PlayCircle className="w-6 h-6 text-green-600" />
-              </div>
-              <h2 className="text-2xl font-extrabold text-slate-900">My Matches</h2>
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+              <PlayCircle className="w-5 h-5 text-green-600" />
+              <h2 className="text-lg font-bold text-slate-900">My Matches</h2>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-3">
               {loadingMatches ? (
-                 <div className="h-32 bg-slate-100 rounded-3xl animate-pulse" />
+                 <div className="h-20 bg-slate-100 rounded-xl animate-pulse" />
               ) : myMatches.length === 0 ? (
-                <div className="bg-slate-50/50 border border-slate-200 border-dashed rounded-3xl p-8 text-center flex flex-col items-center justify-center">
-                  <PlayCircle className="w-10 h-10 text-slate-300 mb-3" />
-                  <p className="text-base text-slate-500 font-medium">You don't have any active<br/>or past matches.</p>
+                <div className="bg-slate-50 border border-slate-200 border-dashed rounded-xl p-6 text-center flex flex-col items-center justify-center">
+                  <PlayCircle className="w-6 h-6 text-slate-300 mb-2" />
+                  <p className="text-sm text-slate-500">You don't have any matches yet.</p>
                 </div>
               ) : (
                 myMatches.map(match => (
-                  <Link key={match.id} to={`/match/${match.id}`} className="block bg-white border border-slate-100 rounded-[1.5rem] p-6 shadow-sm hover:shadow-md hover:border-slate-300 transition-all group">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className={`text-xs font-extrabold px-3 py-1 rounded-full tracking-wide ${
+                  <Link key={match.id} to={`/match/${match.id}`} className="block bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-slate-300 transition-all group">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                         match.status === 'prep' ? 'bg-amber-100 text-amber-800' :
                         match.status === 'live' ? 'bg-red-100 text-red-800 animate-pulse' :
                         'bg-slate-100 text-slate-700'
                       }`}>
                         {match.status === 'prep' ? 'PREP PHASE' : match.status === 'live' ? 'LIVE NOW' : 'ENDED'}
                       </span>
-                      <span className="text-xs font-medium text-slate-400">
+                      <span className="text-[10px] font-medium text-slate-400">
                         {new Date(match.startedAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <h4 className="font-bold text-lg text-slate-900 line-clamp-2 mb-3 group-hover:text-primary transition-colors">{match.topic}</h4>
-                    <div className="flex items-center justify-between text-sm font-medium text-slate-500 bg-slate-50 rounded-xl p-3">
+                    <h4 className="font-semibold text-sm text-slate-900 line-clamp-2 mb-2 group-hover:text-primary transition-colors">{match.topic}</h4>
+                    <div className="flex items-center justify-between text-xs font-medium text-slate-500 bg-slate-50 rounded-lg p-2">
                       <span className="truncate">{match.proPlayerName} <span className="text-slate-400 mx-1">vs</span> {match.conPlayerName}</span>
-                      {match.isRanked && <Trophy className="w-4 h-4 text-amber-500 shrink-0" />}
+                      {match.isRanked && <Trophy className="w-3 h-3 text-amber-500 shrink-0" />}
                     </div>
                   </Link>
                 ))
@@ -324,14 +318,14 @@ export default function MatchDebate() {
           </div>
 
           <div className="pt-2">
-             <button onClick={() => toast({ title: "Spectator Mode coming soon!" })} className="w-full flex items-center justify-between p-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-[2rem] hover:shadow-md transition-all border border-purple-100 group">
-               <div className="flex items-center gap-5">
-                 <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform">
-                   <Eye className="w-7 h-7 text-purple-600" />
+             <button onClick={() => toast({ title: "Spectator Mode coming soon!" })} className="w-full flex items-center justify-between p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-all border border-purple-100 group">
+               <div className="flex items-center gap-3">
+                 <div className="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform">
+                   <Eye className="w-5 h-5 text-purple-600" />
                  </div>
                  <div className="text-left">
-                   <h4 className="font-extrabold text-slate-900 text-xl mb-1">Spectator Mode</h4>
-                   <p className="text-base font-medium text-slate-600">Watch live high-ELO debates</p>
+                   <h4 className="font-bold text-slate-900 text-sm mb-0.5">Spectator Mode</h4>
+                   <p className="text-[11px] font-medium text-slate-600">Watch live high-ELO debates</p>
                  </div>
                </div>
              </button>
