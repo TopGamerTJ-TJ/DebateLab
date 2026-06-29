@@ -17,6 +17,8 @@ import TournamentPage from './pages/TournamentPage';
 import ProfilePage from './pages/ProfilePage';
 import DebateWiki from './pages/DebateWiki';
 import Learn from './pages/Learn';
+import MatchDebate from './pages/MatchDebate';
+import MatchRoom from './pages/MatchRoom';
 
 import PracticeRound from './pages/PracticeRound';
 import AICoach from './pages/AICoach';
@@ -105,6 +107,8 @@ const AuthenticatedApp = () => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/wiki" element={<DebateWiki />} />
           <Route path="/learn" element={<Learn />} />
+          <Route path="/match" element={<MatchDebate />} />
+          <Route path="/match/:id" element={<MatchRoom />} />
 
           <Route path="/practice" element={<PracticeRound />} />
           <Route path="/ai-coach" element={<AICoach />} />

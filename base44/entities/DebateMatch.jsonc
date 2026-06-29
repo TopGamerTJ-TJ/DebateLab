@@ -1,0 +1,93 @@
+{
+  "name": "DebateMatch",
+  "type": "object",
+  "properties": {
+    "lobbyId": {
+      "type": "string"
+    },
+    "topic": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string"
+    },
+    "proPlayerId": {
+      "type": "string"
+    },
+    "proPlayerName": {
+      "type": "string"
+    },
+    "conPlayerId": {
+      "type": "string"
+    },
+    "conPlayerName": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "prep",
+        "live",
+        "ended"
+      ],
+      "default": "prep"
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "prepTimeSeconds": {
+      "type": "number"
+    },
+    "timePerSideSeconds": {
+      "type": "number"
+    },
+    "currentTurn": {
+      "type": "string",
+      "enum": [
+        "pro",
+        "con",
+        "open"
+      ],
+      "default": "open"
+    },
+    "winnerId": {
+      "type": "string"
+    },
+    "aiEvaluation": {
+      "type": "string"
+    },
+    "proScore": {
+      "type": "number"
+    },
+    "conScore": {
+      "type": "number"
+    },
+    "isRanked": {
+      "type": "boolean",
+      "default": false
+    },
+    "spectatorIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "lobbyId",
+    "topic",
+    "proPlayerId",
+    "conPlayerId"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

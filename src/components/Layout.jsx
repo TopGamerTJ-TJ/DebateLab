@@ -7,7 +7,7 @@ import Dashboard from "@/pages/Dashboard";
 import Projects from "@/pages/Projects";
 import CoachChat from "@/pages/CoachChat";
 import Forum from "@/pages/Forum";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords } from "lucide-react";
 
 const doLogout = async () => {
   await base44.auth.logout();
@@ -126,6 +126,7 @@ export default function Layout() {
                 ["/model-un", <Globe className="w-3.5 h-3.5" />, "MUN"],
                 ["/model-congress", <FileText className="w-3.5 h-3.5" />, "Congress"],
                 ["/forum", <MessageSquare className="w-3.5 h-3.5" />, "Forum"],
+                ["/match", <Swords className="w-3.5 h-3.5" />, "Match Debate"],
                 ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
                 ["/friends", <Users className="w-3.5 h-3.5" />, "Friends"],
                 ["/ai-editor", <Sparkles className="w-3.5 h-3.5" />, "AI Editor"],
@@ -192,6 +193,7 @@ export default function Layout() {
               ["/projects", Folder, "Projects"],
               ["/coach", Brain, "Coach"],
               ["/practice", Target, "Practice Rounds"],
+              ["/match", Swords, "Match Debate"],
               ["/forum", MessageSquare, "Forum"],
               ["/friends", Users, "Friends"],
               ["/ai-editor", Sparkles, "AI Editor"],

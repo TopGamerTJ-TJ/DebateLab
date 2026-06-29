@@ -1,0 +1,59 @@
+{
+  "name": "DebateMessage",
+  "type": "object",
+  "properties": {
+    "matchId": {
+      "type": "string"
+    },
+    "senderId": {
+      "type": "string"
+    },
+    "senderName": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "pro",
+        "con",
+        "system",
+        "spectator"
+      ]
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "opening",
+        "rebuttal",
+        "counter",
+        "closing",
+        "normal",
+        "system"
+      ],
+      "default": "normal"
+    },
+    "content": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "matchId",
+    "senderId",
+    "role",
+    "content"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "name": "DebateLobby",
+  "type": "object",
+  "properties": {
+    "topic": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "1v1",
+        "team"
+      ],
+      "default": "1v1"
+    },
+    "timePerSide": {
+      "type": "number",
+      "default": 5
+    },
+    "prepTime": {
+      "type": "number",
+      "default": 3
+    },
+    "creatorId": {
+      "type": "string"
+    },
+    "creatorName": {
+      "type": "string"
+    },
+    "creatorSidePreference": {
+      "type": "string",
+      "enum": [
+        "pro",
+        "con",
+        "random"
+      ],
+      "default": "random"
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "public",
+        "friends",
+        "ranked",
+        "tournament"
+      ],
+      "default": "public"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "full",
+        "canceled",
+        "started"
+      ],
+      "default": "open"
+    },
+    "joinedUserId": {
+      "type": "string"
+    },
+    "joinedUserName": {
+      "type": "string"
+    },
+    "joinedUserSidePreference": {
+      "type": "string",
+      "enum": [
+        "pro",
+        "con",
+        "random"
+      ],
+      "default": "random"
+    }
+  },
+  "required": [
+    "topic",
+    "creatorId",
+    "creatorName"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {},
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
