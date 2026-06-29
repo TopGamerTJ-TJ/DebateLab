@@ -110,7 +110,7 @@ export default function MatchDebate() {
   }
 
   return (
-    <AnimatedPage className="max-w-5xl mx-auto px-6 sm:px-8 py-10 sm:py-12">
+    <AnimatedPage className="w-full max-w-5xl mx-auto px-6 sm:px-10 lg:px-14 py-10 sm:py-12">
       {/* Header */}
       <header className="mb-10 sm:mb-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
