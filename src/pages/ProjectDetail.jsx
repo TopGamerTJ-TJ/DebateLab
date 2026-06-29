@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText, Users, Activity, Check } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/lib/AuthContext";
 import ReactMarkdown from "react-markdown";
 import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
 import AnimatedPage from "@/components/AnimatedPage";
@@ -18,6 +19,7 @@ export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState("contentions");
   const [collabUserId, setCollabUserId] = useState("");
@@ -40,11 +42,13 @@ export default function ProjectDetail() {
   });
 
   const { data: profile } = useQuery({
-    queryKey: ['userProfile', base44.auth?.user?.id],
+    queryKey: ['userProfile', user?.id],
     queryFn: async () => {
-      const res = await base44.entities.UserProfile.list();
+      if (!user) return null;
+      const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       return res[0] || null;
-    }
+    },
+    enabled: !!user
   });
 
   const getActiveAiMode = () => {

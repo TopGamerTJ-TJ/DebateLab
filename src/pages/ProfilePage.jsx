@@ -67,7 +67,7 @@ export default function ProfilePage() {
 
   const { data: profiles = [] } = useQuery({ 
     queryKey: ['userProfile', currentUser?.id], 
-    queryFn: () => base44.entities.UserProfile.list(),
+    queryFn: () => base44.entities.UserProfile.filter({ created_by_id: currentUser.id }),
     enabled: !!currentUser
   });
   const { data: sessions = [] } = useQuery({ queryKey: ['practice_sessions'], queryFn: () => base44.entities.PracticeSession.list('-created_date', 100) });

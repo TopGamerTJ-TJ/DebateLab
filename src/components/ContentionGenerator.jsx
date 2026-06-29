@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Sparkles, Save, BookOpen, Trash2, Info } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/lib/AuthContext";
 import ContentionCard from "./ContentionCard";
 import SaveToProjectDialog from "./SaveToProjectDialog";
 
@@ -75,6 +76,7 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
   const [saveDialog, setSaveDialog] = useState(null); // null | "single" | "all"
   const [singleContention, setSingleContention] = useState(null);
   const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const { data: savedContentions = [] } = useQuery({
@@ -83,11 +85,13 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
   });
 
   const { data: profile } = useQuery({
-    queryKey: ['userProfile', base44.auth?.user?.id],
+    queryKey: ['userProfile', user?.id],
     queryFn: async () => {
-      const res = await base44.entities.UserProfile.list();
+      if (!user) return null;
+      const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       return res[0] || null;
-    }
+    },
+    enabled: !!user
   });
 
   const buildContention = (c, projectId) => ({

@@ -36,7 +36,7 @@ export default function Forum() {
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const res = await base44.entities.UserProfile.list();
+      const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       return res[0] || null;
     },
     enabled: !!user
