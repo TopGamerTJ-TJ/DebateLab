@@ -11,6 +11,10 @@
     "bannedBy": {
       "type": "string"
     },
+    "banPlatform": {
+      "type": "boolean",
+      "default": false
+    },
     "banForum": {
       "type": "boolean",
       "default": true

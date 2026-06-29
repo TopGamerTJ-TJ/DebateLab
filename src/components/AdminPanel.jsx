@@ -13,7 +13,7 @@ export default function AdminPanel() {
   const [tab, setTab] = useState("bans");
   const [banEmail, setBanEmail] = useState("");
   const [banReason, setBanReason] = useState("");
-  const [banOptions, setBanOptions] = useState({ forum: true, friends: true, match: true });
+  const [banOptions, setBanOptions] = useState({ platform: false, forum: true, friends: true, match: true });
   
   const [notifTitle, setNotifTitle] = useState("");
   const [notifMsg, setNotifMsg] = useState("");
@@ -41,6 +41,7 @@ export default function AdminPanel() {
     mutationFn: () => base44.entities.BannedUser.create({ 
       email: banEmail.trim().toLowerCase(), 
       reason: banReason,
+      banPlatform: banOptions.platform,
       banForum: banOptions.forum,
       banFriends: banOptions.friends,
       banMatch: banOptions.match
@@ -49,7 +50,7 @@ export default function AdminPanel() {
       queryClient.invalidateQueries({ queryKey: ['banned_users'] });
       toast({ title: `${banEmail} has been banned` });
       setBanEmail(""); setBanReason("");
-      setBanOptions({ forum: true, friends: true, match: true });
+      setBanOptions({ platform: false, forum: true, friends: true, match: true });
     }
   });
 
@@ -128,7 +129,8 @@ export default function AdminPanel() {
             <div className="space-y-3">
               <Input value={banEmail} onChange={e => setBanEmail(e.target.value)} placeholder="Email address to ban" type="email" />
               <Input value={banReason} onChange={e => setBanReason(e.target.value)} placeholder="Reason (optional)" />
-              <div className="flex items-center gap-4 text-sm px-1 py-1">
+              <div className="flex flex-wrap items-center gap-4 text-sm px-1 py-1">
+                <label className="flex items-center gap-1.5 font-semibold text-red-700"><input type="checkbox" checked={banOptions.platform} onChange={e=>setBanOptions({...banOptions, platform: e.target.checked})} /> Full Platform</label>
                 <label className="flex items-center gap-1.5"><input type="checkbox" checked={banOptions.forum} onChange={e=>setBanOptions({...banOptions, forum: e.target.checked})} /> Forum</label>
                 <label className="flex items-center gap-1.5"><input type="checkbox" checked={banOptions.friends} onChange={e=>setBanOptions({...banOptions, friends: e.target.checked})} /> Friends</label>
                 <label className="flex items-center gap-1.5"><input type="checkbox" checked={banOptions.match} onChange={e=>setBanOptions({...banOptions, match: e.target.checked})} /> Live Match</label>
@@ -146,7 +148,7 @@ export default function AdminPanel() {
                     <div>
                       <div className="text-sm font-medium text-slate-900">{b.email}</div>
                       <div className="text-xs text-slate-500 font-medium mt-0.5">
-                         {[b.banForum && 'Forum', b.banFriends && 'Friends', b.banMatch && 'Match'].filter(Boolean).join(', ')} Restricted
+                         {[b.banPlatform && 'Full Platform', b.banForum && 'Forum', b.banFriends && 'Friends', b.banMatch && 'Match'].filter(Boolean).join(', ')} Restricted
                       </div>
                       {b.reason && <div className="text-xs text-slate-500 mt-0.5">{b.reason}</div>}
                     </div>
