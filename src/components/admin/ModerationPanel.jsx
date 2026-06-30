@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -11,8 +12,16 @@ export default function ModerationPanel() {
 
   const { data: reports = [] } = useQuery({
     queryKey: ["moderation_reports"],
-    queryFn: () => base44.entities.ModerationReport.list("-created_date", 100)
+    queryFn: () => base44.entities.ModerationReport.list("-created_date", 100),
+    refetchInterval: 5000
   });
+
+  useEffect(() => {
+    const unsubscribe = base44.entities.ModerationReport.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ["moderation_reports"] });
+    });
+    return unsubscribe;
+  }, [queryClient]);
 
   const { data: settings = [] } = useQuery({
     queryKey: ["moderation_settings"],
@@ -52,7 +61,7 @@ export default function ModerationPanel() {
           </div>
           <div className="flex gap-2">
             <Button size="sm" variant={mode === "manual" ? "default" : "outline"} onClick={() => setMode.mutate("manual")}>Manual</Button>
-            <Button size="sm" variant={mode === "ai" ? "default" : "outline"} onClick={() => setMode.mutate("ai")} className="gap-1.5"><Bot className="w-3.5 h-3.5" /> AI Auto</Button>
+            <Button size="sm" variant={mode === "ai" ? "default" : "outline"} onClick={() => setMode.mutate("ai")} className="gap-1.5 text-slate-900 [&_svg]:text-slate-900"><Bot className="w-3.5 h-3.5" /> AI Auto</Button>
           </div>
         </div>
       </div>
@@ -76,7 +85,7 @@ export default function ModerationPanel() {
               <p className="text-sm text-slate-800 bg-white border border-amber-100 rounded-lg p-3 whitespace-pre-wrap line-clamp-5">{report.content}</p>
               {report.aiReason && <p className="text-xs text-slate-500 mt-2">AI: {report.aiReason}</p>}
               <div className="flex flex-wrap gap-2 mt-3">
-                <Button size="sm" variant="outline" onClick={() => review.mutate({ reportId: report.id, action: "ai" })} disabled={review.isPending} className="gap-1.5"><Bot className="w-3.5 h-3.5" /> Check with AI</Button>
+                <Button size="sm" variant="outline" onClick={() => review.mutate({ reportId: report.id, action: "ai" })} disabled={review.isPending} className="gap-1.5 text-slate-900 [&_svg]:text-slate-900"><Bot className="w-3.5 h-3.5" /> Check with AI</Button>
                 <Button size="sm" onClick={() => review.mutate({ reportId: report.id, action: "violation" })} disabled={review.isPending} className="gap-1.5 bg-red-600 hover:bg-red-700"><CheckCircle className="w-3.5 h-3.5" /> Remove + Warn</Button>
                 <Button size="sm" variant="ghost" onClick={() => review.mutate({ reportId: report.id, action: "dismiss" })} disabled={review.isPending} className="gap-1.5"><XCircle className="w-3.5 h-3.5" /> Dismiss</Button>
               </div>
