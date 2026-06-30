@@ -118,7 +118,7 @@ export default function LandingPreview() {
 
       {/* Mobile Menu Overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[100] bg-neutral-950 flex flex-col pt-[env(safe-area-inset-top)]">
+        <div className="fixed inset-0 z-[100] bg-neutral-950 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
           <div className="flex items-center justify-between px-6 h-14 border-b border-white border-opacity-10">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 bg-neutral-900 border border-white border-opacity-10 rounded-xl flex items-center justify-center">

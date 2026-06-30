@@ -266,7 +266,7 @@ export default function Layout() {
 
       {/* Full screen menu (Mobile + Desktop) */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[70] bg-slate-50/95 backdrop-blur-xl pt-[calc(env(safe-area-inset-top)+3rem)] pb-24 px-4 overflow-y-auto flex flex-col items-center">
+        <div className="fixed inset-0 z-[70] bg-slate-50/95 backdrop-blur-xl pt-[calc(env(safe-area-inset-top)+3rem)] pb-[calc(env(safe-area-inset-bottom)+6rem)] px-4 overflow-y-auto flex flex-col items-center">
           <div className="w-full max-w-2xl">
           <div className="flex items-center justify-between mb-8 mt-2">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight">Navigation</h2>

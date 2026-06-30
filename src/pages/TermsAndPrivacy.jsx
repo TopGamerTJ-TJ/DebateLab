@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Zap, ArrowLeft } from "lucide-react";
 
 const Section = ({ title, children }) => (
@@ -11,19 +11,28 @@ const Section = ({ title, children }) => (
 
 export default function TermsAndPrivacy() {
   const [tab, setTab] = useState("terms");
+  const navigate = useNavigate();
+
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/");
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <nav className="bg-white border-b border-slate-200 px-6 py-3 flex items-center gap-4">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+      <nav className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] flex items-center justify-between gap-3">
+        <button onClick={goBack} className="min-h-[44px] flex items-center gap-2 rounded-xl px-2 -ml-2 text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm font-medium">Back</span>
+        </button>
+        <Link to="/" className="flex items-center gap-2 min-w-0">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
             <Zap className="w-4 h-4 text-white" />
           </div>
-          <span className="font-bold text-slate-900 font-heading">DebateLab</span>
+          <span className="font-bold text-slate-900 font-heading truncate">DebateLab</span>
         </Link>
-        <ArrowLeft className="w-4 h-4 text-slate-400" />
-        <span className="text-slate-500 text-sm">Legal</span>
+        <span className="text-slate-500 text-sm hidden sm:inline">Legal</span>
       </nav>
 
       <div className="max-w-3xl mx-auto px-6 py-12">
