@@ -5,6 +5,9 @@
     "ownerUserId": {
       "type": "string"
     },
+    "ownerEmail": {
+      "type": "string"
+    },
     "auditId": {
       "type": "number"
     },
@@ -102,6 +105,9 @@
           "data.ownerUserId": "{{user.id}}"
         },
         {
+          "data.ownerEmail": "{{user.email}}"
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -117,6 +123,9 @@
           "data.ownerUserId": "{{user.id}}"
         },
         {
+          "data.ownerEmail": "{{user.email}}"
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -130,6 +139,9 @@
         },
         {
           "data.ownerUserId": "{{user.id}}"
+        },
+        {
+          "data.ownerEmail": "{{user.email}}"
         },
         {
           "user_condition": {
