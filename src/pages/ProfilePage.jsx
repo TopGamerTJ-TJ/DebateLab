@@ -141,9 +141,6 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-      setSaved(true);
-      toast({ title: "Profile saved!" });
-      setTimeout(() => setSaved(false), 2000);
     },
     onError: () => {
       toast({ title: "Couldn't save profile. Please try again.", variant: "destructive" });
