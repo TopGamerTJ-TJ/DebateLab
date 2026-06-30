@@ -31,7 +31,11 @@ Deno.serve(async (req) => {
     const settings = await base44.asServiceRole.entities.AppSettings.filter({ key: 'moderation_mode' });
     const mode = settings[0]?.value || 'manual';
 
-    if (action === 'auto' && mode !== 'ai' && !isAdmin) {
+    // 'auto' is the automatic call fired whenever a user submits a report.
+    // It must only trigger AI review when the app is in 'ai' moderation mode.
+    // In manual mode the report must stay 'pending' for an admin to review,
+    // even when the reporter themselves happens to be an admin.
+    if (action === 'auto' && mode !== 'ai') {
       return Response.json({ status: 'manual_review' });
     }
 
