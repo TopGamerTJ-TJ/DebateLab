@@ -72,7 +72,10 @@ export default function ProfilePage() {
       if (byOwner.length > 0) return byOwner;
       return base44.entities.UserProfile.filter({ created_by_id: currentUser.id });
     },
-    enabled: !!currentUser
+    enabled: !!currentUser,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
   const { data: sessions = [] } = useQuery({ queryKey: ['practice_sessions'], queryFn: () => base44.entities.PracticeSession.list('-created_date', 100) });
   const { data: contentions = [] } = useQuery({ queryKey: ['contentions'], queryFn: () => base44.entities.Contention.list() });
@@ -105,15 +108,28 @@ export default function ProfilePage() {
   }, [profile]);
 
   const save = useMutation({
-    mutationFn: (data) => {
-      const payload = { ...data, ownerUserId: currentUser?.id, themeMode, customColors };
-      return profile ? base44.entities.UserProfile.update(profile.id, payload) : base44.entities.UserProfile.create(payload);
+    mutationFn: async (data) => {
+      const user = currentUser || await base44.auth.me();
+      const payload = { ...data, ownerUserId: user.id, themeMode, customColors };
+      // Always re-check for an existing profile right before saving so we update
+      // (and never create duplicates) — this keeps data consistent across devices.
+      let existing = await base44.entities.UserProfile.filter({ ownerUserId: user.id });
+      if (existing.length === 0) {
+        existing = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+      }
+      if (existing.length > 0) {
+        return base44.entities.UserProfile.update(existing[0].id, payload);
+      }
+      return base44.entities.UserProfile.create(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });
       setSaved(true);
       toast({ title: "Profile saved!" });
       setTimeout(() => setSaved(false), 2000);
+    },
+    onError: () => {
+      toast({ title: "Couldn't save profile. Please try again.", variant: "destructive" });
     }
   });
 
