@@ -76,7 +76,9 @@ export default function TermsAndPrivacy() {
                   <li>Using the Platform to circumvent laws or regulations</li>
                   <li>Impersonating other users or public figures</li>
                 </ul>
-                <p className="mt-2"><strong>Content violations:</strong> Users who post explicit sexual content will be permanently banned. Other violations will receive a warning, then a temporary suspension, and finally a permanent ban for repeated offenses.</p>
+                <p className="mt-2"><strong>Content violations:</strong> Users who post explicit sexual content will be permanently banned. Other violations receive a first warning, a final warning, and then a permanent ban for repeated offenses.</p>
+                <p>Users can report objectionable content and block abusive users from the forum. Blocking immediately removes that user's content from the blocker’s feed and creates a moderation report for review.</p>
+                <p>Moderation reports are reviewed by the developer within 24 hours. Content confirmed as objectionable may be removed, and the user who posted it may be warned, restricted, or permanently banned.</p>
               </Section>
 
               <Section title="6. Account Termination">

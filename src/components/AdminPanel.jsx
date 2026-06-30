@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Ban, Bell, Trash2, Send, Mail, CheckCircle } from "lucide-react";
+import { Shield, Ban, Bell, Trash2, Send, Mail, CheckCircle, ShieldAlert } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import ModerationPanel from "@/components/admin/ModerationPanel";
 
 export default function AdminPanel() {
   const [tab, setTab] = useState("bans");
@@ -100,6 +101,7 @@ export default function AdminPanel() {
 
   const tabs = [
     { id: "bans", icon: Ban, label: `Bans (${banned.length})` },
+    { id: "moderation", icon: ShieldAlert, label: "Flagged Content" },
     { id: "notify", icon: Bell, label: "Notifications" },
     { id: "contacts", icon: Mail, label: `Contact Requests${newContacts > 0 ? ` (${newContacts} new)` : ""}` },
   ];
@@ -161,6 +163,8 @@ export default function AdminPanel() {
             )}
           </div>
         )}
+
+        {tab === "moderation" && <ModerationPanel />}
 
         {tab === "notify" && (
           <div className="space-y-4">

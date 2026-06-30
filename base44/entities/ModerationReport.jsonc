@@ -1,0 +1,85 @@
+{
+  "name": "ModerationReport",
+  "type": "object",
+  "properties": {
+    "reporterId": {
+      "type": "string"
+    },
+    "reporterEmail": {
+      "type": "string"
+    },
+    "itemType": {
+      "type": "string",
+      "enum": [
+        "post",
+        "comment",
+        "user"
+      ]
+    },
+    "itemId": {
+      "type": "string"
+    },
+    "postId": {
+      "type": "string"
+    },
+    "contentAuthorId": {
+      "type": "string"
+    },
+    "contentAuthorName": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "dismissed",
+        "actioned"
+      ],
+      "default": "pending"
+    },
+    "aiDecision": {
+      "type": "string"
+    },
+    "aiReason": {
+      "type": "string"
+    },
+    "actionTaken": {
+      "type": "string"
+    },
+    "adminNotes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "reporterId",
+    "itemType",
+    "itemId",
+    "contentAuthorId",
+    "content",
+    "reason"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

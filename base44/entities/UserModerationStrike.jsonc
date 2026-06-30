@@ -1,0 +1,47 @@
+{
+  "name": "UserModerationStrike",
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string"
+    },
+    "userEmail": {
+      "type": "string"
+    },
+    "warningCount": {
+      "type": "number",
+      "default": 0
+    },
+    "lastReason": {
+      "type": "string"
+    },
+    "lastReportId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "userId"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

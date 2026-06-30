@@ -8,6 +8,8 @@ import { MessageSquare, ThumbsUp, ThumbsDown, ArrowLeft, Trash2 } from "lucide-r
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import AnimatedPage from "@/components/AnimatedPage";
+import ReportBlockActions from "@/components/moderation/ReportBlockActions";
+import { getVisibleItems, hasObjectionableContent } from "@/lib/moderation";
 
 export default function ForumPostDetail() {
   const { id } = useParams();
@@ -33,6 +35,12 @@ export default function ForumPostDetail() {
     enabled: !!user
   });
 
+  const { data: blockedUsers = [] } = useQuery({
+    queryKey: ['blocked_users', user?.id],
+    queryFn: () => base44.entities.BlockedUser.filter({ blockerId: user?.id }),
+    enabled: !!user,
+  });
+
   const { data: profile } = useQuery({
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
@@ -47,6 +55,9 @@ export default function ForumPostDetail() {
 
   const createComment = useMutation({
     mutationFn: async (data) => {
+      if (hasObjectionableContent(data.content)) {
+        throw new Error("Please revise content that may violate community rules.");
+      }
       const comment = await base44.entities.ForumComment.create({ 
         ...data, 
         postId: id,
@@ -172,12 +183,18 @@ export default function ForumPostDetail() {
 
   if (!post) return <div className="p-8 text-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-primary rounded-full animate-spin mx-auto"></div></div>;
 
+  const blockedIds = new Set(blockedUsers.map((b) => b.blockedUserId));
+  if (blockedIds.has(post.created_by_id)) {
+    return <AnimatedPage><div className="max-w-3xl mx-auto px-6 py-16 text-center text-slate-500">You blocked this user, so this post is hidden from your feed.</div></AnimatedPage>;
+  }
+
   const postVote = votes.find(v => v.itemId === post.id && v.itemType === 'post')?.voteValue;
   const postScore = (post.upvotes || 0) - (post.downvotes || 0);
 
   // Group comments by parent
-  const topLevelComments = comments ? comments.filter(c => !c.parentCommentId).sort((a, b) => new Date(a.created_date || 0) - new Date(b.created_date || 0)) : [];
-  const getReplies = (parentId) => comments ? comments.filter(c => c.parentCommentId === parentId).sort((a, b) => new Date(a.created_date || 0) - new Date(b.created_date || 0)) : [];
+  const visibleComments = getVisibleItems(comments, blockedUsers);
+  const topLevelComments = visibleComments ? visibleComments.filter(c => !c.parentCommentId).sort((a, b) => new Date(a.created_date || 0) - new Date(b.created_date || 0)) : [];
+  const getReplies = (parentId) => visibleComments ? visibleComments.filter(c => c.parentCommentId === parentId).sort((a, b) => new Date(a.created_date || 0) - new Date(b.created_date || 0)) : [];
 
   const CommentNode = ({ comment, depth = 0 }) => {
     const commentVote = votes.find(v => v.itemId === comment.id && v.itemType === 'comment')?.voteValue;
@@ -210,6 +227,7 @@ export default function ForumPostDetail() {
               >
                 <MessageSquare className="w-3.5 h-3.5" /> Reply
               </button>
+              <ReportBlockActions user={user} item={comment} itemType="comment" postId={id} content={comment.content} authorName={comment.authorName} toast={toast} />
               {user?.id === comment.created_by_id && (
                 <button 
                   onClick={() => deleteComment.mutate(comment.id)} 
@@ -234,6 +252,10 @@ export default function ForumPostDetail() {
                   <Button size="sm" onClick={() => {
                     if (!isProfileComplete) {
                       toast({ title: "Profile Incomplete", description: "Please set a Display Name in your Profile to comment.", variant: "destructive" });
+                      return;
+                    }
+                    if (hasObjectionableContent(commentText)) {
+                      toast({ title: "Content blocked", description: "Please revise content that may violate community rules.", variant: "destructive" });
                       return;
                     }
                     createComment.mutate({ content: commentText, parentCommentId: comment.id });
@@ -286,6 +308,8 @@ export default function ForumPostDetail() {
               {post.content}
             </div>
             
+            <ReportBlockActions user={user} item={post} itemType="post" content={`${post.title}\n${post.content}`} authorName={post.authorName} toast={toast} />
+
             {post.imageUrl && (
               <div className="mb-4 rounded-xl overflow-hidden border border-slate-200">
                 <img src={post.imageUrl} alt="Post attachment" className="w-full h-auto object-contain max-h-[600px] bg-slate-50" />
@@ -323,6 +347,10 @@ export default function ForumPostDetail() {
             <Button onClick={() => {
               if (!isProfileComplete) {
                 toast({ title: "Profile Incomplete", description: "Please set a Display Name in your Profile to comment.", variant: "destructive" });
+                return;
+              }
+              if (hasObjectionableContent(commentText)) {
+                toast({ title: "Content blocked", description: "Please revise content that may violate community rules.", variant: "destructive" });
                 return;
               }
               createComment.mutate({ content: commentText, parentCommentId: null });

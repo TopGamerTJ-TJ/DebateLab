@@ -17,12 +17,17 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const [otpCode, setOtpCode] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!acceptedTerms) {
+      setError("Please accept the Terms & Privacy agreement to continue.");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -68,7 +73,20 @@ export default function Register() {
   };
 
   const handleGoogle = () => {
-    base44.auth.loginWithProvider("google", "/home");
+    if (!acceptedTerms) {
+      setError("Please accept the Terms & Privacy agreement to continue.");
+      return;
+    }
+    base44.auth.loginWithProvider("google", window.location.origin + "/home");
+  };
+
+  const handleApple = () => {
+    if (!acceptedTerms) {
+      setError("Please accept the Terms & Privacy agreement to continue.");
+      return;
+    }
+    setLoading(true);
+    base44.auth.loginWithProvider("apple", window.location.origin + "/home");
   };
 
   if (showOtp) {
@@ -145,6 +163,7 @@ export default function Register() {
           variant="outline"
           className="w-full h-12 text-sm font-medium border-slate-300 text-black hover:bg-slate-50 bg-white"
           onClick={handleGoogle}
+          disabled={loading || !acceptedTerms}
         >
           <GoogleIcon className="w-5 h-5 mr-2" />
           Continue with Google
@@ -153,12 +172,18 @@ export default function Register() {
           type="button"
           variant="outline"
           className="w-full h-12 text-sm font-medium border-slate-300 text-white hover:bg-black/90 bg-black"
-          onClick={() => base44.auth.loginWithProvider("apple", "/home")}
+          onClick={handleApple}
+          disabled={loading || !acceptedTerms}
         >
           <AppleIcon className="w-5 h-5 mr-2" />
           Continue with Apple
         </Button>
       </div>
+
+      <label className="flex items-start gap-2 text-xs text-slate-600 mb-6">
+        <input type="checkbox" checked={acceptedTerms} onChange={(e) => setAcceptedTerms(e.target.checked)} className="mt-0.5" />
+        <span>I agree to the <Link to="/terms" className="text-primary font-medium hover:underline">Terms & Privacy agreement</Link>, including the community rules.</span>
+      </label>
 
       <div className="relative mb-6">
         <div className="absolute inset-0 flex items-center">
@@ -225,7 +250,7 @@ export default function Register() {
             />
           </div>
         </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
+        <Button type="submit" className="w-full h-12 font-medium" disabled={loading || !acceptedTerms}>
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

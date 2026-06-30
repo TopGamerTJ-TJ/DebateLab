@@ -11,6 +11,8 @@ import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import AnimatedPage from "@/components/AnimatedPage";
 import { useBans } from "@/components/BanGate";
+import ReportBlockActions from "@/components/moderation/ReportBlockActions";
+import { getVisibleItems, hasObjectionableContent } from "@/lib/moderation";
 
 export default function Forum() {
   const { user } = useAuth();
@@ -29,6 +31,12 @@ export default function Forum() {
   const { data: votes = [] } = useQuery({ 
     queryKey: ['forum_votes', user?.id], 
     queryFn: () => base44.entities.ForumVote.filter({ user_id: user?.id }),
+    enabled: !!user,
+  });
+
+  const { data: blockedUsers = [] } = useQuery({
+    queryKey: ['blocked_users', user?.id],
+    queryFn: () => base44.entities.BlockedUser.filter({ blockerId: user?.id }),
     enabled: !!user,
   });
 
@@ -133,7 +141,9 @@ export default function Forum() {
     }
   };
 
-  const sortedPosts = [...posts].sort((a, b) => {
+  const visiblePosts = getVisibleItems(posts, blockedUsers);
+
+  const sortedPosts = [...visiblePosts].sort((a, b) => {
     if (sortMode === 'hot') {
       const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
       const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
@@ -170,6 +180,10 @@ export default function Forum() {
                   onClick={() => {
                     if (!isProfileComplete) {
                       toast({ title: "Profile Incomplete", description: "Please set a Display Name in your Profile to post.", variant: "destructive" });
+                      return;
+                    }
+                    if (hasObjectionableContent(`${form.title} ${form.content}`)) {
+                      toast({ title: "Content blocked", description: "Please revise content that may violate community rules.", variant: "destructive" });
                       return;
                     }
                     createPost.mutate(form);
@@ -238,6 +252,7 @@ export default function Forum() {
                       <div className="flex items-center gap-1.5 hover:bg-slate-100 p-2 -m-2 rounded-lg transition-colors">
                         <MessageSquare className="w-4 h-4" /> Discuss
                       </div>
+                      <ReportBlockActions user={user} item={post} itemType="post" content={`${post.title}\n${post.content}`} authorName={post.authorName} toast={toast} />
                       {user?.id === post.created_by_id && (
                         <button 
                           onClick={(e) => { e.preventDefault(); deletePost.mutate(post.id); }}
