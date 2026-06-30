@@ -71,7 +71,10 @@ export default function TourModal() {
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const byOwner = await base44.entities.UserProfile.filter({ ownerUserId: user.id });
+      let byOwner = await base44.entities.UserProfile.filter({ ownerUserId: user.id });
+      if (byOwner.length === 0 && user.email) {
+        byOwner = await base44.entities.UserProfile.filter({ ownerEmail: user.email });
+      }
       if (byOwner.length > 0) return byOwner[0];
       const res = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       return res[0] || null;
@@ -98,10 +101,18 @@ export default function TourModal() {
 
   const saveProfile = useMutation({
     mutationFn: async (data) => {
-      const payload = { ...data, ownerUserId: user?.id };
+      const payload = { ...data, ownerUserId: user?.id, ownerEmail: user?.email || "" };
       if (profile?.id) {
         return base44.entities.UserProfile.update(profile.id, payload);
       } else {
+        // Re-check by email/userId before creating to avoid duplicates from tour.
+        let existing = await base44.entities.UserProfile.filter({ ownerUserId: user?.id });
+        if (existing.length === 0 && user?.email) {
+          existing = await base44.entities.UserProfile.filter({ ownerEmail: user.email });
+        }
+        if (existing.length > 0) {
+          return base44.entities.UserProfile.update(existing[0].id, payload);
+        }
         return base44.entities.UserProfile.create(payload);
       }
     },

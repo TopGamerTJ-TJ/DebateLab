@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -66,11 +66,19 @@ export default function ProfilePage() {
   };
 
   const { data: profiles = [] } = useQuery({ 
-    queryKey: ['userProfile', currentUser?.id], 
+    queryKey: ['userProfile', currentUser?.id, currentUser?.email], 
     queryFn: async () => {
-      const byOwner = await base44.entities.UserProfile.filter({ ownerUserId: currentUser.id });
-      if (byOwner.length > 0) return byOwner;
-      return base44.entities.UserProfile.filter({ created_by_id: currentUser.id });
+      if (!currentUser) return [];
+      // Try by userId first, then by email, then by created_by_id — ensures we
+      // always find the latest profile record linked to this signed-in user.
+      let results = await base44.entities.UserProfile.filter({ ownerUserId: currentUser.id });
+      if (results.length === 0 && currentUser.email) {
+        results = await base44.entities.UserProfile.filter({ ownerEmail: currentUser.email });
+      }
+      if (results.length === 0) {
+        results = await base44.entities.UserProfile.filter({ created_by_id: currentUser.id });
+      }
+      return results;
     },
     enabled: !!currentUser,
     staleTime: 0,
@@ -83,8 +91,11 @@ export default function ProfilePage() {
 
   const profile = profiles && profiles.length > 0 ? profiles[0] : null;
 
+  const profileLoadedRef = useRef(false);
+
   useEffect(() => {
     if (profile) {
+      profileLoadedRef.current = true;
       setForm({
         displayName: profile.displayName || "",
         school: profile.school || "",
@@ -104,16 +115,22 @@ export default function ProfilePage() {
         localStorage.setItem('custom_colors', JSON.stringify(profile.customColors));
       }
       window.dispatchEvent(new Event('theme-changed'));
+    } else if (currentUser) {
+      // No existing profile found — mark as loaded so autosave can create one.
+      profileLoadedRef.current = true;
     }
-  }, [profile]);
+  }, [profile, currentUser]);
 
   const save = useMutation({
     mutationFn: async (data) => {
       const user = currentUser || await base44.auth.me();
-      const payload = { ...data, ownerUserId: user.id, themeMode, customColors };
+      const payload = { ...data, ownerUserId: user.id, ownerEmail: user.email || "", themeMode, customColors };
       // Always re-check for an existing profile right before saving so we update
       // (and never create duplicates) — this keeps data consistent across devices.
       let existing = await base44.entities.UserProfile.filter({ ownerUserId: user.id });
+      if (existing.length === 0 && user.email) {
+        existing = await base44.entities.UserProfile.filter({ ownerEmail: user.email });
+      }
       if (existing.length === 0) {
         existing = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       }
@@ -132,6 +149,17 @@ export default function ProfilePage() {
       toast({ title: "Couldn't save profile. Please try again.", variant: "destructive" });
     }
   });
+
+  // Autosave: debounced save whenever the form changes after the initial profile load.
+  useEffect(() => {
+    if (!profileLoadedRef.current || !currentUser) return;
+    if (save.isPending) return;
+    const timer = setTimeout(() => {
+      save.mutate(form);
+    }, 1000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, currentUser]);
 
   const wins = (sessions || []).filter(s => s?.winner === 'user').length;
   const losses = (sessions || []).filter(s => s?.winner === 'ai').length;
