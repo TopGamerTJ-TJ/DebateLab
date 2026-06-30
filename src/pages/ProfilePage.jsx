@@ -257,21 +257,21 @@ export default function ProfilePage() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-slate-700 mb-1.5 block">Grade / Year</label>
-                    <select value={form.gradeLevel} onChange={e => setForm({ ...form, gradeLevel: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none">
+                    <select value={form.gradeLevel} onChange={e => setForm({ ...form, gradeLevel: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-black shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none [&>option]:text-black">
                       <option value="" disabled>Select grade</option>
                       {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-slate-700 mb-1.5 block">Skill Level</label>
-                    <select value={form.skillLevel} onChange={e => setForm({ ...form, skillLevel: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none capitalize">
+                    <select value={form.skillLevel} onChange={e => setForm({ ...form, skillLevel: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-black shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none capitalize [&>option]:text-black">
                       {LEVELS.map(l => <option key={l} value={l} className="capitalize">{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
                     </select>
                   </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-slate-700 mb-1.5 block">Preferred Format</label>
-                  <select value={form.preferredFormat} onChange={e => setForm({ ...form, preferredFormat: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none">
+                  <select value={form.preferredFormat} onChange={e => setForm({ ...form, preferredFormat: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-black shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none [&>option]:text-black">
                     <option value="" disabled>Select your main format</option>
                     {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
                   </select>
@@ -306,7 +306,7 @@ export default function ProfilePage() {
                       <select 
                         value={form.defaultAiMode} 
                         onChange={e => setForm({ ...form, defaultAiMode: e.target.value })} 
-                        className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none"
+                        className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm text-black shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none [&>option]:text-black"
                       >
                         <option value="full">Full AI Assistance</option>
                         <option value="dampened">Dampened AI (Guidance Only)</option>
