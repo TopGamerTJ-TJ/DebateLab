@@ -141,22 +141,13 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
     },
     onError: () => {
       toast({ title: "Couldn't save profile. Please try again.", variant: "destructive" });
     }
   });
-
-  // Autosave: debounced save whenever the form changes after the initial profile load.
-  useEffect(() => {
-    if (!profileLoadedRef.current || !currentUser) return;
-    if (save.isPending) return;
-    const timer = setTimeout(() => {
-      save.mutate(form);
-    }, 1000);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, currentUser]);
 
   const wins = (sessions || []).filter(s => s?.winner === 'user').length;
   const losses = (sessions || []).filter(s => s?.winner === 'ai').length;
