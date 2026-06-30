@@ -174,7 +174,7 @@ export default function TourModal() {
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Debate Experience Level <span className="text-red-500">*</span></label>
                 <select 
-                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+                  className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-1 text-base text-black shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm [&>option]:text-black"
                   value={formData.skillLevel} 
                   onChange={e => setFormData({...formData, skillLevel: e.target.value})}
                 >
@@ -191,7 +191,7 @@ export default function TourModal() {
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1.5">Learning Path Focus</label>
                     <select 
-                      className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+                      className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-base text-black shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm [&>option]:text-black"
                       value={formData.learningPathType} 
                       onChange={e => setFormData({...formData, learningPathType: e.target.value})}
                     >
@@ -204,7 +204,7 @@ export default function TourModal() {
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1.5">Debate Format</label>
                       <select 
-                        className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
+                        className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-base text-black shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm [&>option]:text-black"
                         value={formData.learningPathFormat} 
                         onChange={e => setFormData({...formData, learningPathFormat: e.target.value})}
                       >

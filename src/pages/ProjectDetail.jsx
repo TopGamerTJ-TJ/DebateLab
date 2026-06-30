@@ -574,7 +574,7 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
             <h3 className="font-bold text-slate-900 font-heading flex items-center gap-2 mb-4"><Users className="w-5 h-5 text-primary" /> Collaborators</h3>
             <div className="flex gap-2 mb-6">
               <Input placeholder="User ID / Friend Code" value={collabUserId} onChange={e=>setCollabUserId(e.target.value)} className="text-sm"/>
-              <select value={collabRole} onChange={e=>setCollabRole(e.target.value)} className="border border-input rounded-md px-3 text-sm">
+              <select value={collabRole} onChange={e=>setCollabRole(e.target.value)} className="border border-input rounded-md px-3 text-sm bg-white text-black [&>option]:text-black">
                 <option value="viewer">Viewer</option>
                 <option value="contributor">Contributor</option>
                 <option value="editor">Editor</option>
