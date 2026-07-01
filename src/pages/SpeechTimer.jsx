@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, RotateCcw, Timer, Bell } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Play, Pause, RotateCcw, Timer, Bell, Plus, X } from "lucide-react";
 import { haptic } from "@/lib/native";
 import AnimatedPage from "@/components/AnimatedPage";
 
 // Common debate speech lengths (seconds). Users can pick a preset to time a speech.
-const PRESETS = [
+const DEFAULT_PRESETS = [
   { label: "Constructive", sub: "4 min", seconds: 240 },
   { label: "Rebuttal", sub: "4 min", seconds: 240 },
   { label: "Summary", sub: "3 min", seconds: 180 },
@@ -14,14 +15,51 @@ const PRESETS = [
   { label: "Prep Time", sub: "3 min", seconds: 180 },
 ];
 
+const fmtSub = (s) => {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  if (m && sec) return `${m}m ${sec}s`;
+  if (m) return `${m} min`;
+  return `${sec}s`;
+};
+
 export default function SpeechTimer() {
   const [total, setTotal] = useState(240);
   const [remaining, setRemaining] = useState(240);
   const [running, setRunning] = useState(false);
+  const [customPresets, setCustomPresets] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("speech_timer_presets") || "[]"); }
+    catch { return []; }
+  });
+  const [adding, setAdding] = useState(false);
+  const [newLabel, setNewLabel] = useState("");
+  const [newMin, setNewMin] = useState("");
+  const [newSec, setNewSec] = useState("");
   const intervalRef = useRef(null);
   const firedRef = useRef({});
 
   useEffect(() => () => clearInterval(intervalRef.current), []);
+
+  const persistCustom = (next) => {
+    setCustomPresets(next);
+    localStorage.setItem("speech_timer_presets", JSON.stringify(next));
+  };
+
+  const addPreset = () => {
+    const seconds = (parseInt(newMin, 10) || 0) * 60 + (parseInt(newSec, 10) || 0);
+    if (seconds <= 0) return;
+    haptic(10);
+    const label = newLabel.trim() || fmtSub(seconds);
+    persistCustom([...customPresets, { label, sub: fmtSub(seconds), seconds, custom: true }]);
+    setNewLabel(""); setNewMin(""); setNewSec(""); setAdding(false);
+  };
+
+  const removePreset = (idx) => {
+    haptic(10);
+    persistCustom(customPresets.filter((_, i) => i !== idx));
+  };
+
+  const PRESETS = [...DEFAULT_PRESETS, ...customPresets];
 
   // Haptic signals at key debate milestones: halfway, 30s left, 10s countdown, and time up.
   const checkSignals = (secLeft) => {
@@ -101,18 +139,67 @@ export default function SpeechTimer() {
         </div>
 
         {/* Preset picker */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          {PRESETS.map(p => (
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          {PRESETS.map((p, i) => {
+            const customIdx = i - DEFAULT_PRESETS.length;
+            return (
+              <button
+                key={`${p.label}-${i}`}
+                onClick={() => selectPreset(p.seconds)}
+                className={`relative rounded-xl border p-3 text-center transition-all ${total === p.seconds ? "bg-primary text-white border-primary shadow-sm" : "bg-white text-slate-700 border-slate-200 hover:border-blue-300"}`}
+              >
+                {p.custom && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => { e.stopPropagation(); removePreset(customIdx); }}
+                    className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center border ${total === p.seconds ? "bg-white text-primary border-white" : "bg-slate-100 text-slate-500 border-slate-200 hover:text-red-500"}`}
+                  >
+                    <X className="w-3 h-3" />
+                  </span>
+                )}
+                <div className="text-xs font-bold truncate">{p.label}</div>
+                <div className={`text-[11px] ${total === p.seconds ? "text-white/80" : "text-slate-400"}`}>{p.sub}</div>
+              </button>
+            );
+          })}
+
+          {!adding && (
             <button
-              key={p.label}
-              onClick={() => selectPreset(p.seconds)}
-              className={`rounded-xl border p-3 text-center transition-all ${total === p.seconds ? "bg-primary text-white border-primary shadow-sm" : "bg-white text-slate-700 border-slate-200 hover:border-blue-300"}`}
+              onClick={() => { haptic(10); setAdding(true); }}
+              className="rounded-xl border border-dashed border-slate-300 p-3 text-center text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-all flex flex-col items-center justify-center gap-1"
             >
-              <div className="text-xs font-bold">{p.label}</div>
-              <div className={`text-[11px] ${total === p.seconds ? "text-white/80" : "text-slate-400"}`}>{p.sub}</div>
+              <Plus className="w-4 h-4" />
+              <div className="text-[11px] font-medium">Add preset</div>
             </button>
-          ))}
+          )}
         </div>
+
+        {/* Add custom preset form */}
+        {adding && (
+          <div className="bg-white rounded-xl border border-slate-200 p-4 mb-6 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-slate-900">New custom preset</h3>
+              <button onClick={() => { setAdding(false); setNewLabel(""); setNewMin(""); setNewSec(""); }} className="text-slate-400 hover:text-slate-600">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <Input
+              value={newLabel}
+              onChange={(e) => setNewLabel(e.target.value)}
+              placeholder="Label (e.g. My Rebuttal)"
+              className="mb-3"
+            />
+            <div className="flex items-center gap-2 mb-4">
+              <Input type="number" min="0" value={newMin} onChange={(e) => setNewMin(e.target.value)} placeholder="Min" className="text-center" />
+              <span className="text-slate-400 font-medium">:</span>
+              <Input type="number" min="0" max="59" value={newSec} onChange={(e) => setNewSec(e.target.value)} placeholder="Sec" className="text-center" />
+            </div>
+            <Button onClick={addPreset} className="w-full gap-2">
+              <Plus className="w-4 h-4" /> Add preset
+            </Button>
+          </div>
+        )}
 
         {/* Timer dial */}
         <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex flex-col items-center">

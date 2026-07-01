@@ -105,13 +105,13 @@ export default function Layout() {
               <span className="font-bold text-lg tracking-tight text-slate-900 font-heading">DebateLab</span>
             </Link>
 
-            <div className="hidden lg:flex items-center gap-1 flex-wrap justify-center">
+            <div className="hidden lg:flex items-center gap-1 justify-center">
               <div
                 className="relative"
                 onMouseEnter={() => { clearTimeout(timerRef.current); setDebateOpen(true); }}
                 onMouseLeave={() => { timerRef.current = setTimeout(() => setDebateOpen(false), 200); }}
               >
-                <button className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${active(['/parliamentary', '/public-forum']) ? 'bg-primary text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}>
+                <button className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${active(['/parliamentary', '/public-forum']) ? 'bg-primary text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}>
                   <BookOpen className="w-4 h-4" />
                   Debate
                   <ChevronDown className={`w-3 h-3 transition-transform ${debateOpen ? 'rotate-180' : ''}`} />
@@ -137,25 +137,20 @@ export default function Layout() {
               </div>
 
               {[
-                ...(shouldShowLearn ? [["/learn", <GraduationCap className="w-3.5 h-3.5" />, "Learn"]] : []),
                 ["/model-un", <Globe className="w-3.5 h-3.5" />, "MUN"],
                 ["/model-congress", <FileText className="w-3.5 h-3.5" />, "Congress"],
                 ["/forum", <MessageSquare className="w-3.5 h-3.5" />, "Forum"],
-                ["/match", <Swords className="w-3.5 h-3.5" />, "Match Debate"],
-                ["/voice-practice", <Mic className="w-3.5 h-3.5" />, "Voice"],
-              ["/speech-timer", <Timer className="w-3.5 h-3.5" />, "Timer"],
+                ["/match", <Swords className="w-3.5 h-3.5" />, "Match"],
                 ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
-                ["/friends", <Users className="w-3.5 h-3.5" />, "Friends"],
                 ["/ai-editor", <Sparkles className="w-3.5 h-3.5" />, "AI Editor"],
-                ["/formats", <LayoutGrid className="w-3.5 h-3.5" />, "Formats"],
               ].map(([to, icon, label]) => (
-                <Link key={to} to={to} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${active(to) ? 'bg-primary text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}>
+                <Link key={to} to={to} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${active(to) ? 'bg-primary text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}>
                   {icon}{label}
                 </Link>
               ))}
               
               {/* Desktop More Button */}
-              <button onClick={() => setMobileOpen(true)} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100`}>
+              <button onClick={() => setMobileOpen(true)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100`}>
                 <Menu className="w-3.5 h-3.5" /> More
               </button>
               
