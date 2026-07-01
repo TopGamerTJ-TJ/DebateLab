@@ -40,6 +40,7 @@ import BanGate from './components/BanGate';
 import Friends from './pages/Friends';
 import AIEditor from './pages/AIEditor';
 import VoicePractice from './pages/VoicePractice';
+import SpeechTimer from './pages/SpeechTimer';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -124,6 +125,7 @@ const AuthenticatedApp = () => {
           <Route path="/friends" element={<Friends />} />
           <Route path="/ai-editor" element={<AIEditor />} />
           <Route path="/voice-practice" element={<VoicePractice />} />
+          <Route path="/speech-timer" element={<SpeechTimer />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>

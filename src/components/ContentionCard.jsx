@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Save, ExternalLink, Star } from "lucide-react";
+import { ChevronDown, ChevronUp, Save, ExternalLink, Star, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { haptic, shareContent } from "@/lib/native";
+import { useToast } from "@/components/ui/use-toast";
 
 const Section = ({ label, children, color = "bg-slate-50" }) => (
   <div className={`${color} rounded-xl p-4`}>
@@ -11,6 +13,15 @@ const Section = ({ label, children, color = "bg-slate-50" }) => (
 
 export default function ContentionCard({ contention: c, onSave, saving }) {
   const [expanded, setExpanded] = useState(false);
+  const { toast } = useToast();
+
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    haptic(10);
+    const text = `${c.title}\n\nClaim: ${c.claim}\nWarrant: ${c.warrant}\nImpact: ${c.impact}`;
+    const res = await shareContent({ title: c.title, text });
+    if (res === "copied") toast({ title: "Contention copied to clipboard" });
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -24,6 +35,9 @@ export default function ContentionCard({ contention: c, onSave, saving }) {
           <p className="text-sm text-slate-600 mt-1 line-clamp-2">{c.claim}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0 ml-4">
+          <Button variant="outline" size="sm" onClick={handleShare} className="gap-1.5 text-xs h-8">
+            <Share2 className="w-3 h-3" /> Share
+          </Button>
           <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onSave(); }} disabled={saving} className="gap-1.5 text-xs h-8">
             <Save className="w-3 h-3" /> Save
           </Button>

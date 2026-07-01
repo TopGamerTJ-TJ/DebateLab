@@ -7,7 +7,7 @@ import Dashboard from "@/pages/Dashboard";
 import Projects from "@/pages/Projects";
 import CoachChat from "@/pages/CoachChat";
 import Forum from "@/pages/Forum";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords, Bell, Mic } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords, Bell, Mic, Timer } from "lucide-react";
 
 const doLogout = async () => {
   await base44.auth.logout();
@@ -143,6 +143,7 @@ export default function Layout() {
                 ["/forum", <MessageSquare className="w-3.5 h-3.5" />, "Forum"],
                 ["/match", <Swords className="w-3.5 h-3.5" />, "Match Debate"],
                 ["/voice-practice", <Mic className="w-3.5 h-3.5" />, "Voice"],
+              ["/speech-timer", <Timer className="w-3.5 h-3.5" />, "Timer"],
                 ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
                 ["/friends", <Users className="w-3.5 h-3.5" />, "Friends"],
                 ["/ai-editor", <Sparkles className="w-3.5 h-3.5" />, "AI Editor"],
@@ -284,6 +285,7 @@ export default function Layout() {
               ["/coach", Brain, "Coach"],
               ["/practice", Target, "Practice Rounds"],
               ["/voice-practice", Mic, "Voice Practice"],
+              ["/speech-timer", Timer, "Speech Timer"],
               ["/match", Swords, "Match Debate"],
               ["/forum", MessageSquare, "Forum"],
               ["/friends", Users, "Friends"],
