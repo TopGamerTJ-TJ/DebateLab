@@ -39,6 +39,7 @@ import TermsAndPrivacy from './pages/TermsAndPrivacy';
 import BanGate from './components/BanGate';
 import Friends from './pages/Friends';
 import AIEditor from './pages/AIEditor';
+import VoicePractice from './pages/VoicePractice';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -122,6 +123,7 @@ const AuthenticatedApp = () => {
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/friends" element={<Friends />} />
           <Route path="/ai-editor" element={<AIEditor />} />
+          <Route path="/voice-practice" element={<VoicePractice />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>

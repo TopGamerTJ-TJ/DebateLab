@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { BookOpen, Globe, FileText, Trophy, Brain, BarChart2, Zap, ArrowRight, Target, Layers, Archive, Columns, Link as LinkIcon, Settings } from "lucide-react";
+import { BookOpen, Globe, FileText, Trophy, Brain, BarChart2, Zap, ArrowRight, Target, Layers, Archive, Columns, Link as LinkIcon, Settings, Mic } from "lucide-react";
 import TourModal from "@/components/TourModal";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -105,6 +105,7 @@ export default function Dashboard() {
                 <QuickAction to="/model-un" icon={<Globe className="w-5 h-5 text-teal-600" />} title="Model UN" desc="Country research, position papers, and resolutions" color="bg-teal-50" />
                 <QuickAction to="/model-congress" icon={<FileText className="w-5 h-5 text-purple-600" />} title="Model Congress" desc="Bill writing, committee prep, and speeches" color="bg-purple-50" />
                 <QuickAction to="/practice" icon={<Target className="w-5 h-5 text-green-600" />} title="Practice Round" desc="AI-powered debate simulation with judge feedback" color="bg-green-50" />
+                <QuickAction to="/voice-practice" icon={<Mic className="w-5 h-5 text-rose-600" />} title="Voice Practice" desc="Record a speech and get instant spoken-delivery feedback" color="bg-rose-50" />
                 <QuickAction to="/ai-coach" icon={<Brain className="w-5 h-5 text-violet-600" />} title="AI Coach" desc="Performance analytics and personalized recommendations" color="bg-violet-50" />
                 <QuickAction to="/tournament" icon={<Trophy className="w-5 h-5 text-yellow-600" />} title="Tournament" desc="Manage tournaments, rounds, and results" color="bg-yellow-50" />
               </div>
