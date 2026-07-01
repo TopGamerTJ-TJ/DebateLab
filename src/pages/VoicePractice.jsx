@@ -42,6 +42,8 @@ export default function VoicePractice() {
   const [transcript, setTranscript] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [micError, setMicError] = useState("");
+  const [micGranted, setMicGranted] = useState(false);
+  const [requesting, setRequesting] = useState(false);
 
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
@@ -55,6 +57,34 @@ export default function VoicePractice() {
     };
   }, []);
 
+  // Explicitly ask the user for microphone access up front. Triggers the
+  // browser/OS permission prompt so it's clear the app needs the mic.
+  const requestMic = async () => {
+    setMicError("");
+    setRequesting(true);
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setMicError("Your browser doesn't support microphone recording.");
+        return;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Stop the probe stream immediately — we just needed the permission grant.
+      stream.getTracks().forEach(t => t.stop());
+      setMicGranted(true);
+      haptic(10);
+    } catch (err) {
+      if (err && (err.name === "NotAllowedError" || err.name === "PermissionDeniedError")) {
+        setMicError("Microphone access was denied. Please allow microphone access in your browser or device settings, then try again.");
+      } else if (err && err.name === "NotFoundError") {
+        setMicError("No microphone was found on your device.");
+      } else {
+        setMicError("Couldn't access the microphone. Please check your settings and try again.");
+      }
+    } finally {
+      setRequesting(false);
+    }
+  };
+
   const startRecording = async () => {
     setMicError("");
     setTranscript("");
@@ -62,6 +92,7 @@ export default function VoicePractice() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
+      setMicGranted(true);
       const recorder = new MediaRecorder(stream);
       chunksRef.current = [];
       recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
@@ -72,8 +103,13 @@ export default function VoicePractice() {
       setElapsed(0);
       haptic(15);
       timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
-    } catch {
-      setMicError("Microphone access is required for voice practice. Please enable it in your device settings.");
+    } catch (err) {
+      if (err && (err.name === "NotAllowedError" || err.name === "PermissionDeniedError")) {
+        setMicGranted(false);
+        setMicError("Microphone access was denied. Please allow microphone access in your browser or device settings, then try again.");
+      } else {
+        setMicError("Microphone access is required for voice practice. Please enable it in your device settings.");
+      }
     }
   };
 
@@ -174,6 +210,14 @@ export default function VoicePractice() {
                 <Loader2 className="w-10 h-10 text-primary animate-spin mb-3" />
                 <p className="text-sm text-slate-600">Transcribing & analyzing your speech…</p>
               </div>
+            ) : !micGranted ? (
+              <>
+                <Button onClick={requestMic} disabled={requesting} size="lg" className="gap-2">
+                  {requesting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mic className="w-4 h-4" />}
+                  {requesting ? "Requesting access…" : "Enable Microphone"}
+                </Button>
+                <p className="text-xs text-slate-500 mt-3 text-center max-w-xs">DebateLab needs microphone access to record and analyze your speech. Your recording is only used to generate feedback.</p>
+              </>
             ) : (
               <>
                 <button
