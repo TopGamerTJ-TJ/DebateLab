@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AIAssistant from "@/components/AIAssistant";
+import ContextInput from "@/components/ContextInput";
 import { Globe, Sparkles, Loader2, FileText, Trash2, Star, Save, Copy, Download, BookOpen } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -453,7 +454,7 @@ Preambulatory: "Noting with deep concern the [specific problem facing ${country}
 export default function ModelUN() {
   const [form, setForm] = useState({ title: "", type: "position_paper", country: "", committee: "", topic: "", content: "" });
   const [generating, setGenerating] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState({ country: "", committee: "", topic: "", docType: "position_paper" });
+  const [aiPrompt, setAiPrompt] = useState({ country: "", committee: "", topic: "", docType: "position_paper", context: "" });
   const [viewDoc, setViewDoc] = useState(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -499,8 +500,9 @@ export default function ModelUN() {
       toast({ title: "Please fill country, committee, and topic", variant: "destructive" }); return;
     }
     setGenerating(true);
+    const contextNote = aiPrompt.context ? `\n\nADDITIONAL CONTEXT FROM THE DELEGATE (prioritize these instructions): ${aiPrompt.context}\n` : "";
     const prompt = buildPrompt(aiPrompt.docType, { country: aiPrompt.country, committee: aiPrompt.committee, topic: aiPrompt.topic });
-    const content = await base44.integrations.Core.InvokeLLM({ prompt, model: "claude_sonnet_4_6" });
+    const content = await base44.integrations.Core.InvokeLLM({ prompt: prompt + contextNote, model: "claude_sonnet_4_6" });
     const label = DOC_TYPES.find(d => d.value === aiPrompt.docType)?.label || aiPrompt.docType;
     setForm({
       title: `${aiPrompt.country} — ${label} — ${aiPrompt.committee}`,
@@ -570,6 +572,11 @@ export default function ModelUN() {
                   <label className="text-xs font-medium text-slate-600 mb-1.5 block">Topic / Agenda Item</label>
                   <Input value={aiPrompt.topic} onChange={e => setAiPrompt({ ...aiPrompt, topic: e.target.value })} placeholder="e.g., Nuclear Non-Proliferation, Climate Migration, Cybersecurity" />
                 </div>
+                <ContextInput
+                  value={aiPrompt.context}
+                  onChange={v => setAiPrompt({ ...aiPrompt, context: v })}
+                  placeholder="e.g., Emphasize my country's economic ties, this is a crisis committee, keep it under one page..."
+                />
                 <Button onClick={generateDoc} disabled={generating} className="w-full h-11 gap-2 font-semibold bg-teal-600 hover:bg-teal-700">
                   {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                   {generating ? "Generating authentic document..." : "Generate Document"}

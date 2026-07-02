@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AIAssistant from "@/components/AIAssistant";
+import ContextInput from "@/components/ContextInput";
 import { FileText, Sparkles, Loader2, Star, Trash2, Save } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -16,7 +17,7 @@ const POLICY_AREAS = ["Healthcare", "Education", "Environment", "Economy", "Fore
 export default function ModelCongress() {
   const [form, setForm] = useState({ title: "", type: "bill", sponsor: "", topic: "", policyArea: "", content: "", status: "draft" });
   const [generating, setGenerating] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState({ topic: "", policyArea: "", stance: "pro", docType: "bill", sponsor: "", conferenceId: "" });
+  const [aiPrompt, setAiPrompt] = useState({ topic: "", policyArea: "", stance: "pro", docType: "bill", sponsor: "", conferenceId: "", context: "" });
   const [coachConferenceId, setCoachConferenceId] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -76,7 +77,7 @@ Topic: ${aiPrompt.topic}
 Policy Area: ${aiPrompt.policyArea || "General Policy"}
 Stance: ${aiPrompt.stance}
 ${aiPrompt.sponsor ? `Sponsor/Author: ${aiPrompt.sponsor}` : ""}
-
+${aiPrompt.context ? `\nADDITIONAL CONTEXT FROM THE DELEGATE (prioritize these instructions): ${aiPrompt.context}\n` : ""}
 Write in proper legislative format. For bills: include WHEREAS clauses, BE IT ENACTED language, numbered sections, and specific policy provisions. For speeches: write a compelling 3-5 minute speech with opening hook, main arguments, evidence, rebuttals, and closing. For amendments: follow proper amendment format. Make it tournament-quality that demonstrates deep policy knowledge and would earn recognition at competitive Model Congress tournaments.${conferenceContext}`
     });
     setForm({
@@ -149,6 +150,11 @@ Write in proper legislative format. For bills: include WHEREAS clauses, BE IT EN
                     </SelectContent>
                   </Select>
                 )}
+                <ContextInput
+                  value={aiPrompt.context}
+                  onChange={v => setAiPrompt({ ...aiPrompt, context: v })}
+                  placeholder="e.g., Include a funding mechanism, keep it under 3 sections, write in a formal committee tone..."
+                />
                 <Button onClick={generateDoc} disabled={generating} className="w-full gap-2">
                   {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                   {generating ? "Generating..." : "Generate Document"}

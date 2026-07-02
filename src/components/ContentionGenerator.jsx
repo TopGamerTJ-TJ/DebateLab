@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/AuthContext";
 import ContentionCard from "./ContentionCard";
 import SaveToProjectDialog from "./SaveToProjectDialog";
+import ContextInput from "./ContextInput";
 
 const BATCH_SIZE = 8;
 
@@ -48,7 +49,7 @@ ${motionLabel}: "${form.resolution}"
 Side: ${form.side}
 Difficulty: ${form.difficulty}
 Evidence preference: ${form.evidencePreference}
-
+${form.context ? `\nAdditional context from the debater (prioritize this): ${form.context}\n` : ""}
 Create comprehensive, tournament-quality contentions with real academic evidence, statistics, and expert citations. Include realistic source URLs. Make each contention distinct and strategically strong.
 
 Return a JSON object with a "contentions" array. Each must include: title, claim, warrant, impact, evidence (array of {text, source, sourceUrl}), possibleRebuttals, rebuttalResponses, crossfireQuestions, crossfireAnswers, strategicNotes.`;
@@ -70,7 +71,7 @@ Return a JSON object with a "contentions" array. Each must include: title, claim
 
 export default function ContentionGenerator({ format = "parliamentary" }) {
   const [activeTab, setActiveTab] = useState("generate");
-  const [form, setForm] = useState({ resolution: "", side: "", count: "2", difficulty: "intermediate", evidencePreference: "academic" });
+  const [form, setForm] = useState({ resolution: "", side: "", count: "2", difficulty: "intermediate", evidencePreference: "academic", context: "" });
   const [generatedContentions, setGeneratedContentions] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [saveDialog, setSaveDialog] = useState(null); // null | "single" | "all"
@@ -260,6 +261,12 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
                   </Select>
                 </div>
               </div>
+
+              <ContextInput
+                value={form.context}
+                onChange={v => setForm({ ...form, context: v })}
+                placeholder="e.g., Focus on economic impacts, avoid climate arguments, my opponent runs a framework case..."
+              />
 
               <Button onClick={generate} disabled={generating} className="w-full h-11 gap-2 text-sm font-semibold">
                 {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
