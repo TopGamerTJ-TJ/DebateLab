@@ -16,11 +16,13 @@ const POLICY_AREAS = ["Healthcare", "Education", "Environment", "Economy", "Fore
 export default function ModelCongress() {
   const [form, setForm] = useState({ title: "", type: "bill", sponsor: "", topic: "", policyArea: "", content: "", status: "draft" });
   const [generating, setGenerating] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState({ topic: "", policyArea: "", stance: "pro", docType: "bill", sponsor: "" });
+  const [aiPrompt, setAiPrompt] = useState({ topic: "", policyArea: "", stance: "pro", docType: "bill", sponsor: "", conferenceId: "" });
+  const [coachConferenceId, setCoachConferenceId] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: bills = [] } = useQuery({ queryKey: ['congress_bills'], queryFn: () => base44.entities.CongressBill.list('-created_date') });
+  const { data: conferences = [] } = useQuery({ queryKey: ['conference_profiles'], queryFn: () => base44.entities.ConferenceProfile.list('-created_date') });
 
   const createBill = useMutation({
     mutationFn: (data) => base44.entities.CongressBill.create(data),
@@ -60,6 +62,14 @@ export default function ModelCongress() {
     if (!aiPrompt.topic) { toast({ title: "Please enter a topic", variant: "destructive" }); return; }
     setGenerating(true);
     const typeMap = { bill: "Bill", resolution: "Resolution", amendment: "Amendment", speech: "Authorship/Pro/Con Speech", committee_prep: "Committee Preparation Brief" };
+    const conference = conferences.find(c => c.id === aiPrompt.conferenceId);
+    // Inject the conference's own procedure + bill template so output matches their exact required format.
+    const conferenceContext = conference ? `
+
+IMPORTANT — This is for "${conference.name}". Follow THIS conference's specific requirements exactly, overriding any generic defaults:
+${conference.billTemplateText ? `\nRequired bill/document format template:\n"""${conference.billTemplateText.slice(0, 4000)}"""` : ""}
+${conference.procedureText ? `\nConference rules of procedure (for context on structure and expectations):\n"""${conference.procedureText.slice(0, 4000)}"""` : ""}
+Match the formatting, section headings, and conventions of the template above precisely.` : "";
     const content = await base44.integrations.Core.InvokeLLM({
       prompt: `Write a comprehensive, high-quality Model Congress ${typeMap[aiPrompt.docType] || aiPrompt.docType} for:
 Topic: ${aiPrompt.topic}
@@ -67,7 +77,7 @@ Policy Area: ${aiPrompt.policyArea || "General Policy"}
 Stance: ${aiPrompt.stance}
 ${aiPrompt.sponsor ? `Sponsor/Author: ${aiPrompt.sponsor}` : ""}
 
-Write in proper legislative format. For bills: include WHEREAS clauses, BE IT ENACTED language, numbered sections, and specific policy provisions. For speeches: write a compelling 3-5 minute speech with opening hook, main arguments, evidence, rebuttals, and closing. For amendments: follow proper amendment format. Make it tournament-quality that demonstrates deep policy knowledge and would earn recognition at competitive Model Congress tournaments.`
+Write in proper legislative format. For bills: include WHEREAS clauses, BE IT ENACTED language, numbered sections, and specific policy provisions. For speeches: write a compelling 3-5 minute speech with opening hook, main arguments, evidence, rebuttals, and closing. For amendments: follow proper amendment format. Make it tournament-quality that demonstrates deep policy knowledge and would earn recognition at competitive Model Congress tournaments.${conferenceContext}`
     });
     setForm({
       title: `${typeMap[aiPrompt.docType]}: ${aiPrompt.topic}`,
@@ -130,6 +140,15 @@ Write in proper legislative format. For bills: include WHEREAS clauses, BE IT EN
                   <SelectContent>{BILL_TYPES.map(t => <SelectItem key={t} value={t} className="capitalize">{t.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</SelectItem>)}</SelectContent>
                 </Select>
                 <Input value={aiPrompt.sponsor} onChange={e => setAiPrompt({ ...aiPrompt, sponsor: e.target.value })} placeholder="Your name (optional)" />
+                {conferences.length > 0 && (
+                  <Select value={aiPrompt.conferenceId || "none"} onValueChange={v => setAiPrompt({ ...aiPrompt, conferenceId: v === "none" ? "" : v })}>
+                    <SelectTrigger><SelectValue placeholder="Conference format (optional)" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Standard format</SelectItem>
+                      {conferences.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                )}
                 <Button onClick={generateDoc} disabled={generating} className="w-full gap-2">
                   {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                   {generating ? "Generating..." : "Generate Document"}
@@ -198,7 +217,28 @@ Write in proper legislative format. For bills: include WHEREAS clauses, BE IT EN
         </TabsContent>
 
         <TabsContent value="assistant">
-          <AIAssistant format="model_congress" placeholder="Ask about bill writing, congressional procedure, committee strategy, speeches..." />
+          {conferences.length > 0 && (
+            <div className="mb-4 flex items-center gap-3 flex-wrap">
+              <span className="text-sm text-slate-600">Tailor advice to a conference:</span>
+              <Select value={coachConferenceId || "none"} onValueChange={v => setCoachConferenceId(v === "none" ? "" : v)}>
+                <SelectTrigger className="w-64"><SelectValue placeholder="Standard procedure" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Standard procedure</SelectItem>
+                  {conferences.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          <AIAssistant
+            key={coachConferenceId || 'default'}
+            format="model_congress"
+            placeholder="Ask about bill writing, congressional procedure, committee strategy, speeches..."
+            extraContext={(() => {
+              const c = conferences.find(x => x.id === coachConferenceId);
+              if (!c) return "";
+              return `The delegate is preparing for "${c.name}". Base your procedural guidance on THIS conference's rules where relevant.${c.procedureText ? `\n\nConference rules of procedure:\n"""${c.procedureText.slice(0, 5000)}"""` : ""}${c.billTemplateText ? `\n\nRequired bill/document format:\n"""${c.billTemplateText.slice(0, 3000)}"""` : ""}`;
+            })()}
+          />
         </TabsContent>
       </Tabs>
     </div>

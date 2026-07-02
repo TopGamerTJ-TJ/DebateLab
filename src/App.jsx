@@ -41,6 +41,9 @@ import Friends from './pages/Friends';
 import AIEditor from './pages/AIEditor';
 import VoicePractice from './pages/VoicePractice';
 import SpeechTimer from './pages/SpeechTimer';
+import ConferenceProfiles from './pages/ConferenceProfiles';
+import MemoryAssist from './pages/MemoryAssist';
+import MockCommittee from './pages/MockCommittee';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -126,6 +129,9 @@ const AuthenticatedApp = () => {
           <Route path="/ai-editor" element={<AIEditor />} />
           <Route path="/voice-practice" element={<VoicePractice />} />
           <Route path="/speech-timer" element={<SpeechTimer />} />
+          <Route path="/conference-profiles" element={<ConferenceProfiles />} />
+          <Route path="/memory-assist" element={<MemoryAssist />} />
+          <Route path="/mock-committee" element={<MockCommittee />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>

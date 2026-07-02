@@ -11,7 +11,7 @@ const SYSTEM_PROMPTS = {
   model_congress: `You are an expert Model Congress advisor. Help students with: bill writing, resolution drafting, amendment procedures, committee preparation, congressional speeches (authorship, pro, con), cross-examination strategy, parliamentary procedure (Roberts Rules of Order), policy analysis, and mock hearing preparation.`,
 };
 
-export default function AIAssistant({ format = "parliamentary", placeholder }) {
+export default function AIAssistant({ format = "parliamentary", placeholder, extraContext = "" }) {
   const [messages, setMessages] = useState([
     { role: "assistant", content: getWelcome(format) }
   ]);
@@ -43,7 +43,7 @@ export default function AIAssistant({ format = "parliamentary", placeholder }) {
 
     const reply = await base44.integrations.Core.InvokeLLM({
       prompt: `${SYSTEM_PROMPTS[format] || SYSTEM_PROMPTS.parliamentary}
-
+${extraContext ? `\n${extraContext}\n` : ""}
 Conversation history:
 ${history}
 
