@@ -12,6 +12,8 @@ import ReactMarkdown from "react-markdown";
 import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
 import AnimatedPage from "@/components/AnimatedPage";
 import ProjectAIChats from "@/components/ProjectAIChats";
+import ConferenceLinkSelect from "@/components/ConferenceLinkSelect";
+import { buildConferenceContextText } from "@/components/ConferenceContextPicker";
 
 const DIFF_COLORS = { beginner: "bg-green-100 text-green-700", intermediate: "bg-blue-100 text-blue-700", advanced: "bg-purple-100 text-purple-700", expert: "bg-red-100 text-red-700" };
 
@@ -76,6 +78,26 @@ export default function ProjectDetail() {
   const { data: chatSessions = [] } = useQuery({
     queryKey: ['project_chat_sessions', id],
     queryFn: () => base44.entities.AIChatSession.filter({ projectId: id }, '-created_date', 50)
+  });
+
+  const { data: conferenceProfiles = [] } = useQuery({
+    queryKey: ['conference_profiles'],
+    queryFn: () => base44.entities.ConferenceProfile.list('-created_date')
+  });
+  const { data: folders = [] } = useQuery({
+    queryKey: ['project_folders'],
+    queryFn: () => base44.entities.ProjectFolder.list('-created_date')
+  });
+
+  // Effective conference profile: project's own link, else the folder's linked profile.
+  const projectFolder = folders.find(f => f.id === project?.folderId);
+  const effectiveConferenceId = project?.conferenceProfileId || projectFolder?.conferenceProfileId || "";
+  const effectiveConference = conferenceProfiles.find(c => c.id === effectiveConferenceId);
+  const conferenceContext = buildConferenceContextText(effectiveConference);
+
+  const linkConference = useMutation({
+    mutationFn: (profileId) => base44.entities.Project.update(id, { conferenceProfileId: profileId || "" }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['project', id] }); toast({ title: "Conference rules updated" }); }
   });
 
   const addCollaborator = useMutation({
@@ -152,6 +174,10 @@ Search the web and provide:
 3. 2-3 suggested contention titles this research could support
 4. Any counterarguments found in the research`;
 
+    if (conferenceContext) {
+      promptText += `\n\n${conferenceContext}\nKeep findings consistent with the conference rules/context above.`;
+    }
+
     if (activeAiMode === "dampened") {
       promptText += `\n\nCRITICAL: The user has Dampened AI enabled. 
 - You MUST NOT write their arguments or contentions for them. 
@@ -220,6 +246,10 @@ Our side's current contentions context:
 ${context || 'No contentions yet'}
 
 Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a clean list of concise, punchy rebuttals. Do NOT include pleasantries, just the rebuttals.`;
+
+    if (conferenceContext) {
+      promptText += `\n\n${conferenceContext}\nAlign rebuttals with the conference rules/context above.`;
+    }
 
     if (activeAiMode === "dampened") {
       promptText += `\n\nCRITICAL: The user has Dampened AI enabled. 
@@ -319,6 +349,11 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
           <div className="flex gap-2 items-center mt-0.5 flex-wrap">
             {project.format && <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full capitalize">{project.format.replace(/_/g, ' ')}</span>}
             {project.resolution && <span className="text-xs text-slate-400 truncate max-w-xs">{project.resolution}</span>}
+            {effectiveConference && (
+              <span className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                <Globe className="w-3 h-3" />{effectiveConference.name}{!project.conferenceProfileId && projectFolder ? " (folder)" : ""}
+              </span>
+            )}
           </div>
         </div>
         <div className="flex gap-2">
@@ -345,6 +380,21 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
           <span><strong>Archived project</strong> — this project is frozen. Unarchive to make edits or use the Research Agent.</span>
         </div>
       )}
+
+      {/* Conference Rules/Context link */}
+      <div className="bg-white rounded-xl border border-slate-200 p-4 mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex-1">
+          <div className="text-sm font-semibold text-slate-800">Conference Rules/Context</div>
+          <p className="text-xs text-slate-500">
+            {projectFolder?.conferenceProfileId && !project.conferenceProfileId
+              ? `Inherited from folder "${projectFolder.name}". Pick one here to override.`
+              : "Link a saved conference profile so this project's AI tools follow those rules."}
+          </p>
+        </div>
+        <div className="sm:w-64">
+          <ConferenceLinkSelect value={project.conferenceProfileId || ""} onChange={(v) => linkConference.mutate(v)} label={null} />
+        </div>
+      </div>
 
       {/* Daily Suggestions */}
       <ProjectSuggestionsWidget projectId={id} />
@@ -564,7 +614,7 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
 
       {/* AI Chat tab */}
       {tab === "chat" && (
-        <ProjectAIChats project={project} contentions={contentions} />
+        <ProjectAIChats project={project} contentions={contentions} conferenceContext={conferenceContext} />
       )}
 
       {/* Collab Tab */}

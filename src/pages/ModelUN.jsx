@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AIAssistant from "@/components/AIAssistant";
 import ContextInput from "@/components/ContextInput";
+import ConferenceContextPicker, { buildConferenceContextText } from "@/components/ConferenceContextPicker";
 import { Globe, Sparkles, Loader2, FileText, Trash2, Star, Save, Copy, Download, BookOpen } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -455,6 +456,7 @@ export default function ModelUN() {
   const [form, setForm] = useState({ title: "", type: "position_paper", country: "", committee: "", topic: "", content: "" });
   const [generating, setGenerating] = useState(false);
   const [aiPrompt, setAiPrompt] = useState({ country: "", committee: "", topic: "", docType: "position_paper", context: "" });
+  const [conferenceProfile, setConferenceProfile] = useState(null);
   const [viewDoc, setViewDoc] = useState(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -501,8 +503,10 @@ export default function ModelUN() {
     }
     setGenerating(true);
     const contextNote = aiPrompt.context ? `\n\nADDITIONAL CONTEXT FROM THE DELEGATE (prioritize these instructions): ${aiPrompt.context}\n` : "";
+    const conferenceText = buildConferenceContextText(conferenceProfile);
+    const conferenceNote = conferenceText ? `\n\n${conferenceText}\nAdhere to the conference rules/context above.\n` : "";
     const prompt = buildPrompt(aiPrompt.docType, { country: aiPrompt.country, committee: aiPrompt.committee, topic: aiPrompt.topic });
-    const content = await base44.integrations.Core.InvokeLLM({ prompt: prompt + contextNote, model: "claude_sonnet_4_6" });
+    const content = await base44.integrations.Core.InvokeLLM({ prompt: prompt + contextNote + conferenceNote, model: "claude_sonnet_4_6" });
     const label = DOC_TYPES.find(d => d.value === aiPrompt.docType)?.label || aiPrompt.docType;
     setForm({
       title: `${aiPrompt.country} — ${label} — ${aiPrompt.committee}`,
@@ -576,6 +580,10 @@ export default function ModelUN() {
                   value={aiPrompt.context}
                   onChange={v => setAiPrompt({ ...aiPrompt, context: v })}
                   placeholder="e.g., Emphasize my country's economic ties, this is a crisis committee, keep it under one page..."
+                />
+                <ConferenceContextPicker
+                  value={conferenceProfile?.id || ""}
+                  onChange={(_, p) => setConferenceProfile(p)}
                 />
                 <Button onClick={generateDoc} disabled={generating} className="w-full h-11 gap-2 font-semibold bg-teal-600 hover:bg-teal-700">
                   {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
