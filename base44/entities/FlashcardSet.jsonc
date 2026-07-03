@@ -1,0 +1,112 @@
+{
+  "name": "FlashcardSet",
+  "type": "object",
+  "properties": {
+    "ownerUserId": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "projectId": {
+      "type": "string"
+    },
+    "sourceSummary": {
+      "type": "string"
+    },
+    "keyPoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cue": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "acronym": {
+      "type": "string"
+    },
+    "acronymMeaning": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "flashcards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "front": {
+            "type": "string"
+          },
+          "back": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "tips": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.ownerUserId": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.ownerUserId": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.ownerUserId": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

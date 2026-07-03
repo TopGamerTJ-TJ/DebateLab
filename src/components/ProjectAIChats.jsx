@@ -7,7 +7,7 @@ import { Sparkles, Loader2, MessageSquare, ChevronLeft, Plus, Brain, Globe, Tras
 import { useAuth } from "@/lib/AuthContext";
 import ReactMarkdown from "react-markdown";
 
-export default function ProjectAIChats({ project, contentions }) {
+export default function ProjectAIChats({ project, contentions, conferenceContext = "" }) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [sessionId, setSessionId] = useState("");
@@ -71,6 +71,7 @@ ${context || 'No contentions yet'}
 Conversation history:
 ${currentMessages.map(m => `${m.role === 'user' ? 'Student' : 'Coach'}: ${m.content}`).join('\n')}
 Provide specific, actionable coaching advice.`;
+        if (conferenceContext) promptText += `\n\n${conferenceContext}\nFollow the conference rules/context above.`;
       } else {
         const context = [project.resolution, project.format, project.side].filter(Boolean).join(', ');
         promptText = `You are an AI assistant for the project "${project.name}". Context: ${context}.
@@ -78,6 +79,7 @@ History:
 ${currentMessages.map(m => `${m.role}: ${m.content}`).join('\n')}
 User: ${userMsg}
 Provide a helpful, accurate response.`;
+        if (conferenceContext) promptText += `\n\n${conferenceContext}\nFollow the conference rules/context above.`;
       }
 
       const res = await base44.integrations.Core.InvokeLLM({ prompt: promptText });

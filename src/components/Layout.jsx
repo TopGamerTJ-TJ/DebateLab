@@ -7,7 +7,7 @@ import Dashboard from "@/pages/Dashboard";
 import Projects from "@/pages/Projects";
 import CoachChat from "@/pages/CoachChat";
 import Forum from "@/pages/Forum";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords, Bell, Mic, Timer, Landmark } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords, Bell, Mic, Timer, Landmark, Layers3 } from "lucide-react";
 
 const doLogout = async () => {
   await base44.auth.logout();
@@ -280,7 +280,7 @@ export default function Layout() {
               ["/coach", Brain, "Coach"],
               ["/practice", Target, "Practice Rounds"],
               ["/mock-committee", Swords, "Mock Committee"],
-              ["/memory-assist", Brain, "Memory Assist"],
+              ["/memory-assist", Layers3, "Memory Assist"],
               ["/voice-practice", Mic, "Voice Practice"],
               ["/speech-timer", Timer, "Speech Timer"],
               ["/conference-profiles", Landmark, "Conference Rules"],
