@@ -6,6 +6,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import AppStorePromoStep from "@/components/AppStorePromoStep";
+import { shouldShowAppStorePromo } from "@/lib/platform";
 
 const TOUR_STEPS = [
   {
@@ -52,11 +54,28 @@ const TOUR_STEPS = [
   }
 ];
 
+const APPSTORE_STEP = { id: "appstore", title: "", desc: "" };
+
 export default function TourModal() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(0);
+
+  // App Store promo step only for genuine web visitors (not native app, not
+  // an installed PWA). Decided once on mount so the step list stays stable.
+  const [steps] = useState(() => {
+    const promo = shouldShowAppStorePromo();
+    if (!promo.show) {
+      const reasonEvent = {
+        native_app: "onboarding_skipped_due_to_native_app",
+        existing_install: "onboarding_skipped_due_to_existing_install",
+      }[promo.reason];
+      if (reasonEvent) base44.analytics.track({ eventName: reasonEvent });
+      return TOUR_STEPS;
+    }
+    return [...TOUR_STEPS, APPSTORE_STEP];
+  });
   const [formData, setFormData] = useState({ 
     displayName: "", 
     skillLevel: "", 
@@ -134,20 +153,24 @@ export default function TourModal() {
   };
 
   const handleNext = async () => {
-    if (TOUR_STEPS[step].id === "experience" && !formData.skillLevel) {
+    if (steps[step].id === "experience" && !formData.skillLevel) {
       // Must select skill level
       return;
     }
 
-    if (TOUR_STEPS[step].id === "profile") {
+    if (steps[step].id === "profile") {
       try {
         await saveProfile.mutateAsync(formData);
       } catch (e) {
         console.error("Failed to save profile:", e);
-      } finally {
+      }
+      // If an App Store promo step follows, advance to it; otherwise finish.
+      if (step < steps.length - 1) {
+        setStep(step + 1);
+      } else {
         handleClose();
       }
-    } else if (step < TOUR_STEPS.length - 1) {
+    } else if (step < steps.length - 1) {
       setStep(step + 1);
     } else {
       handleClose();
@@ -156,7 +179,7 @@ export default function TourModal() {
 
   if (!isOpen) return null;
 
-  const currentStep = TOUR_STEPS[step];
+  const currentStep = steps[step];
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
@@ -169,6 +192,10 @@ export default function TourModal() {
             <X className="w-5 h-5" />
           </button>
 
+          {currentStep.id === "appstore" ? (
+            <AppStorePromoStep onContinue={handleClose} />
+          ) : (
+          <>
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner">
               {currentStep.icon}
@@ -278,7 +305,7 @@ export default function TourModal() {
 
           <div className="flex items-center justify-between mt-8">
             <div className="flex gap-1.5">
-              {TOUR_STEPS.map((_, i) => (
+              {steps.map((_, i) => (
                 <div 
                   key={i} 
                   className={`h-1.5 rounded-full transition-all duration-300 ${i === step ? 'w-6 bg-primary' : 'w-1.5 bg-slate-200'}`}
@@ -291,7 +318,7 @@ export default function TourModal() {
                 Skip
               </Button>
               <Button onClick={handleNext} disabled={currentStep.id === "profile" && saveProfile.isPending} className="gap-1.5 rounded-xl font-medium px-6">
-                {step === TOUR_STEPS.length - 1 ? (
+                {step === steps.length - 1 ? (
                   <>{saveProfile.isPending ? "Saving..." : "Get Started"} {!saveProfile.isPending && <Check className="w-4 h-4" />}</>
                 ) : (
                   <>Next <ChevronRight className="w-4 h-4" /></>
@@ -299,6 +326,8 @@ export default function TourModal() {
               </Button>
             </div>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>

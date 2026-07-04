@@ -9,6 +9,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import AdminPanel from "@/components/AdminPanel";
 import ContactForm from "@/components/ContactForm";
+import AppStoreBadge from "@/components/AppStoreBadge";
+import { appConfig } from "@/lib/app-config";
+import { isNativeApp } from "@/lib/platform";
 
 const FORMATS = ["Parliamentary Debate", "Public Forum", "Model UN", "Model Congress"];
 const LEVELS = ["new", "beginner", "intermediate", "advanced"];
@@ -383,6 +386,21 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Get the iOS app — shown to web & installed-PWA users, hidden inside the native app */}
+      {!isNativeApp() && appConfig.appStoreUrl && (
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h4 className="font-bold text-slate-900 text-sm font-heading">Get the iPhone App</h4>
+            <p className="text-slate-500 text-xs mt-0.5">Faster performance, native notifications, and a more seamless experience.</p>
+          </div>
+          <AppStoreBadge
+            href={appConfig.appStoreUrl}
+            onClick={() => base44.analytics.track({ eventName: "onboarding_appstore_clicked" })}
+            className="shrink-0"
+          />
         </div>
       )}
 
