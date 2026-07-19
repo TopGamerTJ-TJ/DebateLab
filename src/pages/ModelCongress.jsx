@@ -81,18 +81,24 @@ Match the formatting, section headings, and conventions of the template above pr
 - OPENING HOOK: Do NOT start with a quote from a politician — that is cliché. Instead open with either (a) a striking statistic/number followed by [pause] then a one-line clarification, or (b) a short line of humor or a relatable pop-culture reference a high-schooler would get.
 - Use plain, conversational language a high-schooler can follow. Work in at least one moment of humor and one relatable reference — chairs notice these and they boost speaking scores.
 - End rebuttals with a rhetorical question for the chamber to ponder (this drives engagement).`
-      : `FORMAT REQUIREMENTS FOR THE ${docLabel.toUpperCase()} (match real competitive Model Congress bills exactly — Yale, Dalton, Harvard-style):
+      : `FORMAT REQUIREMENTS FOR THE ${docLabel.toUpperCase()} — follow the standard competitive Model Congress bill structure used by Princeton, Yale, and Harvard conferences (use this default format when no conference-specific template is provided):
 - HEADER block at the top:
-  Line 1: Conference name (e.g., "Yale Model Congress 2025")
-  Line 2: Committee (e.g., "Blue Senate — Energy and Commerce Committee")
-  Line 3: Author name (left) and School/Delegation (right)
-- "Title of Bill: An Act to..." (or "A Resolution to..." for resolutions)
-- Enacting clause: "Be It Hereby Enacted By The [Conference Name]:"
-- PREAMBLE: a block of "Whereas" clauses, each a single justification starting with "Whereas" and ending with a semicolon; the last ends with a period. Cover the problem, harm, and why federal action is needed.
-- NUMBERED SECTIONS, each starting "Section X:" followed by a clear operative provision. Use legislative phrasing ("Let Congress...", "Let the Department of...", "Let..."). Each section should address ONE action.
-- Use "Subsection A:", "Subsection B:", etc. for sub-provisions within a section.
-- Always include: definitions section (if needed), enforcement/penalty section, an enforcement agency, and a final enactment/effective-date section ("Let this bill be enacted X days after its passage.").
-- Be specific: include numbers, percentages, timelines, agencies, and mechanisms — not vague platitudes.`;
+  Line 1: Conference name (e.g., "Model Congress") — left aligned
+  Line 2: Committee (e.g., "Senate — Energy and Commerce Committee")
+  Line 3: Author (left) and School/Delegation (right)
+- TITLE LINE: "A Bill to [action in plain language]" (or "A Resolution to..." for resolutions; "An Amendment to..." for amendments).
+- ENACTING CLAUSE on its own line: "Be It Enacted by the Model Congress assembled:"
+- PREAMBLE: 3–6 "Whereas" clauses. Each clause is ONE justification starting with "Whereas" and ending with a semicolon (last one ends with a period). Cover: the problem, who is harmed, why current law is insufficient, and why federal action is the right level. Use real statistics where possible.
+- BODY — numbered sections in THIS order, each starting "Section X:" with a bolded short title in parentheses after the number:
+  • Section 1: Short Title — "This act may be cited as the '[Name] Act.'" Be creative but serious.
+  • Section 2: Statement of Purpose — 1–2 sentences on the goals of the law.
+  • Section 3: Definitions — define any unusual or key terms (one per subsection: Subsection A, B, C...).
+  • Section 4–6: Main Provisions — the operative law. Each section = ONE distinct action. Use legislative phrasing ("Let...", "The [Agency] shall...", "Congress directs..."). Use "Subsection A/B/C" for detail, exceptions, and clarification. Be SPECIFIC: real numbers, percentages, dollar amounts, timelines, named agencies, and mechanisms — never vague platitudes.
+  • Appropriations/Funding section — estimate start-up AND annual costs in dollars, and name the funding source (tax, user fee, program cut, etc.). If it saves money, estimate the savings.
+  • Penalty/Enforcement section — name the enforcing agency, penalties for non-compliance (fines, jail time, license revocation), and a case-by-case or minimum threshold.
+  • Final Section — Enactment Clause: state when the bill takes effect. Default to "91 days after passage" (standard for normal legislation; under 30 days is emergency only and requires 2/3 majority).
+- Use "Subsection A:", "Subsection B:" etc. for sub-provisions within any section.
+- Every operative provision should be specific and enforceable, not aspirational.`;
     const content = await base44.integrations.Core.InvokeLLM({
       prompt: `Write a competitive, tournament-quality Model Congress ${docLabel} for:
 Topic: ${aiPrompt.topic}
