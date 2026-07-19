@@ -48,38 +48,37 @@ function buildPrompt(docType, form) {
   const { country, committee, topic } = form;
 
   if (docType === "position_paper") {
-    return `You are writing an official Model UN Position Paper following NMUN (National Model United Nations) format exactly. 
+    return `You are writing an official Model UN Position Paper following NMUN (National Model United Nations) format exactly, per the official NMUN Position Paper Guide.
 
-Country: ${country}
-Committee: ${committee}  
+Member State: ${country}
+Committee: ${committee}
 Topic: ${topic}
 
 Write a complete, authentic position paper following this EXACT NMUN format:
 
 ---
-[COUNTRY NAME IN ALL CAPS]
-[COMMITTEE NAME]
-[TOPIC]
+Delegation from ${country}
+Position Paper for the ${committee}
 
-[Country]'s Position on [Topic]
+[SHORT INTRODUCTORY PARAGRAPH: 2-3 sentences introducing the topic(s) on the committee's agenda and ${country}'s commitment to addressing them. Written as a policy statement from ${country}'s foreign ministry.]
 
-I. BACKGROUND AND COUNTRY CONTEXT
-[2-3 paragraphs providing factual background on the topic from ${country}'s perspective. Include relevant national statistics, geographic context, and historical relationship to the issue. Use formal diplomatic language.]
+${topic}
 
-II. COUNTRY'S POSITION
-[2-3 paragraphs stating ${country}'s official stance. Reference actual treaties signed, UN resolutions previously supported/opposed, official government statements. Be specific and factual.]
+[PARAGRAPH 1 — GLOBAL/REGIONAL CONTEXT: Provide the factual background on the topic, including relevant statistics, geographic context, and the scope of the problem. Written from ${country}'s perspective but framing the global situation. Use formal diplomatic language.]
 
-III. PAST INTERNATIONAL ACTION AND UN INVOLVEMENT
-[1-2 paragraphs on relevant UN resolutions, international agreements, and ${country}'s voting record. Reference real resolution numbers where applicable (e.g., A/RES/70/1, S/RES/1373).]
+[PARAGRAPH 2 — PAST INTERNATIONAL ACTION: Describe what the international/regional community has previously done to address the topic — relevant UN resolutions (cite real resolution numbers, e.g., A/RES/70/1, S/RES/1373), treaties, conferences, and agency efforts.]
 
-IV. PROPOSED SOLUTIONS AND POLICY RECOMMENDATIONS
-[2-3 paragraphs with 3-5 specific, actionable policy proposals ${country} will advocate for. Number each recommendation. Make them feasible and aligned with ${country}'s interests and the committee's mandate.]
+[PARAGRAPH 3 — ${country.toUpperCase()}'S POSITION & NATIONAL ACTION: State ${country}'s official stance. Reference actual treaties ${country} has signed/ratified, votes on relevant resolutions, national policies, and statements by government officials. Be specific and factual about ${country}'s real foreign policy.]
 
-V. REFERENCES
-[List 3-5 actual sources: UN documents, government websites, academic publications]
+[PARAGRAPH 4 — PROPOSED SOLUTIONS: 3-5 specific, actionable policy proposals ${country} will advocate for in committee. Number each proposal. Make them feasible, aligned with ${country}'s interests, and within the ${committee}'s actual mandate.]
 ---
 
-Use formal diplomatic language throughout. Include real statistics, real treaty names, and real UN resolution numbers. Make it tournament-quality that would win Best Position Paper.`;
+CRITICAL NMUN FORMATTING RULES (follow exactly):
+- This is written as a POLICY STATEMENT from ${country}'s foreign ministry — DO NOT include academic citations, footnotes, endnotes, or in-text parenthetical references. NMUN explicitly forbids formal citations. You may informally acknowledge a source in the text (e.g., "as noted by the Secretary-General's 2023 report"), but no bibliography or "References" section.
+- Do NOT include university name, national flags, or national symbols.
+- Keep it to roughly two pages (be substantive but not excessive).
+- Use formal diplomatic language throughout. Include real statistics, real treaty names, and real UN resolution numbers woven into the prose.
+- Make it tournament-quality that would win a Position Paper Award.`;
   }
 
   if (docType === "draft_resolution") {
@@ -147,46 +146,55 @@ Country/Bloc: ${country}
 Committee: ${committee}
 Topic: ${topic}
 
-A Working Paper is an informal document that captures ideas before a draft resolution. Format it as follows:
+A Working Paper is the precursor to a Draft Resolution — it has NOT yet been approved by the Dais as a formal draft resolution, but it ALREADY follows the standard resolution format (preambulatory + operative clauses). Once the Dais approves it, it becomes a Draft Resolution. Format it as follows (matching real conference standards like AMUN/THIMUN):
 
 ---
-WORKING PAPER
+WORKING PAPER [number to be assigned by the Dais]
+
 Committee: ${committee}
 Topic: ${topic}
-Submitted by: ${country} and supporting delegations
 
-INTRODUCTION
-[Brief problem statement - 1 paragraph]
+Sponsors: ${country} and [list 2-4 realistic co-sponsoring Member States — sponsors help write the paper and agree to vote YES on it]
+Signatories: [list 4-6 realistic signatory Member States — signatories only support the idea being introduced for debate; they are NOT obligated to vote yes]
 
-KEY ISSUES IDENTIFIED
-1. [Issue with evidence/statistics]
-2. [Issue with evidence/statistics]
-3. [Issue with evidence/statistics]
+THE ${committee.toUpperCase()},
 
-PROPOSED FRAMEWORK FOR ACTION
-A. Short-term measures (0-1 year):
-   • [Specific proposal]
-   • [Specific proposal]
+[PREAMBULATORY CLAUSES — minimum 5. Each clause begins with a preambulatory phrase (italicized conceptually) and ends with a COMMA. Do NOT repeat the same opening phrase. Use real precedents:]
+Affirming [relevant UN Charter article or principle],
+Recalling [real UN resolution number, e.g., A/RES/70/1],
+Deeply concerned [about the specific problem with a real statistic],
+Noting with appreciation [recent positive development or past UN effort],
+Guided by [relevant international treaty or convention],
+Emphasizing [key principle at stake],
+Bearing in mind [relevant contextual fact],
+Aware of [quantified scope of the issue],
 
-B. Medium-term measures (1-5 years):
-   • [Specific proposal]
-   • [Specific proposal]
+[OPERATIVE CLAUSES — minimum 6, numbered, each begins with an operative verb and ends with a SEMICOLON (the final clause ends with a PERIOD). Each clause = one specific actionable policy. Use sub-clauses (a, b, c) for detail:]
+1. Calls upon all Member States to [specific action with mechanism];
 
-C. Long-term structural changes:
-   • [Specific proposal]
-   • [Specific proposal]
+2. Recommends the establishment of [body/program] with the following mandate:
+   a. [specific mandate point],
+   b. [specific mandate point],
+   c. [specific mandate point];
 
-FUNDING MECHANISMS
-[How proposals would be funded]
+3. Requests the Secretary-General to [specific request with a timeline];
 
-IMPLEMENTATION OVERSIGHT
-[How compliance/progress would be monitored]
+4. Encourages Member States, particularly [qualifier], to [action];
 
-SUPPORTING DELEGATIONS
-[List 4-6 realistic supporting countries]
+5. Decides to [specific measurable decision with funding mechanism named];
+
+6. Invites [relevant UN body, specialized agency, or NGOs] to [collaborative action];
+
+7. Further resolves to [follow-up action, e.g., report back at the next session];
 ---
 
-Include real statistics and evidence. Make it substantive and coalition-buildable.`;
+CRITICAL FORMAT RULES:
+- The entire resolution is ONE long sentence. Preambulatory clauses separated by commas; operative clauses by semicolons; the whole thing ends with a period.
+- Preambulatory clause starters must NOT repeat (no two clauses starting with "Recalling").
+- Use correct preambulatory phrases (Affirming, Alarmed by, Bearing in mind, Deeply concerned, Emphasizing, Guided by, Having adopted, Noting with concern, Reaffirming, Recalling, Recognizing, Welcoming, etc.).
+- Use correct operative phrases (Calls upon, Decides, Encourages, Endorses, Invites, Recommends, Requests, Resolves, Strongly urges, Urges, etc.).
+- Operative clauses must be specific, measurable, realistic, and within the ${committee}'s actual mandate. Include real numbers, timelines, named agencies, and funding mechanisms.
+- This is still labeled "Working Paper" (not "Draft Resolution") because the Dais has not yet approved it.`;
   }
 
   if (docType === "opening_speech") {
