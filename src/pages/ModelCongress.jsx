@@ -71,14 +71,37 @@ IMPORTANT — This is for "${conference.name}". Follow THIS conference's specifi
 ${conference.billTemplateText ? `\nRequired bill/document format template:\n"""${conference.billTemplateText.slice(0, 4000)}"""` : ""}
 ${conference.procedureText ? `\nConference rules of procedure (for context on structure and expectations):\n"""${conference.procedureText.slice(0, 4000)}"""` : ""}
 Match the formatting, section headings, and conventions of the template above precisely.` : "";
+    const isSpeech = aiPrompt.docType === "speech";
+    const docLabel = typeMap[aiPrompt.docType] || aiPrompt.docType;
+    const formatRules = isSpeech
+      ? `FORMAT REQUIREMENTS FOR THE SPEECH (this is critical — a real delegate must be able to deliver this from the page while engaging the chamber, not reading full sentences):
+- Write in KEYWORD/BULLET format: 2–4 words per bullet, one bullet per sentence or clause. The delegate reconstructs the full sentence aloud from the keywords. Do NOT write out full prose paragraphs.
+  Example: "• $1,000 per pill  • costs $1.60 to make  • 625x markup"
+- Structure: (1) Opening hook, (2) 2–3 main arguments (each as a cluster of keyword bullets with a one-line evidence tag), (3) Rebuttals to likely opposition, (4) Closing call to action.
+- OPENING HOOK: Do NOT start with a quote from a politician — that is cliché. Instead open with either (a) a striking statistic/number followed by [pause] then a one-line clarification, or (b) a short line of humor or a relatable pop-culture reference a high-schooler would get.
+- Use plain, conversational language a high-schooler can follow. Work in at least one moment of humor and one relatable reference — chairs notice these and they boost speaking scores.
+- End rebuttals with a rhetorical question for the chamber to ponder (this drives engagement).`
+      : `FORMAT REQUIREMENTS FOR THE ${docLabel.toUpperCase()} (match real competitive Model Congress bills exactly — Yale, Dalton, Harvard-style):
+- HEADER block at the top:
+  Line 1: Conference name (e.g., "Yale Model Congress 2025")
+  Line 2: Committee (e.g., "Blue Senate — Energy and Commerce Committee")
+  Line 3: Author name (left) and School/Delegation (right)
+- "Title of Bill: An Act to..." (or "A Resolution to..." for resolutions)
+- Enacting clause: "Be It Hereby Enacted By The [Conference Name]:"
+- PREAMBLE: a block of "Whereas" clauses, each a single justification starting with "Whereas" and ending with a semicolon; the last ends with a period. Cover the problem, harm, and why federal action is needed.
+- NUMBERED SECTIONS, each starting "Section X:" followed by a clear operative provision. Use legislative phrasing ("Let Congress...", "Let the Department of...", "Let..."). Each section should address ONE action.
+- Use "Subsection A:", "Subsection B:", etc. for sub-provisions within a section.
+- Always include: definitions section (if needed), enforcement/penalty section, an enforcement agency, and a final enactment/effective-date section ("Let this bill be enacted X days after its passage.").
+- Be specific: include numbers, percentages, timelines, agencies, and mechanisms — not vague platitudes.`;
     const content = await base44.integrations.Core.InvokeLLM({
-      prompt: `Write a comprehensive, high-quality Model Congress ${typeMap[aiPrompt.docType] || aiPrompt.docType} for:
+      prompt: `Write a competitive, tournament-quality Model Congress ${docLabel} for:
 Topic: ${aiPrompt.topic}
 Policy Area: ${aiPrompt.policyArea || "General Policy"}
 Stance: ${aiPrompt.stance}
 ${aiPrompt.sponsor ? `Sponsor/Author: ${aiPrompt.sponsor}` : ""}
-${aiPrompt.context ? `\nADDITIONAL CONTEXT FROM THE DELEGATE (prioritize these instructions): ${aiPrompt.context}\n` : ""}
-Write in proper legislative format. For bills: include WHEREAS clauses, BE IT ENACTED language, numbered sections, and specific policy provisions. For speeches: write a compelling 3-5 minute speech with opening hook, main arguments, evidence, rebuttals, and closing. For amendments: follow proper amendment format. Make it tournament-quality that demonstrates deep policy knowledge and would earn recognition at competitive Model Congress tournaments.${conferenceContext}`
+${aiPrompt.context ? `\nADDITIONAL CONTEXT FROM THE DELEGATE (prioritize these instructions and any bill text they provide above generic defaults): ${aiPrompt.context}\n` : ""}
+${formatRules}
+Make it demonstrate deep policy knowledge, accurate specifics, and the kind of polish that earns recognition at competitive Model Congress tournaments.${conferenceContext}`
     });
     setForm({
       title: `${typeMap[aiPrompt.docType]}: ${aiPrompt.topic}`,
