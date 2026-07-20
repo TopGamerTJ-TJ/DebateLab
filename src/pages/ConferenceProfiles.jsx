@@ -45,7 +45,11 @@ export default function ConferenceProfiles() {
       setForm(emptyForm);
       setOpen(false);
     },
-    onError: () => toast({ title: "Couldn't save profile", variant: "destructive" }),
+    onError: (err) => {
+      console.error("Conference profile save error:", err);
+      const msg = err?.message || err?.data?.message || "Couldn't save profile";
+      toast({ title: msg, variant: "destructive" });
+    },
   });
 
   const deleteProfile = useMutation({
