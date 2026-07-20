@@ -3,10 +3,12 @@
   "type": "object",
   "properties": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "message": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "type": {
       "type": "string",
@@ -15,13 +17,15 @@
         "warning",
         "success",
         "alert"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "isActive": {
       "type": "boolean"
     },
     "sentBy": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "targetAudience": {
       "type": "string",
@@ -30,10 +34,12 @@
         "select",
         "group"
       ],
-      "default": "all"
+      "default": "all",
+      "maxLength": 4000000
     },
     "targetGroup": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "sendPushNotification": {
       "type": "boolean",

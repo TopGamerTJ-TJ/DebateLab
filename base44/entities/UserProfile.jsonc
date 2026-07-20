@@ -3,25 +3,31 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "ownerEmail": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "auditId": {
       "type": "number"
     },
     "displayName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "school": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "gradeLevel": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "preferredFormat": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "skillLevel": {
       "type": "string",
@@ -31,10 +37,12 @@
         "intermediate",
         "advanced",
         "expert"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "bio": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "totalPracticeSessions": {
       "type": "number"
@@ -61,14 +69,16 @@
         "debate",
         "model_un",
         "model_congress"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "learningPathFormat": {
       "type": "string",
       "enum": [
         "public_forum",
         "parliamentary"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "defaultAiMode": {
       "type": "string",
@@ -76,7 +86,8 @@
         "full",
         "dampened"
       ],
-      "default": "full"
+      "default": "full",
+      "maxLength": 4000000
     },
     "notificationsEnabled": {
       "type": "boolean",
@@ -87,7 +98,8 @@
       "enum": [
         "light",
         "dark"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "customColors": {
       "type": "object"

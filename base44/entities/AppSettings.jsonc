@@ -3,10 +3,12 @@
   "type": "object",
   "properties": {
     "key": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "value": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

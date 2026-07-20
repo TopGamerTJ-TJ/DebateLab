@@ -3,29 +3,36 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "docLabel": {
       "type": "string",
-      "description": "Free-form label for the document type, e.g. 'Cross-Ex Prep', 'Briefing Memo'"
+      "description": "Free-form label for the document type, e.g. 'Cross-Ex Prep', 'Briefing Memo'",
+      "maxLength": 4000000
     },
     "description": {
       "type": "string",
-      "description": "The instructions the user gave the AI for what to generate"
+      "description": "The instructions the user gave the AI for what to generate",
+      "maxLength": 4000000
     },
     "content": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "projectId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "tags": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "isFavorite": {

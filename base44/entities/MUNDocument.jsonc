@@ -3,7 +3,8 @@
   "type": "object",
   "properties": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "type": {
       "type": "string",
@@ -15,31 +16,38 @@
         "speech",
         "country_profile",
         "committee_prep"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "country": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "committee": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "topic": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "content": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "tags": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "isFavorite": {
       "type": "boolean"
     },
     "tournamentId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

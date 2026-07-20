@@ -3,14 +3,16 @@
   "type": "object",
   "properties": {
     "itemId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "itemType": {
       "type": "string",
       "enum": [
         "post",
         "comment"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "voteValue": {
       "type": "number",

@@ -3,16 +3,20 @@
   "type": "object",
   "properties": {
     "blockerId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "blockedUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "blockedUserName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "reason": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

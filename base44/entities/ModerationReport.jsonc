@@ -3,10 +3,12 @@
   "type": "object",
   "properties": {
     "reporterId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "reporterEmail": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "itemType": {
       "type": "string",
@@ -14,25 +16,32 @@
         "post",
         "comment",
         "user"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "itemId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "postId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "contentAuthorId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "contentAuthorName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "content": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "reason": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "status": {
       "type": "string",
@@ -41,19 +50,24 @@
         "dismissed",
         "actioned"
       ],
-      "default": "pending"
+      "default": "pending",
+      "maxLength": 4000000
     },
     "aiDecision": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "aiReason": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "actionTaken": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "adminNotes": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

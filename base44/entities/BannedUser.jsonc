@@ -3,13 +3,16 @@
   "type": "object",
   "properties": {
     "email": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "reason": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "bannedBy": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "banPlatform": {
       "type": "boolean",

@@ -3,35 +3,43 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "auditId": {
       "type": "number"
     },
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "format": {
       "type": "string",
       "enum": [
         "parliamentary",
         "public_forum"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "resolution": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "side": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "claim": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "warrant": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "impact": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "evidence": {
       "type": "array",
@@ -39,13 +47,16 @@
         "type": "object",
         "properties": {
           "text": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           },
           "source": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           },
           "sourceUrl": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           }
         },
         "required": []
@@ -54,50 +65,59 @@
     "possibleRebuttals": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "rebuttalResponses": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "crossfireQuestions": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "crossfireAnswers": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "weighingMechanisms": {
       "type": "object"
     },
     "strategicNotes": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "tags": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "isFavorite": {
       "type": "boolean"
     },
     "tournamentId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "caseId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "projectId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "difficulty": {
       "type": "string",
@@ -106,7 +126,8 @@
         "intermediate",
         "advanced",
         "expert"
-      ]
+      ],
+      "maxLength": 4000000
     }
   },
   "required": [

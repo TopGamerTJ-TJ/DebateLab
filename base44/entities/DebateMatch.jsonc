@@ -3,31 +3,39 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "auditId": {
       "type": "number"
     },
     "lobbyId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "topic": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "format": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "proPlayerId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "proPlayerName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "conPlayerId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "conPlayerName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "status": {
       "type": "string",
@@ -36,11 +44,13 @@
         "live",
         "ended"
       ],
-      "default": "prep"
+      "default": "prep",
+      "maxLength": 4000000
     },
     "startedAt": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "maxLength": 4000000
     },
     "prepTimeSeconds": {
       "type": "number"
@@ -55,13 +65,16 @@
         "con",
         "open"
       ],
-      "default": "open"
+      "default": "open",
+      "maxLength": 4000000
     },
     "winnerId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "aiEvaluation": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "proScore": {
       "type": "number"
@@ -76,7 +89,8 @@
     "spectatorIds": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     }
   },

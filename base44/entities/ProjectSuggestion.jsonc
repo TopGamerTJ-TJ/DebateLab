@@ -3,19 +3,24 @@
   "type": "object",
   "properties": {
     "projectId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "projectName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "userId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "status": {
       "type": "string",
@@ -24,7 +29,8 @@
         "approved",
         "rejected"
       ],
-      "default": "pending"
+      "default": "pending",
+      "maxLength": 4000000
     }
   },
   "required": [

@@ -3,19 +3,23 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "auditId": {
       "type": "number"
     },
     "senderId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "receiverId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "content": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

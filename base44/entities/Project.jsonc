@@ -3,16 +3,19 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "auditId": {
       "type": "number"
     },
     "name": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "format": {
       "type": "string",
@@ -21,19 +24,24 @@
         "public_forum",
         "model_un",
         "model_congress"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "resolution": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "side": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "color": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "notes": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "isArchived": {
       "type": "boolean"
@@ -45,13 +53,16 @@
         "full",
         "dampened"
       ],
-      "default": "default"
+      "default": "default",
+      "maxLength": 4000000
     },
     "folderId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "conferenceProfileId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "whitelist": {
       "type": "array",
@@ -59,10 +70,12 @@
         "type": "object",
         "properties": {
           "url": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           }
         }
       }
@@ -73,10 +86,12 @@
         "type": "object",
         "properties": {
           "url": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           }
         }
       }

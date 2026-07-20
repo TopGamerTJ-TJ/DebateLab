@@ -3,13 +3,16 @@
   "type": "object",
   "properties": {
     "subject": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "email": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "body": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "status": {
       "type": "string",
@@ -18,7 +21,8 @@
         "read",
         "resolved"
       ],
-      "default": "new"
+      "default": "new",
+      "maxLength": 4000000
     }
   },
   "required": [

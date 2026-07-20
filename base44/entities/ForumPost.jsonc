@@ -3,19 +3,24 @@
   "type": "object",
   "properties": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "content": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "imageUrl": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "authorName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "format": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "upvotes": {
       "type": "number",

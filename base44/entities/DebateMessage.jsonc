@@ -3,13 +3,16 @@
   "type": "object",
   "properties": {
     "matchId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "senderId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "senderName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "role": {
       "type": "string",
@@ -18,7 +21,8 @@
         "con",
         "system",
         "spectator"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "type": {
       "type": "string",
@@ -30,10 +34,12 @@
         "normal",
         "system"
       ],
-      "default": "normal"
+      "default": "normal",
+      "maxLength": 4000000
     },
     "content": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

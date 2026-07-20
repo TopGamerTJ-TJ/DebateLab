@@ -3,19 +3,24 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "name": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "color": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "conferenceProfileId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

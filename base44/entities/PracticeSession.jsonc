@@ -3,31 +3,39 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "auditId": {
       "type": "number"
     },
     "format": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "side": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "resolution": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "difficulty": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "transcript": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "rfd": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "winner": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "speakerPoints": {
       "type": "number"
@@ -35,23 +43,27 @@
     "strengths": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "weaknesses": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "keyVotingIssues": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "notes": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "duration": {
       "type": "number"

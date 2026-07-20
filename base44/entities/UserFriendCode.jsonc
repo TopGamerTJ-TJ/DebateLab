@@ -3,13 +3,16 @@
   "type": "object",
   "properties": {
     "code": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "userId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "userName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

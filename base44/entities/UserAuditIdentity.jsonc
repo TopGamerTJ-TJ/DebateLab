@@ -3,7 +3,8 @@
   "type": "object",
   "properties": {
     "userId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "auditId": {
       "type": "number"

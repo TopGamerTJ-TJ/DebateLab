@@ -3,16 +3,19 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "auditId": {
       "type": "number"
     },
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "projectId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "feature": {
       "type": "string",
@@ -20,7 +23,8 @@
         "editor",
         "coach",
         "research"
-      ]
+      ],
+      "maxLength": 4000000
     }
   },
   "required": [

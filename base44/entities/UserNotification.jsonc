@@ -3,23 +3,28 @@
   "type": "object",
   "properties": {
     "userId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "message": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "link": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "isRead": {
       "type": "boolean",
       "default": false
     },
     "type": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

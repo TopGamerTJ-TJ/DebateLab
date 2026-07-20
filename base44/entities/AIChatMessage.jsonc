@@ -3,23 +3,27 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "auditId": {
       "type": "number"
     },
     "sessionId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "role": {
       "type": "string",
       "enum": [
         "user",
         "assistant"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "content": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

@@ -3,7 +3,8 @@
   "type": "object",
   "properties": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "type": {
       "type": "string",
@@ -13,24 +14,30 @@
         "amendment",
         "speech",
         "committee_prep"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "sponsor": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "topic": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "content": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "policyArea": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "tags": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "isFavorite": {
@@ -43,10 +50,12 @@
         "submitted",
         "passed",
         "failed"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "notes": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

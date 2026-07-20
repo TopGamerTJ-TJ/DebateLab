@@ -3,7 +3,8 @@
   "type": "object",
   "properties": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "format": {
       "type": "string",
@@ -12,46 +13,55 @@
         "public_forum",
         "model_un",
         "model_congress"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "resolution": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "side": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "contentionIds": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "evidenceIds": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "tags": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "isFavorite": {
       "type": "boolean"
     },
     "tournamentId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "version": {
       "type": "number"
     },
     "notes": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

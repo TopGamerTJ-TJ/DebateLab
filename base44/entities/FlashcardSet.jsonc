@@ -3,16 +3,20 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "projectId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "sourceSummary": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "keyPoints": {
       "type": "array",
@@ -20,21 +24,25 @@
         "type": "object",
         "properties": {
           "cue": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           },
           "detail": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           }
         }
       }
     },
     "acronym": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "acronymMeaning": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "flashcards": {
@@ -43,10 +51,12 @@
         "type": "object",
         "properties": {
           "front": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           },
           "back": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 4000000
           }
         }
       }
@@ -54,7 +64,8 @@
     "tips": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     }
   },

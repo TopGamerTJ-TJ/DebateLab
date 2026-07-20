@@ -3,13 +3,15 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "auditId": {
       "type": "number"
     },
     "topic": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "format": {
       "type": "string",
@@ -17,7 +19,8 @@
         "1v1",
         "team"
       ],
-      "default": "1v1"
+      "default": "1v1",
+      "maxLength": 4000000
     },
     "timePerSide": {
       "type": "number",
@@ -29,13 +32,16 @@
     },
     "scheduledTime": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "maxLength": 4000000
     },
     "creatorId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "creatorName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "creatorSidePreference": {
       "type": "string",
@@ -44,7 +50,8 @@
         "con",
         "random"
       ],
-      "default": "random"
+      "default": "random",
+      "maxLength": 4000000
     },
     "visibility": {
       "type": "string",
@@ -54,7 +61,8 @@
         "ranked",
         "tournament"
       ],
-      "default": "public"
+      "default": "public",
+      "maxLength": 4000000
     },
     "status": {
       "type": "string",
@@ -64,13 +72,16 @@
         "canceled",
         "started"
       ],
-      "default": "open"
+      "default": "open",
+      "maxLength": 4000000
     },
     "joinedUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "joinedUserName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "joinedUserSidePreference": {
       "type": "string",
@@ -79,7 +90,8 @@
         "con",
         "random"
       ],
-      "default": "random"
+      "default": "random",
+      "maxLength": 4000000
     }
   },
   "required": [

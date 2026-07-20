@@ -3,20 +3,24 @@
   "type": "object",
   "properties": {
     "userId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "userEmail": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "warningCount": {
       "type": "number",
       "default": 0
     },
     "lastReason": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "lastReportId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

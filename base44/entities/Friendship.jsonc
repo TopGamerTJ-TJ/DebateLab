@@ -3,16 +3,20 @@
   "type": "object",
   "properties": {
     "requesterId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "requesterName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "recipientId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "recipientName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "status": {
       "type": "string",
@@ -21,7 +25,8 @@
         "accepted",
         "rejected"
       ],
-      "default": "pending"
+      "default": "pending",
+      "maxLength": 4000000
     }
   },
   "required": [

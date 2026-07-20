@@ -3,43 +3,54 @@
   "type": "object",
   "properties": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "content": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "source": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "sourceUrl": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "tags": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     },
     "category": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "format": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "isFavorite": {
       "type": "boolean"
     },
     "contentionId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "caseId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "tournamentId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "notes": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

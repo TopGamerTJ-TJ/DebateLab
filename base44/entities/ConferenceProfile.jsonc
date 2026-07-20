@@ -3,10 +3,12 @@
   "type": "object",
   "properties": {
     "ownerUserId": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "name": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "conferenceType": {
       "type": "string",
@@ -16,28 +18,36 @@
         "debate",
         "other"
       ],
-      "default": "model_congress"
+      "default": "model_congress",
+      "maxLength": 4000000
     },
     "notes": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "procedureText": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "procedureFileUrl": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "procedureFileName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "billTemplateText": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "billTemplateFileUrl": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "billTemplateFileName": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     }
   },
   "required": [

@@ -3,7 +3,8 @@
   "type": "object",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "format": {
       "type": "string",
@@ -12,16 +13,20 @@
         "public_forum",
         "model_un",
         "model_congress"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "location": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "date": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "division": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "rounds": {
       "type": "array",
@@ -39,7 +44,8 @@
       "type": "number"
     },
     "notes": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 4000000
     },
     "status": {
       "type": "string",
@@ -47,12 +53,14 @@
         "upcoming",
         "active",
         "completed"
-      ]
+      ],
+      "maxLength": 4000000
     },
     "caseIds": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 4000000
       }
     }
   },
