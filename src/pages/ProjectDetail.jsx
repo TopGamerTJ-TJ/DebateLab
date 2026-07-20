@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText, Users, Activity, Check, Copy, ScrollText, Lightbulb, ExternalLink, Scale, Wand2, FileDown } from "lucide-react";
+import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText, Users, Activity, Check, Copy, ScrollText, Lightbulb, ExternalLink, Scale, Wand2, FileDown, Mic } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/AuthContext";
 import ReactMarkdown from "react-markdown";
@@ -369,6 +369,7 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
   const tabs = [
     { id: "contentions", icon: BookOpen, label: `Contentions (${contentions.length})` },
     { id: "flow", icon: ScrollText, label: "Flow" },
+    { id: "speech", icon: Mic, label: "Speech" },
     { id: "rebuttals", icon: ShieldAlert, label: "Rebuttal Hub" },
     { id: "notes", icon: StickyNote, label: "Notes" },
     { id: "chat", icon: MessageSquare, label: "AI Chats" },
@@ -467,6 +468,19 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
           />
           <ProjectFlowTab project={project} contentions={contentions} rebuttals={rebuttals} />
         </div>
+      )}
+
+      {/* Speech tab */}
+      {tab === "speech" && (
+        <ProjectSpeechGenerator
+          project={project}
+          contentions={contentions}
+          rebuttals={rebuttals}
+          otherDocs={otherDocs}
+          agentResults={agentResults}
+          conferenceContext={conferenceContext}
+          onSaved={() => queryClient.invalidateQueries({ queryKey: ['project_other_documents', id] })}
+        />
       )}
 
       {/* Rebuttal Hub tab */}

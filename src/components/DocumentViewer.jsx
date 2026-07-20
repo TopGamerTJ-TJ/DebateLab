@@ -184,15 +184,15 @@ Apply the requested edit and return the COMPLETE updated document. Structure you
             <h3 className="font-bold text-slate-900 font-heading truncate">{doc.title}</h3>
             {(doc.country || doc.committee) && <p className="text-xs text-slate-500 mt-0.5">{[doc.country, doc.committee].filter(Boolean).join(" • ")}</p>}
           </div>
-          <div className="flex flex-wrap gap-2 shrink-0 justify-end">
+          <div className="flex flex-wrap items-center gap-1.5 shrink-0 justify-end">
             {mode === "view" && onUpdate && <button onClick={enterEditMode} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-primary bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /> Edit</button>}
             {mode === "view" && onUpdate && <button onClick={() => { setMode("chat"); setChatMessages([]); setPendingDoc(null); }} className="flex items-center gap-1.5 text-xs text-white bg-violet-600 hover:bg-violet-700 px-3 py-1.5 rounded-lg transition-colors"><MessageSquare className="w-3.5 h-3.5" /> AI Edit</button>}
-            {mode !== "view" && <button onClick={() => { setMode("view"); setEditFields(null); setPendingDoc(null); }} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">← Back to View</button>}
-            {mode === "view" && <button onClick={copy} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-primary bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors"><Copy className="w-3.5 h-3.5" /> Copy</button>}
-            {mode === "view" && <button onClick={download} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-primary bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors"><Download className="w-3.5 h-3.5" /> .txt</button>}
-            {mode === "view" && <button onClick={() => setFullscreen(f => !f)} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-primary bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">{fullscreen ? <><Minimize2 className="w-3.5 h-3.5" /> Exit</> : <><Maximize2 className="w-3.5 h-3.5" /> Fullscreen</>}</button>}
-            {mode === "view" && onAddContention && <button onClick={() => onAddContention(doc)} className="flex items-center gap-1.5 text-xs text-white bg-primary hover:bg-primary/90 px-3 py-1.5 rounded-lg transition-colors"><Plus className="w-3.5 h-3.5" /> {addContentionLabel}</button>}
-            {onClose && <button onClick={onClose} className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors"><X className="w-3.5 h-3.5" /> Close</button>}
+            {mode !== "view" && <button onClick={() => { setMode("view"); setEditFields(null); setPendingDoc(null); }} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">← Back</button>}
+            {mode === "view" && <button onClick={copy} title="Copy" className="flex items-center text-slate-500 hover:text-primary bg-slate-50 hover:bg-slate-100 p-1.5 rounded-lg transition-colors"><Copy className="w-4 h-4" /></button>}
+            {mode === "view" && <button onClick={download} title="Download .txt" className="flex items-center text-slate-500 hover:text-primary bg-slate-50 hover:bg-slate-100 p-1.5 rounded-lg transition-colors"><Download className="w-4 h-4" /></button>}
+            {mode === "view" && <button onClick={() => setFullscreen(f => !f)} title={fullscreen ? "Exit fullscreen" : "Fullscreen"} className="flex items-center text-slate-500 hover:text-primary bg-slate-50 hover:bg-slate-100 p-1.5 rounded-lg transition-colors">{fullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}</button>}
+            {mode === "view" && onAddContention && <button onClick={() => onAddContention(doc)} className="flex items-center gap-1 text-xs text-white bg-primary hover:bg-primary/90 px-2.5 py-1.5 rounded-lg transition-colors"><Plus className="w-3.5 h-3.5" /> Contention</button>}
+            {onClose && <button onClick={onClose} title="Close" className="flex items-center text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 p-1.5 rounded-lg transition-colors"><X className="w-4 h-4" /></button>}
           </div>
         </div>
 
