@@ -38,7 +38,22 @@ export default function ConferenceProfiles() {
   });
 
   const createProfile = useMutation({
-    mutationFn: (data) => base44.entities.ConferenceProfile.create({ ...data, ownerUserId: user?.id }),
+    mutationFn: (data) => {
+      const validTypes = ["model_congress", "model_un", "debate", "other"];
+      const payload = {
+        name: data.name?.trim() || "Untitled Conference",
+        conferenceType: validTypes.includes(data.conferenceType) ? data.conferenceType : "model_congress",
+        notes: data.notes || "",
+        procedureText: data.procedureText || "",
+        procedureFileUrl: data.procedureFileUrl || "",
+        procedureFileName: data.procedureFileName || "",
+        billTemplateText: data.billTemplateText || "",
+        billTemplateFileUrl: data.billTemplateFileUrl || "",
+        billTemplateFileName: data.billTemplateFileName || "",
+        ownerUserId: user?.id,
+      };
+      return base44.entities.ConferenceProfile.create(payload);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conference_profiles"] });
       toast({ title: "Conference profile saved!" });
