@@ -29,6 +29,14 @@ export default function OtherDocuments() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['other_documents'] }),
   });
 
+  const updateDoc = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.OtherDocument.update(id, data),
+    onSuccess: (_, { data }) => {
+      queryClient.invalidateQueries({ queryKey: ['other_documents'] });
+      setViewDoc(prev => prev ? { ...prev, ...data } : null);
+    },
+  });
+
   const toggleFavorite = useMutation({
     mutationFn: ({ id, val }) => base44.entities.OtherDocument.update(id, { isFavorite: val }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['other_documents'] }),
@@ -102,7 +110,7 @@ export default function OtherDocuments() {
           </div>
         </div>
 
-        <DocumentViewer doc={viewDoc} onClose={() => setViewDoc(null)} />
+        <DocumentViewer doc={viewDoc} onClose={() => setViewDoc(null)} onUpdate={(id, data) => updateDoc.mutateAsync({ id, data })} />
       </div>
     </AnimatedPage>
   );

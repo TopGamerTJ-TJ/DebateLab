@@ -24,6 +24,18 @@
       "type": "string",
       "maxLength": 4000000
     },
+    "takeaways": {
+      "type": "string",
+      "maxLength": 4000000
+    },
+    "importantNotes": {
+      "type": "string",
+      "maxLength": 4000000
+    },
+    "sources": {
+      "type": "string",
+      "maxLength": 4000000
+    },
     "projectId": {
       "type": "string",
       "maxLength": 4000000

@@ -143,7 +143,6 @@ export default function Layout() {
                 ["/model-congress", <FileText className="w-3.5 h-3.5" />, "Congress"],
                 ["/research", <Search className="w-3.5 h-3.5" />, "Research"],
                 ["/other-documents", <FileText className="w-3.5 h-3.5" />, "Other Docs"],
-                ["/forum", <MessageSquare className="w-3.5 h-3.5" />, "Forum"],
                 ["/match", <Swords className="w-3.5 h-3.5" />, "Match"],
                 ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
                 ["/ai-editor", <Sparkles className="w-3.5 h-3.5" />, "AI Editor"],

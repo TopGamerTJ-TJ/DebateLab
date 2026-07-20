@@ -107,7 +107,11 @@ export default function AIEditor() {
 Context: ${context}
 History: ${currentMessages.map(m => m.role+": "+m.content).join('\n')}
 
-Provide a comprehensive, directly usable response.`
+Provide a comprehensive, directly usable response. When creating a document, structure it with:
+1. The main document content in markdown
+2. A "## Main Takeaways" section with 3-5 key bullet points
+3. An "## Important Notes" section with critical reminders or caveats
+4. A "## Sources" section listing any sources cited or referenced (if none, write "None cited")`
       });
       // Save assistant message
       await createMessage.mutateAsync({ sessionId: currentSessionId, role: "assistant", content: res });
@@ -117,12 +121,28 @@ Provide a comprehensive, directly usable response.`
     setLoading(false);
   };
 
+  const parseSections = (text) => {
+    const result = { content: text, takeaways: "", importantNotes: "", sources: "" };
+    const extract = (key, regex) => {
+      const match = result.content.match(regex);
+      if (match) { result[key] = match[1].trim(); result.content = result.content.replace(match[0], "").replace(/\n{3,}/g, '\n\n').trim(); }
+    };
+    extract('takeaways', /##\s*(?:Main\s+)?Takeaways?\s*\n([\s\S]*?)(?=\n##\s|$)/i);
+    extract('importantNotes', /##\s*(?:Important\s+)?Notes?\s*\n([\s\S]*?)(?=\n##\s|$)/i);
+    extract('sources', /##\s*Sources?\s*\n([\s\S]*?)(?=\n##\s|$)/i);
+    return result;
+  };
+
   const saveToDocs = async ({ projectId }) => {
     try {
+      const parsed = parseSections(contentToSave);
       await base44.entities.OtherDocument.create({
         title: `AI Editor — ${contentToSave.slice(0, 40)}${contentToSave.length > 40 ? "..." : ""}`,
         docLabel: "AI Editor Content",
-        content: contentToSave,
+        content: parsed.content,
+        takeaways: parsed.takeaways,
+        importantNotes: parsed.importantNotes,
+        sources: parsed.sources,
         projectId: projectId || "",
         ownerUserId: user?.id,
       });

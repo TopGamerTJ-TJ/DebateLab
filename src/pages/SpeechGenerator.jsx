@@ -107,7 +107,8 @@ REQUIREMENTS:
 - Stay within ${minutes} minutes when spoken at a normal pace (~130 words/minute). Aim for ~${wordTarget} words.
 - If contentions or research are provided, weave them in naturally with claim, warrant, and impact.
 - Format with clear section headers using Markdown (## Introduction, ## Main Point, etc.).
-- End with a powerful, memorable conclusion.`;
+- End with a powerful, memorable conclusion.
+- After the speech, include a "## Sources" section listing any sources, facts, or references used (if none, write "None cited").`;
 
       const res = await base44.integrations.Core.InvokeLLM({ prompt, add_context_from_internet: false });
       setSpeech(typeof res === 'string' ? res : JSON.stringify(res));
@@ -123,11 +124,25 @@ REQUIREMENTS:
     toast({ title: "Speech copied!" });
   };
 
+  const parseSections = (text) => {
+    const result = { content: text, takeaways: "", importantNotes: "", sources: "" };
+    const extract = (key, regex) => {
+      const match = result.content.match(regex);
+      if (match) { result[key] = match[1].trim(); result.content = result.content.replace(match[0], "").replace(/\n{3,}/g, '\n\n').trim(); }
+    };
+    extract('takeaways', /##\s*(?:Main\s+)?Takeaways?\s*\n([\s\S]*?)(?=\n##\s|$)/i);
+    extract('sources', /##\s*Sources?\s*\n([\s\S]*?)(?=\n##\s|$)/i);
+    return result;
+  };
+
   const handleSave = async ({ projectId }) => {
+    const parsed = parseSections(speech);
     await base44.entities.OtherDocument.create({
       title: `${speechType} — ${topic.slice(0, 40)}${topic.length > 40 ? "..." : ""}`,
       docLabel: "Generated Speech",
-      content: speech,
+      content: parsed.content,
+      takeaways: parsed.takeaways,
+      sources: parsed.sources,
       projectId: projectId || "",
       ownerUserId: user?.id,
     });

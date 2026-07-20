@@ -87,7 +87,8 @@ Requirements:
 - Use the contentions, evidence, research facts, and prepared rebuttals above. Weave them in naturally.
 - Include brief [pause] or [transition] cues where helpful for delivery.
 - Stay within ${minutes} minutes when spoken at a normal pace (~130 words/minute). Aim for ~${Math.round(minutes * 130)} words.
-- Format with clear section headers (## Introduction, ## Contention 1, etc.) using Markdown.`;
+- Format with clear section headers (## Introduction, ## Contention 1, etc.) using Markdown.
+- After the speech, include a "## Sources" section listing any sources, facts, or evidence cited (if none, write "None cited").`;
 
       const res = await base44.integrations.Core.InvokeLLM({ prompt, add_context_from_internet: false });
       setSpeech(typeof res === 'string' ? res : JSON.stringify(res));
