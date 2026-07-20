@@ -107,6 +107,16 @@ export default function ProjectDetail() {
     }
   });
 
+  const updateOtherDoc = useMutation({
+    mutationFn: ({ docId, data }) => base44.entities.OtherDocument.update(docId, data),
+    onSuccess: (_, { data }) => {
+      queryClient.invalidateQueries({ queryKey: ['project_other_documents', id] });
+      queryClient.invalidateQueries({ queryKey: ['other_documents'] });
+      setViewDoc(prev => prev ? { ...prev, ...data } : null);
+      logActivity("Edited Document", "Updated a document in the project.");
+    }
+  });
+
   const copyOtherDoc = (text) => {
     navigator.clipboard.writeText(text);
     toast({ title: "Copied to clipboard!" });
@@ -733,6 +743,7 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
           doc={viewDoc}
           onClose={() => setViewDoc(null)}
           onAddContention={(doc) => addContentionFromDoc.mutate(doc)}
+          onUpdate={(docId, data) => updateOtherDoc.mutateAsync({ docId, data })}
         />
       )}
     </div>
