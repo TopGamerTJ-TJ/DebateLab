@@ -139,6 +139,7 @@ export default function Layout() {
               {[
                 ["/model-un", <Globe className="w-3.5 h-3.5" />, "MUN"],
                 ["/model-congress", <FileText className="w-3.5 h-3.5" />, "Congress"],
+                ["/other-documents", <FileText className="w-3.5 h-3.5" />, "Other Docs"],
                 ["/forum", <MessageSquare className="w-3.5 h-3.5" />, "Forum"],
                 ["/match", <Swords className="w-3.5 h-3.5" />, "Match"],
                 ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
@@ -293,6 +294,7 @@ export default function Layout() {
               ["/public-forum", BookOpen, "Public Forum"],
               ["/model-un", Globe, "Model UN"],
               ["/model-congress", FileText, "Congress"],
+              ["/other-documents", FileText, "Other Docs"],
               ["/formats", LayoutGrid, "Formats"],
               ["/office-hours", MessageSquare, "Office Hours"],
               ["/tournament", Trophy, "Tournament"],

@@ -5,13 +5,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText, Users, Activity, Check } from "lucide-react";
+import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText, Users, Activity, Check, Copy } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/AuthContext";
 import ReactMarkdown from "react-markdown";
 import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
 import AnimatedPage from "@/components/AnimatedPage";
 import ProjectAIChats from "@/components/ProjectAIChats";
+import OtherDocGenerator from "@/components/OtherDocGenerator";
 import ConferenceLinkSelect from "@/components/ConferenceLinkSelect";
 import { buildConferenceContextText } from "@/components/ConferenceContextPicker";
 
@@ -79,6 +80,25 @@ export default function ProjectDetail() {
     queryKey: ['project_chat_sessions', id],
     queryFn: () => base44.entities.AIChatSession.filter({ projectId: id }, '-created_date', 50)
   });
+
+  const { data: otherDocs = [] } = useQuery({
+    queryKey: ['project_other_documents', id],
+    queryFn: () => base44.entities.OtherDocument.filter({ projectId: id }, '-created_date'),
+  });
+
+  const deleteOtherDoc = useMutation({
+    mutationFn: (docId) => base44.entities.OtherDocument.delete(docId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['project_other_documents', id] });
+      queryClient.invalidateQueries({ queryKey: ['other_documents'] });
+      logActivity("Deleted Document", "Removed a custom document from the project.");
+    }
+  });
+
+  const copyOtherDoc = (text) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "Copied to clipboard!" });
+  };
 
   const { data: conferenceProfiles = [] } = useQuery({
     queryKey: ['conference_profiles'],
@@ -334,6 +354,7 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
     { id: "chat", icon: MessageSquare, label: "AI Chats" },
     { id: "agent", icon: Globe, label: "Research Agent" },
     { id: "collab", icon: Users, label: "Collab & Activity" },
+    { id: "other", icon: FileText, label: `Other Docs (${otherDocs.length})` },
   ];
 
   return (
@@ -662,6 +683,57 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Other Documents tab */}
+      {tab === "other" && (
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <FileText className="w-4 h-4 text-violet-500" />
+              <h3 className="font-bold text-slate-900 font-heading text-sm">Other Notes & Documents</h3>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">Generate any custom document that doesn't fit the standard sections — describe it and the AI builds it. Saved documents appear here.</p>
+          </div>
+
+          <OtherDocGenerator
+            projectId={id}
+            onSaved={() => queryClient.invalidateQueries({ queryKey: ['project_other_documents', id] })}
+          />
+
+          {otherDocs.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+              <FileText className="w-10 h-10 text-slate-200 mx-auto mb-3" />
+              <p className="text-slate-400 text-sm">No custom documents in this project yet.</p>
+              <p className="text-slate-300 text-xs mt-1">Use the generator above to create your first one.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {otherDocs.map(doc => (
+                <div key={doc.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-slate-900 font-heading text-sm">{doc.title}</h4>
+                      {doc.docLabel && <span className="inline-block text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full font-medium mt-1">{doc.docLabel}</span>}
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <button onClick={() => copyOtherDoc(doc.content)} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-colors" title="Copy">
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => deleteOtherDoc.mutate(doc.id)} className="p-1.5 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-500 transition-colors" title="Delete">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <details className="group">
+                    <summary className="text-xs text-violet-600 font-medium cursor-pointer hover:underline select-none">View full document</summary>
+                    <pre className="text-xs leading-relaxed text-slate-700 font-mono whitespace-pre-wrap mt-3">{doc.content}</pre>
+                  </details>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

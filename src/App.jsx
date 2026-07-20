@@ -44,6 +44,7 @@ import SpeechTimer from './pages/SpeechTimer';
 import ConferenceProfiles from './pages/ConferenceProfiles';
 import MemoryAssist from './pages/MemoryAssist';
 import MockCommittee from './pages/MockCommittee';
+import OtherDocuments from './pages/OtherDocuments';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -132,6 +133,7 @@ const AuthenticatedApp = () => {
           <Route path="/conference-profiles" element={<ConferenceProfiles />} />
           <Route path="/memory-assist" element={<MemoryAssist />} />
           <Route path="/mock-committee" element={<MockCommittee />} />
+          <Route path="/other-documents" element={<OtherDocuments />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
