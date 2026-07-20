@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Landmark, Plus, Loader2, Trash2, Upload, FileText, Gavel, ScrollText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/lib/AuthContext";
 import AnimatedPage from "@/components/AnimatedPage";
 
 const CONF_TYPES = [
@@ -26,6 +27,7 @@ const emptyForm = {
 export default function ConferenceProfiles() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [uploading, setUploading] = useState(null);
@@ -36,7 +38,7 @@ export default function ConferenceProfiles() {
   });
 
   const createProfile = useMutation({
-    mutationFn: (data) => base44.entities.ConferenceProfile.create(data),
+    mutationFn: (data) => base44.entities.ConferenceProfile.create({ ...data, ownerUserId: user?.id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conference_profiles"] });
       toast({ title: "Conference profile saved!" });
