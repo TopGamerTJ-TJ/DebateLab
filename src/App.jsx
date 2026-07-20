@@ -46,6 +46,7 @@ import MemoryAssist from './pages/MemoryAssist';
 import MockCommittee from './pages/MockCommittee';
 import OtherDocuments from './pages/OtherDocuments';
 import Research from './pages/Research';
+import SpeechGenerator from './pages/SpeechGenerator';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -136,6 +137,7 @@ const AuthenticatedApp = () => {
           <Route path="/mock-committee" element={<MockCommittee />} />
           <Route path="/other-documents" element={<OtherDocuments />} />
           <Route path="/research" element={<Research />} />
+          <Route path="/speech-generator" element={<SpeechGenerator />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>

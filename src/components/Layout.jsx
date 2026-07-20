@@ -7,7 +7,7 @@ import Dashboard from "@/pages/Dashboard";
 import Projects from "@/pages/Projects";
 import CoachChat from "@/pages/CoachChat";
 import Forum from "@/pages/Forum";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords, Bell, Mic, Timer, Landmark, Layers3, Search } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords, Bell, Mic, Timer, Landmark, Layers3, Search, Megaphone } from "lucide-react";
 import { useUnMode } from "@/hooks/useUnMode";
 
 const doLogout = async () => {
@@ -26,7 +26,7 @@ export default function Layout() {
   const timerRef = useRef(null);
 
   // Detect if we're on a sub-route (not a root tab) for mobile back button
-  const rootPaths = ["/home", "/projects", "/practice", "/forum", "/coach", "/research"];
+  const rootPaths = ["/home", "/projects", "/practice", "/forum", "/coach", "/research", "/speech-generator"];
   const isSubRoute = !rootPaths.includes(location.pathname);
   const unMode = useUnMode();
 
@@ -147,6 +147,7 @@ export default function Layout() {
                 ["/match", <Swords className="w-3.5 h-3.5" />, "Match"],
                 ["/projects", <Folder className="w-3.5 h-3.5" />, "Projects"],
                 ["/ai-editor", <Sparkles className="w-3.5 h-3.5" />, "AI Editor"],
+              ["/speech-generator", <Megaphone className="w-3.5 h-3.5" />, "Speech"],
               ].map(([to, icon, label]) => (
                 <Link key={to} to={to} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${active(to) ? 'bg-primary text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}>
                   {icon}{label}
@@ -292,6 +293,7 @@ export default function Layout() {
               ["/forum", MessageSquare, "Forum"],
               ["/friends", Users, "Friends"],
               ["/ai-editor", Sparkles, "AI Editor"],
+              ["/speech-generator", Megaphone, "Speech Generator"],
               ["/profile", User, "Profile"],
               ["/parliamentary", BookOpen, "Parliamentary"],
               ["/public-forum", BookOpen, "Public Forum"],

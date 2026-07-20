@@ -4,11 +4,12 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Loader2, MessageSquare, BookOpen, ChevronRight, Save, History, Plus, Trash2, ChevronLeft } from "lucide-react";
+import { Sparkles, Loader2, MessageSquare, BookOpen, ChevronRight, Save, History, Plus, Trash2, ChevronLeft, FileText } from "lucide-react";
 import AnimatedPage from "@/components/AnimatedPage";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/AuthContext";
 import ReactMarkdown from "react-markdown";
+import SaveGeneratedDialog from "@/components/SaveGeneratedDialog";
 
 export default function AIEditor() {
   const queryClient = useQueryClient();
@@ -19,6 +20,8 @@ export default function AIEditor() {
   const [loading, setLoading] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [showHistory, setShowHistory] = useState(false);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [contentToSave, setContentToSave] = useState("");
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
@@ -114,6 +117,24 @@ Provide a comprehensive, directly usable response.`
     setLoading(false);
   };
 
+  const saveToDocs = async ({ projectId }) => {
+    try {
+      await base44.entities.OtherDocument.create({
+        title: `AI Editor — ${contentToSave.slice(0, 40)}${contentToSave.length > 40 ? "..." : ""}`,
+        docLabel: "AI Editor Content",
+        content: contentToSave,
+        projectId: projectId || "",
+        ownerUserId: user?.id,
+      });
+      queryClient.invalidateQueries({ queryKey: ['other_documents'] });
+      if (projectId) queryClient.invalidateQueries({ queryKey: ['project_other_docs', projectId] });
+      toast({ title: "Saved to Docs!" });
+      setSaveDialogOpen(false);
+    } catch (e) {
+      toast({ title: "Failed to save", variant: "destructive" });
+    }
+  };
+
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['projects'] });
   };
@@ -199,13 +220,16 @@ Provide a comprehensive, directly usable response.`
                     {m.role === 'assistant' ? (
                       <div>
                         <ReactMarkdown className="prose prose-sm max-w-none prose-slate">{m.content}</ReactMarkdown>
-                        {selectedProjectId && (
-                          <div className="mt-4 pt-4 border-t border-slate-100 flex justify-end">
+                        <div className="mt-4 pt-4 border-t border-slate-100 flex justify-end gap-2">
+                          <Button size="sm" variant="outline" onClick={() => { setContentToSave(m.content); setSaveDialogOpen(true); }} className="gap-2 text-xs">
+                            <FileText className="w-3.5 h-3.5"/> Save to Docs
+                          </Button>
+                          {selectedProjectId && (
                             <Button size="sm" variant="outline" onClick={() => saveToProject(m.content)} className="gap-2 text-xs">
                               <Save className="w-3.5 h-3.5"/> Save to Project
                             </Button>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     ) : (
                       <div className="text-sm whitespace-pre-wrap">{m.content}</div>
@@ -239,6 +263,12 @@ Provide a comprehensive, directly usable response.`
           </div>
         </div>
       </div>
+      <SaveGeneratedDialog
+        open={saveDialogOpen}
+        onClose={() => setSaveDialogOpen(false)}
+        onSave={saveToDocs}
+        itemLabel="Document"
+      />
     </AnimatedPage>
   );
 }
