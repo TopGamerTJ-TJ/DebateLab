@@ -11,12 +11,13 @@ export default function ProjectFlowTab({ project, contentions, rebuttals }) {
   const [speechMinutes, setSpeechMinutes] = useState(10);
 
   const n = contentions.length || 1;
+  const r1 = (x) => Math.round(x * 10) / 10;
   // Proportional allocation: ~10% intro, ~60% contentions, ~20% rebuttals, ~10% conclusion
-  const introMin = Math.max(1, Math.round(speechMinutes * 0.10));
-  const concMin = Math.max(1, Math.round(speechMinutes * 0.10));
-  const rebMin = Math.max(1, Math.round(speechMinutes * 0.20));
-  const contTotal = Math.max(n, speechMinutes - introMin - concMin - rebMin);
-  const contMin = Math.max(1, Math.round(contTotal / n));
+  const introMin = Math.max(0.1, r1(speechMinutes * 0.10));
+  const concMin = Math.max(0.1, r1(speechMinutes * 0.10));
+  const rebMin = Math.max(0.1, r1(speechMinutes * 0.20));
+  const contTotal = Math.max(n * 0.1, speechMinutes - introMin - concMin - rebMin);
+  const contMin = r1(contTotal / n);
   const sections = [
     { label: "Introduction", min: introMin },
     ...contentions.map((c, i) => ({ label: `Contention ${i + 1}: ${c.title}`, min: contMin, c })),
@@ -113,9 +114,7 @@ export default function ProjectFlowTab({ project, contentions, rebuttals }) {
           <div className="flex items-center gap-1.5 text-xs">
             <Clock className="w-3.5 h-3.5 text-slate-400" />
             <span className="text-slate-500">Length:</span>
-            <select value={speechMinutes} onChange={e => setSpeechMinutes(+e.target.value)} className="border border-slate-200 rounded-md px-1.5 py-0.5 text-xs text-black bg-white">
-              {[3,5,7,10,13,15,20].map(m => <option key={m} value={m}>{m} min</option>)}
-            </select>
+            <input type="number" min={0.5} max={30} step={0.5} value={speechMinutes} onChange={e => setSpeechMinutes(Math.min(30, Math.max(0.5, +e.target.value || 0.5)))} className="w-14 border border-slate-200 rounded-md px-1.5 py-0.5 text-xs text-black bg-white" />
           </div>
           <button onClick={() => setFullscreen(true)} className="flex items-center gap-1.5 text-xs text-primary font-medium hover:underline">
             <Maximize2 className="w-3.5 h-3.5" /> Fullscreen

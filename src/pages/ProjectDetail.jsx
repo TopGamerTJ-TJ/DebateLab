@@ -525,10 +525,10 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
       <ProjectSuggestionsWidget projectId={id} />
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200 mb-6 gap-1 overflow-x-auto">
+      <div className="flex gap-1 overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none] border-b border-slate-200 mb-6">
         {tabs.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all ${tab === t.id ? "border-primary text-primary" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
+            className={`flex items-center gap-1.5 px-3.5 py-2.5 text-sm font-medium whitespace-nowrap shrink-0 border-b-2 transition-colors rounded-t-lg ${tab === t.id ? "border-primary text-primary bg-primary/5" : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}>
             <t.icon className="w-4 h-4" />{t.label}
           </button>
         ))}

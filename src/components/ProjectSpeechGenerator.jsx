@@ -135,9 +135,7 @@ Requirements:
       <div className="grid sm:grid-cols-3 gap-3">
         <div>
           <label className="text-xs font-medium text-slate-600 mb-1 block">Speech length</label>
-          <select value={minutes} onChange={e => setMinutes(+e.target.value)} className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm text-black">
-            {[3,5,7,10,13,15,20].map(m => <option key={m} value={m}>{m} minutes</option>)}
-          </select>
+          <input type="number" min={0.5} max={30} step={0.5} value={minutes} onChange={e => setMinutes(Math.min(30, Math.max(0.5, +e.target.value || 0.5)))} className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm text-black" />
         </div>
         <div>
           <label className="text-xs font-medium text-slate-600 mb-1 block">Tone</label>
