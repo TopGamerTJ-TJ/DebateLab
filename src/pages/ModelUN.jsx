@@ -44,6 +44,29 @@ const COMMITTEES = [
   "Other",
 ];
 
+const MUN_FRAMEWORK_CONTEXT = `
+
+MUN FRAMEWORK & DIPLOMATIC CONTEXT (ground all output in this):
+5 STAGES OF MUN: Research → Debate → Negotiate → Resolution → Action.
+
+UN STRUCTURE:
+- General Assembly: 193 member states, each gets 1 vote. Resolutions are NOT enforceable — they are recommendations. Unrecognized countries may observe but cannot vote. GA-passed resolutions do not automatically advance elsewhere.
+- Security Council: resolves urgent international peace & security issues. 5 permanent members (US, UK, China, France, Russia — all WWII allies) + 10 rotating. Only permanent members hold VETO. A substantive matter requires all 5 permanent members to vote YES (any veto kills it). The Council CAN authorize military force, sanctions, and peacekeepers, and CAN enforce its resolutions. The GA refers resolutions/treaties to the Council for enforcement.
+- Sustainable Development Goals (SDGs): targets for completion by 2030; used to track progress (likely not all met by 2030).
+
+BASE DISCUSSIONS ON: national interests, security, economics, politics, and history.
+
+P.E.G.S. COUNTRY ANALYSIS (understand your country through these lenses):
+- Political: who leads the government; democracy? monarchy? military?
+- Economic: rich? developing? major industries; influencing factors.
+- Geographic: location; allies & neighbors; natural resources.
+- Society: population; culture; ethnic groups; beliefs; struggles.
+
+SPEECH STRUCTURE (especially ~1-minute speeches): better to do ONE thing well than many things poorly.
+- Hook: a surprising statistic, thoughtful quote, provocative question, or VERY short story.
+- Point: one-sentence main point with 2-3 supporting points. Talk about your country's POLICY, not just the problem (e.g., "The issue is X; my country believes Y").
+- Call to action: a get-in-touch note, policy support request, feedback, or specific ways to help.`;
+
 function buildPrompt(docType, form) {
   const { country, committee, topic } = form;
 
@@ -514,7 +537,7 @@ export default function ModelUN() {
     const conferenceText = buildConferenceContextText(conferenceProfile);
     const conferenceNote = conferenceText ? `\n\n${conferenceText}\nAdhere to the conference rules/context above.\n` : "";
     const prompt = buildPrompt(aiPrompt.docType, { country: aiPrompt.country, committee: aiPrompt.committee, topic: aiPrompt.topic });
-    const content = await base44.integrations.Core.InvokeLLM({ prompt: prompt + contextNote + conferenceNote, model: "claude_sonnet_4_6" });
+    const content = await base44.integrations.Core.InvokeLLM({ prompt: prompt + MUN_FRAMEWORK_CONTEXT + contextNote + conferenceNote, model: "claude_sonnet_4_6" });
     const label = DOC_TYPES.find(d => d.value === aiPrompt.docType)?.label || aiPrompt.docType;
     setForm({
       title: `${aiPrompt.country} — ${label} — ${aiPrompt.committee}`,

@@ -16,6 +16,26 @@ import { useToast } from "@/components/ui/use-toast";
  *  - projectId (string, optional): when set, documents save directly to this project.
  *  - onSaved (fn, optional): called after a successful save.
  */
+const QUICK_TEMPLATES = [
+  {
+    label: "P.E.G.S. Plan",
+    chip: "📊 P.E.G.S. Plan",
+    docLabel: "P.E.G.S. Plan",
+    description: `Generate a P.E.G.S. country analysis plan for Model UN. Replace [COUNTRY] below with your assigned country, and [TOPIC] with your committee topic if relevant.
+
+Country: [COUNTRY]
+Topic (if any): [TOPIC]
+
+Structure the plan into the four P.E.G.S. lenses:
+- Political: Who leads the government? Democracy, monarchy, or military rule? Key political dynamics.
+- Economic: Is the country rich or developing? Major industries and influencing factors.
+- Geographic: Where is it located? Allies and neighbors? Natural resources.
+- Society: Population, culture, ethnic groups, beliefs, and key struggles.
+
+Then add: the country's likely position on the topic, 2-3 strategic discussion points grounded in national interests / security / economics / politics / history, and natural allies & likely opponents in committee.`,
+  },
+];
+
 export default function OtherDocGenerator({ projectId, onSaved }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -125,6 +145,17 @@ REQUIREMENTS:
         <div>
           <h3 className="font-bold text-slate-900 font-heading">Custom Document Generator</h3>
           <p className="text-xs text-slate-500">Describe any document you need and the AI will build it</p>
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-slate-600 mb-1.5 block">Quick templates</label>
+        <div className="flex flex-wrap gap-2">
+          {QUICK_TEMPLATES.map(t => (
+            <button key={t.label} type="button" onClick={() => { setDescription(t.description); setDocLabel(t.docLabel); }} className="text-xs px-3 py-1.5 rounded-full border border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100 transition-colors">
+              {t.chip}
+            </button>
+          ))}
         </div>
       </div>
 
