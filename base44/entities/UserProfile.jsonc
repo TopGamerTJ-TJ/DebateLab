@@ -91,6 +91,18 @@
     },
     "customColors": {
       "type": "object"
+    },
+    "defaultMinKeyFacts": {
+      "type": "number",
+      "default": 3
+    },
+    "defaultMinLogicPoints": {
+      "type": "number",
+      "default": 3
+    },
+    "defaultMinContentions": {
+      "type": "number",
+      "default": 2
     }
   },
   "required": [],

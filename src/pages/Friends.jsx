@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useBans } from "@/components/BanGate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, UserPlus, MessageCircle, Check, X, Search, Clock, Loader2, Target } from "lucide-react";
+import { Users, UserPlus, MessageCircle, Check, X, Search, Clock, Loader2, Target, Copy } from "lucide-react";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
 import { useToast } from "@/components/ui/use-toast";
@@ -40,27 +40,35 @@ export default function Friends() {
 
   const isProfileComplete = profile && profile.displayName && profile.skillLevel && profile.preferredFormat;
 
+  const [codeCreating, setCodeCreating] = useState(false);
   const { data: myFriendCodes = [] } = useQuery({
     queryKey: ['myFriendCode', user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const codes = await base44.entities.UserFriendCode.filter({ userId: user.id });
-      if (codes.length === 0) {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let newCode = '';
-        for (let i = 0; i < 6; i++) newCode += chars.charAt(Math.floor(Math.random() * chars.length));
-        const created = await base44.entities.UserFriendCode.create({
-          code: newCode,
-          userId: user.id,
-          userName: user.full_name || "Debater"
-        });
-        return [created];
-      }
-      return codes;
-    },
+    queryFn: () => base44.entities.UserFriendCode.filter({ userId: user.id }),
     enabled: !!user
   });
-  const myCode = myFriendCodes[0]?.code || "Loading...";
+  const myCode = myFriendCodes[0]?.code;
+
+  // Ensure the user always has a friend code — created robustly outside the
+  // query function so retries don't spawn duplicates.
+  useEffect(() => {
+    if (!user || codeCreating) return;
+    if (myFriendCodes.length === 0) {
+      setCodeCreating(true);
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let newCode = '';
+      for (let i = 0; i < 6; i++) newCode += chars.charAt(Math.floor(Math.random() * chars.length));
+      base44.entities.UserFriendCode.create({
+        code: newCode, userId: user.id, userName: user.full_name || "Debater"
+      }).then(() => queryClient.invalidateQueries(['myFriendCode']))
+        .catch(() => {}).finally(() => setCodeCreating(false));
+    }
+  }, [user, myFriendCodes, codeCreating]);
+
+  const copyCode = () => {
+    if (!myCode) return;
+    navigator.clipboard.writeText(myCode);
+    toast({ title: "Friend code copied!" });
+  };
 
   const { data: directMessages = [], isLoading: loadingMsgs } = useQuery({
     queryKey: ['dms', user?.id, selectedFriend],
@@ -156,7 +164,10 @@ export default function Friends() {
               <h2 className="font-bold text-slate-900 font-heading mb-4 flex items-center gap-2"><Users className="w-5 h-5 text-primary"/> Friends & Collab</h2>
               <div className="bg-slate-50 p-3 rounded-xl mb-4 border border-slate-100 text-center">
                 <div className="text-xs text-slate-500 mb-1">Your Friend Code</div>
-                <div className="font-mono text-lg font-bold text-slate-700 bg-white p-2 rounded border border-slate-200 tracking-widest select-all">{myCode}</div>
+                <div className="font-mono text-lg font-bold text-slate-700 bg-white p-2 rounded border border-slate-200 tracking-widest select-all">{myCode || (codeCreating ? "Generating..." : "Loading...")}</div>
+                <button onClick={copyCode} disabled={!myCode} className="mt-2 inline-flex items-center gap-1.5 text-xs text-primary hover:underline disabled:opacity-40">
+                  <Copy className="w-3.5 h-3.5" /> Copy code
+                </button>
               </div>
               
               <div className="flex gap-2">

@@ -26,7 +26,10 @@ export default function ProfilePage() {
     skillLevel: "intermediate", 
     bio: "", 
     learnTabEnabled: true, 
-    defaultAiMode: "full" 
+    defaultAiMode: "full",
+    defaultMinKeyFacts: 3,
+    defaultMinLogicPoints: 3,
+    defaultMinContentions: 2
   });
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState("profile");
@@ -107,7 +110,10 @@ export default function ProfilePage() {
         skillLevel: profile.skillLevel || "intermediate",
         bio: profile.bio || "",
         learnTabEnabled: profile.learnTabEnabled !== false,
-        defaultAiMode: profile.defaultAiMode || "full"
+        defaultAiMode: profile.defaultAiMode || "full",
+        defaultMinKeyFacts: profile.defaultMinKeyFacts ?? 3,
+        defaultMinLogicPoints: profile.defaultMinLogicPoints ?? 3,
+        defaultMinContentions: profile.defaultMinContentions ?? 2
       });
       if (profile.themeMode) {
         setThemeMode(profile.themeMode);
@@ -335,6 +341,25 @@ export default function ProfilePage() {
                           ? "AI will generate complete speeches and arguments for you." 
                           : "AI acts as a guide, providing outlines and evidence instead of writing for you."}
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100">
+                  <h4 className="text-sm font-bold text-slate-900 mb-1">Research Agent Defaults</h4>
+                  <p className="text-xs text-slate-500 mb-3">Default minimums for AI research generation (max 50 each). Used whenever you run the Research Agent in a project.</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-xs text-slate-500 mb-1 block">Min key facts/stats</label>
+                      <input type="number" min={1} max={50} value={form.defaultMinKeyFacts} onChange={e => setForm({ ...form, defaultMinKeyFacts: Math.min(50, Math.max(1, +e.target.value || 1)) })} className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm text-black shadow-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-500 mb-1 block">Min logic points</label>
+                      <input type="number" min={1} max={50} value={form.defaultMinLogicPoints} onChange={e => setForm({ ...form, defaultMinLogicPoints: Math.min(50, Math.max(1, +e.target.value || 1)) })} className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm text-black shadow-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-500 mb-1 block">Min contentions</label>
+                      <input type="number" min={1} max={50} value={form.defaultMinContentions} onChange={e => setForm({ ...form, defaultMinContentions: Math.min(50, Math.max(1, +e.target.value || 1)) })} className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm text-black shadow-sm" />
                     </div>
                   </div>
                 </div>

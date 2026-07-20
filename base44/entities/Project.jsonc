@@ -52,6 +52,38 @@
     },
     "conferenceProfileId": {
       "type": "string"
+    },
+    "whitelist": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "blacklist": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "strictMode": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
