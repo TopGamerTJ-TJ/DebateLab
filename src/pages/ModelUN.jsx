@@ -11,6 +11,7 @@ import ContextInput from "@/components/ContextInput";
 import ConferenceContextPicker, { buildConferenceContextText } from "@/components/ConferenceContextPicker";
 import { Globe, Sparkles, Loader2, FileText, Trash2, Star, Save, Copy, Download, BookOpen } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import MarkdownContent from "@/components/MarkdownContent";
 
 const DOC_TYPES = [
   { value: "position_paper", label: "Position Paper (NMUN)" },
@@ -676,7 +677,7 @@ export default function ModelUN() {
                 </div>
               </div>
               <div className="p-6">
-                <pre className="text-xs leading-relaxed text-slate-800 font-mono whitespace-pre-wrap">{viewDoc.content}</pre>
+                <MarkdownContent content={viewDoc.content} />
               </div>
             </div>
           ) : docs.length === 0 ? (

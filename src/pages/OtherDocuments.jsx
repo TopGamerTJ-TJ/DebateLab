@@ -6,6 +6,7 @@ import { Trash2, Star, Copy, FileText, Folder, Sparkles } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import OtherDocGenerator from "@/components/OtherDocGenerator";
+import DocumentViewer from "@/components/DocumentViewer";
 import AnimatedPage from "@/components/AnimatedPage";
 
 export default function OtherDocuments() {
@@ -101,29 +102,7 @@ export default function OtherDocuments() {
           </div>
         </div>
 
-        {viewDoc && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setViewDoc(null)}>
-            <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-5 border-b border-slate-100">
-                <div className="min-w-0">
-                  {viewDoc.docLabel && <span className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full font-medium mb-1 inline-block">{viewDoc.docLabel}</span>}
-                  <h3 className="font-bold text-slate-900 font-heading truncate">{viewDoc.title}</h3>
-                </div>
-                <div className="flex gap-2 shrink-0">
-                  <button onClick={() => copyToClipboard(viewDoc.content)} className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-primary bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">
-                    <Copy className="w-3.5 h-3.5" /> Copy
-                  </button>
-                  <button onClick={() => setViewDoc(null)} className="text-xs text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">
-                    Close
-                  </button>
-                </div>
-              </div>
-              <div className="p-6 overflow-y-auto">
-                <pre className="text-xs leading-relaxed text-slate-800 font-mono whitespace-pre-wrap">{viewDoc.content}</pre>
-              </div>
-            </div>
-          </div>
-        )}
+        <DocumentViewer doc={viewDoc} onClose={() => setViewDoc(null)} />
       </div>
     </AnimatedPage>
   );

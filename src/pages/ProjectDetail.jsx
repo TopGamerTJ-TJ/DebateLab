@@ -16,6 +16,7 @@ import OtherDocGenerator from "@/components/OtherDocGenerator";
 import ProjectContextCard from "@/components/ProjectContextCard";
 import ProjectFlowTab from "@/components/ProjectFlowTab";
 import ProjectSpeechGenerator from "@/components/ProjectSpeechGenerator";
+import DocumentViewer from "@/components/DocumentViewer";
 import ConferenceLinkSelect from "@/components/ConferenceLinkSelect";
 import { buildConferenceContextText } from "@/components/ConferenceContextPicker";
 
@@ -35,6 +36,7 @@ export default function ProjectDetail() {
   const [note, setNote] = useState("");
   const [savingNote, setSavingNote] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const [viewDoc, setViewDoc] = useState(null);
   const [agentQuery, setAgentQuery] = useState("");
   const [agentLoading, setAgentLoading] = useState(false);
   const [agentResults, setAgentResults] = useState(null);
@@ -108,6 +110,24 @@ export default function ProjectDetail() {
     navigator.clipboard.writeText(text);
     toast({ title: "Copied to clipboard!" });
   };
+
+  const addContentionFromDoc = useMutation({
+    mutationFn: (doc) => base44.entities.Contention.create({
+      ownerUserId: user?.id,
+      title: doc.title,
+      format: ["parliamentary", "public_forum"].includes(project?.format) ? project.format : "public_forum",
+      resolution: project?.resolution || "—",
+      side: project?.side || "pro",
+      projectId: id,
+      strategicNotes: doc.content,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['project_contentions', id] });
+      logActivity("Added Contention", "Created a contention from a saved document.");
+      toast({ title: "Added as a contention! Edit it in the Contentions tab." });
+    },
+    onError: () => toast({ title: "Could not add contention", variant: "destructive" })
+  });
 
   const { data: conferenceProfiles = [] } = useQuery({
     queryKey: ['conference_profiles'],
@@ -916,13 +936,16 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
             ) : (
               <div className="space-y-3">
                 {otherDocs.map(doc => (
-                  <div key={doc.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                  <div key={doc.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:border-violet-200 transition-colors">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="min-w-0">
-                        <h4 className="font-bold text-slate-900 font-heading text-sm">{doc.title}</h4>
+                      <button onClick={() => setViewDoc(doc)} className="text-left min-w-0 flex-1">
+                        <h4 className="font-bold text-slate-900 font-heading text-sm hover:text-primary transition-colors">{doc.title}</h4>
                         {doc.docLabel && <span className="inline-block text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full font-medium mt-1">{doc.docLabel}</span>}
-                      </div>
+                      </button>
                       <div className="flex gap-1 shrink-0">
+                        <button onClick={() => addContentionFromDoc.mutate(doc)} disabled={addContentionFromDoc.isPending} className="p-1.5 hover:bg-violet-50 rounded-lg text-slate-400 hover:text-violet-600 transition-colors disabled:opacity-50" title="Add as Contention">
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
                         <button onClick={() => copyOtherDoc(doc.content)} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-colors" title="Copy">
                           <Copy className="w-3.5 h-3.5" />
                         </button>
@@ -931,10 +954,8 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
                         </button>
                       </div>
                     </div>
-                    <details className="group">
-                      <summary className="text-xs text-violet-600 font-medium cursor-pointer hover:underline select-none">View full document</summary>
-                      <pre className="text-xs leading-relaxed text-slate-700 font-mono whitespace-pre-wrap mt-3">{doc.content}</pre>
-                    </details>
+                    <p className="text-xs text-slate-500 line-clamp-2">{doc.content}</p>
+                    <button onClick={() => setViewDoc(doc)} className="text-xs text-violet-600 font-medium mt-2 hover:underline">View full document →</button>
                   </div>
                 ))}
               </div>
@@ -946,6 +967,14 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
             onSaved={() => queryClient.invalidateQueries({ queryKey: ['project_other_documents', id] })}
           />
         </div>
+      )}
+
+      {viewDoc && (
+        <DocumentViewer
+          doc={viewDoc}
+          onClose={() => setViewDoc(null)}
+          onAddContention={(doc) => addContentionFromDoc.mutate(doc)}
+        />
       )}
     </div>
     </AnimatedPage>
