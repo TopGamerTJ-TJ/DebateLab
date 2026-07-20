@@ -1,9 +1,11 @@
-import { Copy, Download, Plus, X } from "lucide-react";
+import { useState } from "react";
+import { Copy, Download, Plus, X, Maximize2, Minimize2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import MarkdownContent from "@/components/MarkdownContent";
 
 export default function DocumentViewer({ doc, onClose, onAddContention, addContentionLabel = "Add as Contention" }) {
   const { toast } = useToast();
+  const [fullscreen, setFullscreen] = useState(false);
   if (!doc) return null;
 
   const copy = () => {
@@ -25,7 +27,7 @@ export default function DocumentViewer({ doc, onClose, onAddContention, addConte
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[88vh] flex flex-col" onClick={e => e.stopPropagation()}>
+      <div className={`bg-white rounded-2xl shadow-2xl w-full flex flex-col ${fullscreen ? "max-w-6xl max-h-[96vh]" : "max-w-3xl max-h-[88vh]"}`} onClick={e => e.stopPropagation()}>
         <div className="flex items-start justify-between gap-3 p-5 border-b border-slate-100">
           <div className="min-w-0">
             <div className="flex flex-wrap gap-1.5 mb-1">
@@ -38,6 +40,7 @@ export default function DocumentViewer({ doc, onClose, onAddContention, addConte
           <div className="flex flex-wrap gap-2 shrink-0 justify-end">
             <button onClick={copy} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-primary bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors"><Copy className="w-3.5 h-3.5" /> Copy</button>
             <button onClick={download} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-primary bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors"><Download className="w-3.5 h-3.5" /> .txt</button>
+            <button onClick={() => setFullscreen(f => !f)} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-primary bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">{fullscreen ? <><Minimize2 className="w-3.5 h-3.5" /> Exit Fullscreen</> : <><Maximize2 className="w-3.5 h-3.5" /> Fullscreen</>}</button>
             {onAddContention && <button onClick={() => onAddContention(doc)} className="flex items-center gap-1.5 text-xs text-white bg-primary hover:bg-primary/90 px-3 py-1.5 rounded-lg transition-colors"><Plus className="w-3.5 h-3.5" /> {addContentionLabel}</button>}
             {onClose && <button onClick={onClose} className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors"><X className="w-3.5 h-3.5" /> Close</button>}
           </div>

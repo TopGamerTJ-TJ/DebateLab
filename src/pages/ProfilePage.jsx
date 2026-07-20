@@ -12,6 +12,7 @@ import ContactForm from "@/components/ContactForm";
 import AppStoreBadge from "@/components/AppStoreBadge";
 import { appConfig } from "@/lib/app-config";
 import { isNativeApp } from "@/lib/platform";
+import { setUnMode, stripModel } from "@/lib/un-mode";
 
 const FORMATS = ["Parliamentary Debate", "Public Forum", "Model UN", "Model Congress"];
 const LEVELS = ["new", "beginner", "intermediate", "advanced"];
@@ -29,7 +30,8 @@ export default function ProfilePage() {
     defaultAiMode: "full",
     defaultMinKeyFacts: 3,
     defaultMinLogicPoints: 3,
-    defaultMinContentions: 2
+    defaultMinContentions: 2,
+    delegateOfUN: false
   });
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState("profile");
@@ -113,7 +115,8 @@ export default function ProfilePage() {
         defaultAiMode: profile.defaultAiMode || "full",
         defaultMinKeyFacts: profile.defaultMinKeyFacts ?? 3,
         defaultMinLogicPoints: profile.defaultMinLogicPoints ?? 3,
-        defaultMinContentions: profile.defaultMinContentions ?? 2
+        defaultMinContentions: profile.defaultMinContentions ?? 2,
+        delegateOfUN: profile.delegateOfUN === true
       });
       if (profile.themeMode) {
         setThemeMode(profile.themeMode);
@@ -123,6 +126,8 @@ export default function ProfilePage() {
         setCustomColors(profile.customColors);
         localStorage.setItem('custom_colors', JSON.stringify(profile.customColors));
       }
+      localStorage.setItem('un_mode', profile.delegateOfUN === true ? 'true' : 'false');
+      window.dispatchEvent(new Event('un-mode-changed'));
       window.dispatchEvent(new Event('theme-changed'));
     } else if (currentUser) {
       // No existing profile found — mark as loaded so autosave can create one.
@@ -298,7 +303,7 @@ export default function ProfilePage() {
                   <label className="text-sm font-medium text-slate-700 mb-1.5 block">Preferred Format</label>
                   <select value={form.preferredFormat} onChange={e => setForm({ ...form, preferredFormat: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-black shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none [&>option]:text-black">
                     <option value="" disabled>Select your main format</option>
-                    {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
+                    {FORMATS.map(f => <option key={f} value={f}>{stripModel(f)}</option>)}
                   </select>
                 </div>
                 <div>
@@ -341,6 +346,22 @@ export default function ProfilePage() {
                           ? "AI will generate complete speeches and arguments for you." 
                           : "AI acts as a guide, providing outlines and evidence instead of writing for you."}
                       </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                      <div>
+                        <div className="text-sm font-semibold text-slate-900">Delegate of the UN</div>
+                        <div className="text-xs text-slate-500">Removes the word "Model" from all references on your account</div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={!!form.delegateOfUN}
+                          onChange={(e) => { setForm({ ...form, delegateOfUN: e.target.checked }); setUnMode(e.target.checked); }}
+                        />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
                     </div>
                   </div>
                 </div>

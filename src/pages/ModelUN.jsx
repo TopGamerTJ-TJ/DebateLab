@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import AIAssistant from "@/components/AIAssistant";
 import ContextInput from "@/components/ContextInput";
 import ConferenceContextPicker, { buildConferenceContextText } from "@/components/ConferenceContextPicker";
-import { Globe, Sparkles, Loader2, FileText, Trash2, Star, Save, Copy, Download, BookOpen } from "lucide-react";
+import { Globe, Sparkles, Loader2, FileText, Trash2, Star, Save, Copy, Download, BookOpen, Maximize2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import MarkdownContent from "@/components/MarkdownContent";
+import DocumentViewer from "@/components/DocumentViewer";
 
 const DOC_TYPES = [
   { value: "position_paper", label: "Position Paper (NMUN)" },
@@ -490,6 +491,7 @@ export default function ModelUN() {
   const [aiPrompt, setAiPrompt] = useState({ country: "", committee: "", topic: "", docType: "position_paper", context: "" });
   const [conferenceProfile, setConferenceProfile] = useState(null);
   const [viewDoc, setViewDoc] = useState(null);
+  const [fullscreenDoc, setFullscreenDoc] = useState(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -671,6 +673,9 @@ export default function ModelUN() {
                   <button onClick={() => copyToClipboard(viewDoc.content)} className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-primary bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">
                     <Copy className="w-3.5 h-3.5" /> Copy
                   </button>
+                  <button onClick={() => setFullscreenDoc(viewDoc)} className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-primary bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">
+                    <Maximize2 className="w-3.5 h-3.5" /> Fullscreen
+                  </button>
                   <button onClick={() => setViewDoc(null)} className="text-xs text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">
                     ← Back to Library
                   </button>
@@ -759,6 +764,8 @@ export default function ModelUN() {
           <AIAssistant format="model_un" placeholder="Ask about country positions, resolution writing, bloc strategy, committee procedures, how to win Best Delegate..." />
         </TabsContent>
       </Tabs>
+
+      <DocumentViewer doc={fullscreenDoc} onClose={() => setFullscreenDoc(null)} />
     </div>
   );
 }

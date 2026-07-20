@@ -7,7 +7,8 @@ import Dashboard from "@/pages/Dashboard";
 import Projects from "@/pages/Projects";
 import CoachChat from "@/pages/CoachChat";
 import Forum from "@/pages/Forum";
-import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords, Bell, Mic, Timer, Landmark, Layers3 } from "lucide-react";
+import { ChevronDown, BookOpen, Globe, FileText, Trophy, User, Zap, Menu, X, LayoutGrid, Folder, LogOut, LayoutDashboard, Brain, MessageSquare, Target, Users, Sparkles, GraduationCap, Swords, Bell, Mic, Timer, Landmark, Layers3, Search } from "lucide-react";
+import { useUnMode } from "@/hooks/useUnMode";
 
 const doLogout = async () => {
   await base44.auth.logout();
@@ -25,8 +26,9 @@ export default function Layout() {
   const timerRef = useRef(null);
 
   // Detect if we're on a sub-route (not a root tab) for mobile back button
-  const rootPaths = ["/home", "/projects", "/practice", "/forum", "/coach"];
+  const rootPaths = ["/home", "/projects", "/practice", "/forum", "/coach", "/research"];
   const isSubRoute = !rootPaths.includes(location.pathname);
+  const unMode = useUnMode();
 
   const { data: profile } = useQuery({
     queryKey: ['userProfile', user?.id],
@@ -137,8 +139,9 @@ export default function Layout() {
               </div>
 
               {[
-                ["/model-un", <Globe className="w-3.5 h-3.5" />, "MUN"],
+                ["/model-un", <Globe className="w-3.5 h-3.5" />, unMode ? "UN" : "MUN"],
                 ["/model-congress", <FileText className="w-3.5 h-3.5" />, "Congress"],
+                ["/research", <Search className="w-3.5 h-3.5" />, "Research"],
                 ["/other-documents", <FileText className="w-3.5 h-3.5" />, "Other Docs"],
                 ["/forum", <MessageSquare className="w-3.5 h-3.5" />, "Forum"],
                 ["/match", <Swords className="w-3.5 h-3.5" />, "Match"],
@@ -292,8 +295,9 @@ export default function Layout() {
               ["/profile", User, "Profile"],
               ["/parliamentary", BookOpen, "Parliamentary"],
               ["/public-forum", BookOpen, "Public Forum"],
-              ["/model-un", Globe, "Model UN"],
+              ["/model-un", Globe, unMode ? "UN" : "Model UN"],
               ["/model-congress", FileText, "Congress"],
+              ["/research", Search, "Research"],
               ["/other-documents", FileText, "Other Docs"],
               ["/formats", LayoutGrid, "Formats"],
               ["/office-hours", MessageSquare, "Office Hours"],

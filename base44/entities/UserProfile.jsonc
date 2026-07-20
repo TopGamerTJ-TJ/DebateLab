@@ -103,6 +103,10 @@
     "defaultMinContentions": {
       "type": "number",
       "default": 2
+    },
+    "delegateOfUN": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [],

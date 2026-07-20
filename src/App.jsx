@@ -45,6 +45,7 @@ import ConferenceProfiles from './pages/ConferenceProfiles';
 import MemoryAssist from './pages/MemoryAssist';
 import MockCommittee from './pages/MockCommittee';
 import OtherDocuments from './pages/OtherDocuments';
+import Research from './pages/Research';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -134,6 +135,7 @@ const AuthenticatedApp = () => {
           <Route path="/memory-assist" element={<MemoryAssist />} />
           <Route path="/mock-committee" element={<MockCommittee />} />
           <Route path="/other-documents" element={<OtherDocuments />} />
+          <Route path="/research" element={<Research />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
