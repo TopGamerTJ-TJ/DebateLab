@@ -8,15 +8,20 @@ import { ScrollText, Clock, BookOpen, ShieldAlert, ChevronRight, X, Maximize2 } 
  */
 export default function ProjectFlowTab({ project, contentions, rebuttals }) {
   const [fullscreen, setFullscreen] = useState(false);
+  const [speechMinutes, setSpeechMinutes] = useState(10);
 
   const n = contentions.length || 1;
-  // Allocate ~6 min across contentions, 1 intro, 2 rebuttals, 1 conclusion = 10 min
-  const contMin = Math.max(1, Math.round(6 / n));
+  // Proportional allocation: ~10% intro, ~60% contentions, ~20% rebuttals, ~10% conclusion
+  const introMin = Math.max(1, Math.round(speechMinutes * 0.10));
+  const concMin = Math.max(1, Math.round(speechMinutes * 0.10));
+  const rebMin = Math.max(1, Math.round(speechMinutes * 0.20));
+  const contTotal = Math.max(n, speechMinutes - introMin - concMin - rebMin);
+  const contMin = Math.max(1, Math.round(contTotal / n));
   const sections = [
-    { label: "Introduction", min: 1 },
+    { label: "Introduction", min: introMin },
     ...contentions.map((c, i) => ({ label: `Contention ${i + 1}: ${c.title}`, min: contMin, c })),
-    { label: "Rebuttals", min: 2 },
-    { label: "Conclusion", min: 1 },
+    { label: "Rebuttals", min: rebMin },
+    { label: "Conclusion", min: concMin },
   ];
   const totalMin = sections.reduce((a, s) => a + s.min, 0);
 
@@ -99,16 +104,25 @@ export default function ProjectFlowTab({ project, contentions, rebuttals }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
           <ScrollText className="w-4 h-4 text-primary" />
           <h3 className="font-bold text-slate-900 font-heading text-sm">Speaking Flow</h3>
         </div>
-        <button onClick={() => setFullscreen(true)} className="flex items-center gap-1.5 text-xs text-primary font-medium hover:underline">
-          <Maximize2 className="w-3.5 h-3.5" /> Fullscreen
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs">
+            <Clock className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-slate-500">Length:</span>
+            <select value={speechMinutes} onChange={e => setSpeechMinutes(+e.target.value)} className="border border-slate-200 rounded-md px-1.5 py-0.5 text-xs text-black bg-white">
+              {[3,5,7,10,13,15,20].map(m => <option key={m} value={m}>{m} min</option>)}
+            </select>
+          </div>
+          <button onClick={() => setFullscreen(true)} className="flex items-center gap-1.5 text-xs text-primary font-medium hover:underline">
+            <Maximize2 className="w-3.5 h-3.5" /> Fullscreen
+          </button>
+        </div>
       </div>
-      <p className="text-xs text-slate-500">A structured ~10-minute flow: intro, your contentions, prepared rebuttals, and conclusion. Scroll through while you speak.</p>
+      <p className="text-xs text-slate-500">A structured ~{totalMin}-minute flow: intro, your contentions, prepared rebuttals, and conclusion. Times scale to your chosen length.</p>
       <FlowBody />
     </div>
   );

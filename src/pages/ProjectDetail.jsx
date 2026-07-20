@@ -15,6 +15,7 @@ import ProjectAIChats from "@/components/ProjectAIChats";
 import OtherDocGenerator from "@/components/OtherDocGenerator";
 import ProjectContextCard from "@/components/ProjectContextCard";
 import ProjectFlowTab from "@/components/ProjectFlowTab";
+import ProjectSpeechGenerator from "@/components/ProjectSpeechGenerator";
 import ConferenceLinkSelect from "@/components/ConferenceLinkSelect";
 import { buildConferenceContextText } from "@/components/ConferenceContextPicker";
 
@@ -535,7 +536,18 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
 
       {/* Flow tab */}
       {tab === "flow" && (
-        <ProjectFlowTab project={project} contentions={contentions} rebuttals={rebuttals} />
+        <div className="space-y-4">
+          <ProjectSpeechGenerator
+            project={project}
+            contentions={contentions}
+            rebuttals={rebuttals}
+            otherDocs={otherDocs}
+            agentResults={agentResults}
+            conferenceContext={conferenceContext}
+            onSaved={() => queryClient.invalidateQueries({ queryKey: ['project_other_documents', id] })}
+          />
+          <ProjectFlowTab project={project} contentions={contentions} rebuttals={rebuttals} />
+        </div>
       )}
 
       {/* Rebuttal Hub tab */}
