@@ -1,41 +1,136 @@
-import { useState } from "react";
-import { ScrollText, Clock, BookOpen, ShieldAlert, ChevronRight, X, Maximize2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ScrollText, Clock, BookOpen, ChevronRight, X, Maximize2, Minimize2, RefreshCw, CheckSquare, Square, FileText, Gavel } from "lucide-react";
 
 /**
- * A scrollable "flow" view structured for a ~10 minute speech:
+ * A scrollable "flow" view structured for a timed speech:
  * Introduction → Contentions (with timing) → Rebuttals → Conclusion.
- * Props: project, contentions, rebuttals
+ * Props: project, contentions, rebuttals, otherDocs, onRefresh
  */
-export default function ProjectFlowTab({ project, contentions, rebuttals }) {
+export default function ProjectFlowTab({ project, contentions, rebuttals, otherDocs = [], onRefresh }) {
   const [fullscreen, setFullscreen] = useState(false);
   const [speechMinutes, setSpeechMinutes] = useState(10);
+  const [selectedContIds, setSelectedContIds] = useState(null);
+  const [selectedDocIds, setSelectedDocIds] = useState(new Set());
+  const [showSelector, setShowSelector] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const n = contentions.length || 1;
+  const isCongress = project?.format === "model_congress";
+  const isParli = project?.format === "parliamentary";
+  const isMUN = project?.format === "model_un";
+
+  const labels = {
+    intro: isCongress ? "Authorship / Sponsorship Intro" : (isMUN ? "Opening Remarks" : "Introduction"),
+    contentionWord: isCongress ? "Argument" : (isMUN ? "Point" : "Contention"),
+    rebuttal: isCongress ? "Refutation" : (isMUN ? "Rebuttal" : "Rebuttals"),
+    conclusion: isCongress ? "Voting Issues & Conclusion" : "Conclusion",
+  };
+
+  // Default: all contentions selected (min 1). Re-sync when list changes.
+  useEffect(() => {
+    if (!contentions || contentions.length === 0) return;
+    setSelectedContIds(prev => {
+      if (!prev || prev.size === 0) return new Set(contentions.map(c => c.id));
+      const next = new Set();
+      contentions.forEach(c => { if (prev.has(c.id)) next.add(c.id); });
+      if (next.size === 0) return new Set(contentions.map(c => c.id)); // min 1
+      return next;
+    });
+  }, [contentions]);
+
+  const selectedContentions = contentions.filter(c => selectedContIds?.has(c.id));
+  const selectedDocs = otherDocs.filter(d => selectedDocIds.has(d.id));
+
+  const toggleContention = (cid) => {
+    setSelectedContIds(prev => {
+      const base = prev || new Set(contentions.map(c => c.id));
+      const next = new Set(base);
+      if (next.has(cid)) {
+        if (next.size > 1) next.delete(cid); // enforce min 1
+      } else {
+        next.add(cid);
+      }
+      return next;
+    });
+  };
+
+  const toggleDoc = (did) => {
+    setSelectedDocIds(prev => {
+      const next = new Set(prev);
+      if (next.has(did)) next.delete(did);
+      else next.add(did);
+      return next;
+    });
+  };
+
+  const handleRefresh = async () => {
+    if (!onRefresh) return;
+    setRefreshing(true);
+    await onRefresh();
+    setTimeout(() => setRefreshing(false), 600);
+  };
+
+  const n = Math.max(selectedContentions.length, 1);
   const r1 = (x) => Math.round(x * 10) / 10;
-  // Proportional allocation: ~10% intro, ~60% contentions, ~20% rebuttals, ~10% conclusion
   const introMin = Math.max(0.1, r1(speechMinutes * 0.10));
   const concMin = Math.max(0.1, r1(speechMinutes * 0.10));
   const rebMin = Math.max(0.1, r1(speechMinutes * 0.20));
-  const contTotal = Math.max(n * 0.1, speechMinutes - introMin - concMin - rebMin);
+  const docMin = selectedDocs.length > 0 ? Math.max(0.2, r1(speechMinutes * 0.05)) : 0;
+  const contTotal = Math.max(n * 0.1, speechMinutes - introMin - concMin - rebMin - (docMin * selectedDocs.length));
   const contMin = r1(contTotal / n);
+
   const sections = [
-    { label: "Introduction", min: introMin },
-    ...contentions.map((c, i) => ({ label: `Contention ${i + 1}: ${c.title}`, min: contMin, c })),
-    { label: "Rebuttals", min: rebMin },
-    { label: "Conclusion", min: concMin },
+    { label: labels.intro, min: introMin, type: "intro" },
+    ...selectedContentions.map((c, i) => ({ label: `${labels.contentionWord} ${i + 1}: ${c.title}`, min: contMin, c })),
+    ...selectedDocs.map((d) => ({ label: `Doc: ${d.title}`, min: docMin, doc: d })),
+    { label: labels.rebuttal, min: rebMin, type: "rebuttal" },
+    { label: labels.conclusion, min: concMin, type: "conclusion" },
   ];
   const totalMin = sections.reduce((a, s) => a + s.min, 0);
+
+  const SelectorPanel = () => (
+    <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+      <div className="flex items-center justify-between">
+        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+          <FileText className="w-3.5 h-3.5" /> Select Documents to Base Flow On
+        </h4>
+        <span className="text-xs text-slate-400">{selectedContentions.length} contention{selectedContentions.length !== 1 ? 's' : ''}{selectedDocs.length > 0 ? ` + ${selectedDocs.length} doc${selectedDocs.length !== 1 ? 's' : ''}` : ''} · min 1</span>
+      </div>
+      {contentions.length === 0 && otherDocs.length === 0 ? (
+        <p className="text-xs text-slate-400 italic">No contentions or documents yet. Generate contentions or add documents first.</p>
+      ) : (
+        <div className="space-y-1.5 max-h-48 overflow-y-auto">
+          {contentions.map(c => (
+            <button key={c.id} onClick={() => toggleContention(c.id)} className="w-full flex items-center gap-2 text-left p-2 rounded-lg hover:bg-slate-50 transition-colors">
+              {selectedContIds?.has(c.id) ? <CheckSquare className="w-4 h-4 text-primary shrink-0" /> : <Square className="w-4 h-4 text-slate-300 shrink-0" />}
+              <span className="text-sm text-slate-700 truncate">{c.title}</span>
+              <span className="text-xs text-slate-400 shrink-0 ml-auto">{labels.contentionWord}</span>
+            </button>
+          ))}
+          {otherDocs.map(d => (
+            <button key={d.id} onClick={() => toggleDoc(d.id)} className="w-full flex items-center gap-2 text-left p-2 rounded-lg hover:bg-slate-50 transition-colors">
+              {selectedDocIds.has(d.id) ? <CheckSquare className="w-4 h-4 text-primary shrink-0" /> : <Square className="w-4 h-4 text-slate-300 shrink-0" />}
+              <span className="text-sm text-slate-700 truncate">{d.title}</span>
+              <span className="text-xs text-slate-400 shrink-0 ml-auto">{d.docLabel || 'Doc'}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <p className="text-xs text-slate-400">At least 1 contention is required. Toggle documents on/off to customize your flow.</p>
+    </div>
+  );
 
   const FlowBody = () => (
     <div className="space-y-6">
       {/* Overview */}
       <div className="bg-gradient-to-br from-slate-700 to-slate-900 rounded-2xl p-6 text-white">
-        <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 flex items-center gap-1.5"><ScrollText className="w-3.5 h-3.5" /> Speaking Flow · ~{totalMin} min</div>
+        <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 flex items-center gap-1.5">
+          <ScrollText className="w-3.5 h-3.5" /> Speaking Flow · ~{totalMin} min
+        </div>
         <h2 className="text-xl font-bold font-heading mb-2">{project.resolution || project.name}</h2>
         <div className="flex flex-wrap gap-2 text-xs">
           {project.side && <span className="bg-white/15 px-2 py-0.5 rounded-full">{project.side}</span>}
           {project.format && <span className="bg-white/15 px-2 py-0.5 rounded-full capitalize">{project.format.replace(/_/g, ' ')}</span>}
-          <span className="bg-white/15 px-2 py-0.5 rounded-full">{contentions.length} contentions</span>
+          <span className="bg-white/15 px-2 py-0.5 rounded-full">{selectedContentions.length} {labels.contentionWord.toLowerCase()}{selectedContentions.length !== 1 ? 's' : ''}</span>
           {rebuttals.length > 0 && <span className="bg-white/15 px-2 py-0.5 rounded-full">{rebuttals.length} rebuttal sets</span>}
         </div>
       </div>
@@ -60,7 +155,16 @@ export default function ProjectFlowTab({ project, contentions, rebuttals }) {
                 </ul>
               )}
             </div>
-          ) : s.label === "Rebuttals" ? (
+          ) : s.doc ? (
+            <div className="text-sm text-slate-600">
+              {s.doc.content ? (
+                <p className="line-clamp-6 whitespace-pre-wrap">{s.doc.content}</p>
+              ) : (
+                <p className="text-xs text-slate-400 italic">No content in this document.</p>
+              )}
+              {s.doc.takeaways && <p className="text-xs text-slate-500 mt-2"><span className="font-semibold">Takeaways:</span> {s.doc.takeaways}</p>}
+            </div>
+          ) : s.type === "rebuttal" ? (
             rebuttals.length > 0 ? (
               <div className="space-y-3">
                 {rebuttals.map((r, ri) => (
@@ -71,17 +175,21 @@ export default function ProjectFlowTab({ project, contentions, rebuttals }) {
                 ))}
               </div>
             ) : <p className="text-xs text-slate-400 italic">No rebuttals prepared yet — generate some in the Rebuttal Hub.</p>
-          ) : s.label === "Introduction" ? (
+          ) : s.type === "intro" ? (
             <ul className="text-sm text-slate-600 space-y-1 list-disc pl-5">
-              <li>Hook the audience and state the resolution.</li>
+              <li>Hook the audience and state the resolution{isCongress ? '/bill' : ''}.</li>
               <li>Define key terms and frame the debate.</li>
-              <li>Preview your {contentions.length} contentions.</li>
+              <li>Preview your {selectedContentions.length} {labels.contentionWord.toLowerCase()}s.</li>
+              {isCongress && <li className="text-slate-500">Acknowledge co-sponsors and establish authorship/sponsorship of the bill.</li>}
+              {isMUN && <li className="text-slate-500">Address fellow delegates and reference the resolution's operative clauses.</li>}
             </ul>
           ) : (
             <ul className="text-sm text-slate-600 space-y-1 list-disc pl-5">
               <li>Crystalize the key voting issues.</li>
               <li>Weigh your impacts against the opponent's.</li>
               <li>End with a strong call to vote {project.side || 'your side'}.</li>
+              {isCongress && <li className="text-slate-500">Urge an aye/nay vote and summarize the bill's merits.</li>}
+              {isParli && <li className="text-slate-500">Offer Points of Information (POI) opportunities during opponent speeches.</li>}
             </ul>
           )}
         </div>
@@ -94,8 +202,14 @@ export default function ProjectFlowTab({ project, contentions, rebuttals }) {
       <div className="fixed inset-0 bg-slate-50 z-50 flex flex-col">
         <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 bg-white">
           <span className="font-bold text-slate-900 font-heading text-sm flex items-center gap-2"><ScrollText className="w-4 h-4 text-primary" /> Speaking Flow · {project.name}</span>
-          <button onClick={() => setFullscreen(false)} className="p-2 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5" /></button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowSelector(!showSelector)} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-primary font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100">
+              <FileText className="w-3.5 h-3.5" /> Select Docs
+            </button>
+            <button onClick={() => setFullscreen(false)} className="p-2 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5" /></button>
+          </div>
         </div>
+        {showSelector && <div className="px-6 py-3 border-b border-slate-200 bg-white"><SelectorPanel /></div>}
         <div className="flex-1 overflow-y-auto px-6 py-6 max-w-3xl mx-auto w-full">
           <FlowBody />
         </div>
@@ -109,8 +223,15 @@ export default function ProjectFlowTab({ project, contentions, rebuttals }) {
         <div className="flex items-center gap-2">
           <ScrollText className="w-4 h-4 text-primary" />
           <h3 className="font-bold text-slate-900 font-heading text-sm">Speaking Flow</h3>
+          {isCongress && <span className="flex items-center gap-1 text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full"><Gavel className="w-3 h-3" /> Congress Mode</span>}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowSelector(!showSelector)} className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-primary font-medium px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors">
+            <FileText className="w-3.5 h-3.5" /> Select Docs
+          </button>
+          <button onClick={handleRefresh} disabled={!onRefresh || refreshing} title="Refresh contentions and data" className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-primary font-medium px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-40">
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} /> Refresh
+          </button>
           <div className="flex items-center gap-1.5 text-xs">
             <Clock className="w-3.5 h-3.5 text-slate-400" />
             <span className="text-slate-500">Length:</span>
@@ -121,7 +242,8 @@ export default function ProjectFlowTab({ project, contentions, rebuttals }) {
           </button>
         </div>
       </div>
-      <p className="text-xs text-slate-500">A structured ~{totalMin}-minute flow: intro, your contentions, prepared rebuttals, and conclusion. Times scale to your chosen length.</p>
+      <p className="text-xs text-slate-500">A structured ~{totalMin}-minute flow: {labels.intro.toLowerCase()}, your {labels.contentionWord.toLowerCase()}s, prepared {labels.rebuttal.toLowerCase().toLowerCase()}, and {labels.conclusion.toLowerCase()}. Times scale to your chosen length.</p>
+      {showSelector && <SelectorPanel />}
       <FlowBody />
     </div>
   );

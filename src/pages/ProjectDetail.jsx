@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText, Users, Activity, Check, Copy, ScrollText, Lightbulb, ExternalLink, Scale, Wand2, FileDown, Mic } from "lucide-react";
+import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, ChevronDown, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText, Users, Activity, Check, Copy, ScrollText, Lightbulb, ExternalLink, Scale, Wand2, FileDown, Mic } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/AuthContext";
 import ReactMarkdown from "react-markdown";
@@ -15,6 +15,7 @@ import ProjectAIChats from "@/components/ProjectAIChats";
 import OtherDocGenerator from "@/components/OtherDocGenerator";
 import ProjectContextCard from "@/components/ProjectContextCard";
 import ProjectFlowTab from "@/components/ProjectFlowTab";
+import ProjectContentionGenerator from "@/components/ProjectContentionGenerator";
 import ProjectSpeechGenerator from "@/components/ProjectSpeechGenerator";
 import ResearchAgent from "@/components/ResearchAgent";
 import DocumentViewer from "@/components/DocumentViewer";
@@ -43,6 +44,7 @@ export default function ProjectDetail() {
   const [rebuttalLoading, setRebuttalLoading] = useState(false);
   const [rebuttals, setRebuttals] = useState([]);
   const [genOppLoading, setGenOppLoading] = useState(false);
+  const [showGen, setShowGen] = useState(false);
 
   const { data: project, isLoading: projLoading } = useQuery({
     queryKey: ['project', id],
@@ -466,7 +468,13 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
             conferenceContext={conferenceContext}
             onSaved={() => queryClient.invalidateQueries({ queryKey: ['project_other_documents', id] })}
           />
-          <ProjectFlowTab project={project} contentions={contentions} rebuttals={rebuttals} />
+          <ProjectFlowTab
+            project={project}
+            contentions={contentions}
+            rebuttals={rebuttals}
+            otherDocs={otherDocs}
+            onRefresh={() => queryClient.invalidateQueries({ queryKey: ['project_contentions', id] })}
+          />
         </div>
       )}
 
@@ -536,6 +544,27 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
       {/* Contentions tab */}
       {tab === "contentions" && (
         <div className="space-y-4">
+          {/* Contention Generator */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <button onClick={() => setShowGen(!showGen)} className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
+              <span className="flex items-center gap-2 font-bold text-slate-900 font-heading text-sm">
+                <Sparkles className="w-4 h-4 text-primary" /> Generate Contentions
+              </span>
+              {showGen ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+            </button>
+            {showGen && (
+              <div className="p-4 pt-0">
+                <ProjectContentionGenerator
+                  project={project}
+                  contentions={contentions}
+                  conferenceProfile={effectiveConference}
+                  aiMode={getActiveAiMode()}
+                  onSaved={() => queryClient.invalidateQueries({ queryKey: ['project_contentions', id] })}
+                />
+              </div>
+            )}
+          </div>
+
           {selectedIds.size > 0 && (
             <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5">
               <span className="text-sm text-blue-700 font-medium">{selectedIds.size} selected</span>
@@ -551,7 +580,9 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
             <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
               <BookOpen className="w-10 h-10 text-slate-200 mx-auto mb-3" />
               <p className="text-slate-400 text-sm">No contentions in this project yet.</p>
-              <p className="text-slate-300 text-xs mt-1">Generate contentions from Parliamentary or Public Forum and save them here.</p>
+              <Button variant="outline" size="sm" onClick={() => setShowGen(true)} className="mt-3 gap-1.5 text-xs">
+                <Sparkles className="w-3.5 h-3.5" /> Generate Contentions
+              </Button>
             </div>
           ) : contentions.map(c => (
             <div key={c.id} className={`bg-white rounded-2xl border shadow-sm p-5 transition-all ${selectedIds.has(c.id) ? "border-primary ring-1 ring-primary/20" : "border-slate-200"}`}>
