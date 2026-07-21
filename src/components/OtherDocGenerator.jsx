@@ -82,6 +82,8 @@ REQUIREMENTS:
 - Be specific, substantive, and practical — no placeholder text.
 - Write in a polished, confident tone suited to competitive debate / MUN / Congress preparation.
 - If the described document implies a known structure (e.g. a briefing memo, cross-examination prep sheet, flow template, judge adaptation guide, research summary, alliance map), follow that structure faithfully.
+- Open with a catchy, attention-grabbing hook if the document is speech-like or persuasive — a surprising statistic, a vivid scenario, a rhetorical question, or a bold statement.
+- End with a "## Key Takeaways" section containing 3-5 concise bullet points summarizing the key points of the document. These takeaways will appear at the bottom of the saved document.
 - Output ONLY the document content (with a clear title at the top). Do not add meta-commentary about the document.`;
 
     try {

@@ -14,6 +14,7 @@ export default function ProjectSpeechGenerator({ project, contentions, rebuttals
   const { toast } = useToast();
   const [minutes, setMinutes] = useState(7);
   const [tone, setTone] = useState("persuasive");
+  const [includeGreeting, setIncludeGreeting] = useState(true);
   const [loading, setLoading] = useState(false);
   const [speech, setSpeech] = useState("");
   const [saving, setSaving] = useState(false);
@@ -72,6 +73,19 @@ export default function ProjectSpeechGenerator({ project, contentions, rebuttals
     setSpeech("");
     try {
       const context = buildContext();
+      const isMUN = project?.format === "model_un";
+      const isCongress = project?.format === "model_congress";
+
+      const greetingInstruction = includeGreeting
+        ? (isMUN || isCongress
+            ? `Start with a formal greeting: "Honorable Chair, fellow delegates..." (or equivalent for the format).`
+            : `Start with a brief, professional greeting appropriate to the debate format.`)
+        : `Do NOT include any formal greeting, pleasantries, or "Honorable Chair" address. Skip straight to your hook — get to the point immediately.`;
+
+      const ctaInstruction = isMUN
+        ? `Always include a clear call to action (e.g., "I urge all delegates to vote in favor of this resolution," "I call upon this body to act..."). The speech must end with a direct call to action.`
+        : `Do NOT include a call to action, a "vote for me" appeal, or any legislative "I urge you to vote" language — this is a competitive debate, not a legislative session.`;
+
       const prompt = `You are an elite debate coach writing a complete, ready-to-deliver speech.
 
 PROJECT CONTEXT:
@@ -83,12 +97,16 @@ Tone: ${tone}.
 
 Requirements:
 - Write the ACTUAL speech text, ready to be read aloud — not an outline or instructions.
-- Structure: strong hook + state the resolution → contentions (with claim, warrant, impact, and cite evidence/research) → preempt and rebut likely opponent arguments → weighing → powerful conclusion with a call to vote ${project?.side || 'your side'}.
+- ${greetingInstruction}
+- Open with a CATCHY, attention-grabbing hook — a surprising statistic, a vivid scenario, a powerful rhetorical question, or a bold statement that immediately grabs the audience. Make the hook memorable and specific (not generic).
+- Structure: catchy hook + state the resolution → contentions (with claim, warrant, impact, and cite evidence/research) → preempt and rebut likely opponent arguments → weighing → powerful conclusion.
+- ${ctaInstruction}
 - Use the contentions, evidence, research facts, and prepared rebuttals above. Weave them in naturally.
 - Include brief [pause] or [transition] cues where helpful for delivery.
 - Stay within ${minutes} minutes when spoken at a normal pace (~130 words/minute). Aim for ~${Math.round(minutes * 130)} words.
 - Format with clear section headers (## Introduction, ## Contention 1, etc.) using Markdown.
-- After the speech, include a "## Sources" section listing any sources, facts, or evidence cited (if none, write "None cited").`;
+- After the speech, include a "## Key Takeaways" section with 3-5 concise bullet points summarizing the main arguments. These takeaways will appear at the bottom of the saved document.
+- After Key Takeaways, include a "## Sources" section listing any sources, facts, or evidence cited (if none, write "None cited").`;
 
       const res = await base44.integrations.Core.InvokeLLM({ prompt, add_context_from_internet: false });
       setSpeech(typeof res === 'string' ? res : JSON.stringify(res));
@@ -154,6 +172,11 @@ Requirements:
           </Button>
         </div>
       </div>
+
+      <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer select-none">
+        <input type="checkbox" checked={includeGreeting} onChange={e => setIncludeGreeting(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
+        Start with formal greeting ("Honorable Chair, fellow delegates…")
+      </label>
 
       {contentions.length === 0 && !agentResults && (
         <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-2">
