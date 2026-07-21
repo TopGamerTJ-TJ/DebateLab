@@ -17,6 +17,9 @@ export default function ProjectSpeechGenerator({ project, contentions, rebuttals
   const [tone, setTone] = useState("persuasive");
   const [includeGreeting, setIncludeGreeting] = useState(true);
   const [customPrompt, setCustomPrompt] = useState("");
+  const [contentionCount, setContentionCount] = useState("");
+  const [longConclusion, setLongConclusion] = useState(false);
+  const [includeCta, setIncludeCta] = useState(project?.format === "model_un");
   const [loading, setLoading] = useState(false);
   const [speech, setSpeech] = useState("");
   const [saving, setSaving] = useState(false);
@@ -84,9 +87,17 @@ export default function ProjectSpeechGenerator({ project, contentions, rebuttals
             : `Start with a brief, professional greeting appropriate to the debate format.`)
         : `Do NOT include any formal greeting, pleasantries, or "Honorable Chair" address. Skip straight to your hook — get to the point immediately.`;
 
-      const ctaInstruction = isMUN
-        ? `Always include a clear call to action (e.g., "I urge all delegates to vote in favor of this resolution," "I call upon this body to act..."). The speech must end with a direct call to action.`
-        : `Do NOT include a call to action, a "vote for me" appeal, or any legislative "I urge you to vote" language — this is a competitive debate, not a legislative session.`;
+      const ctaInstruction = includeCta
+        ? `Include a clear call to action (e.g., "I urge all delegates to vote in favor of this resolution," "I call upon this body to act..."). The speech must end with a direct call to action.`
+        : `Do NOT include a call to action, a "vote for me" appeal, or any legislative "I urge you to vote" language.`;
+
+      const contentionInstruction = contentionCount
+        ? `Structure the speech around exactly ${contentionCount} main point${contentionCount === "1" ? "" : "s"}/contention${contentionCount === "1" ? "" : "s"}. Give each its own section with full development (claim, warrant, impact, evidence).`
+        : `Structure the speech around a natural number of main points/contentions appropriate for the time limit.`;
+
+      const conclusionInstruction = longConclusion
+        ? `Write a LONG, powerful conclusion — restate key arguments, deliver a strong emotional appeal, and end memorably.`
+        : `Write a SHORT, punchy conclusion — 2-3 sentences that land the final blow and sit down. No rambling.`;
 
       const prompt = `You are an elite debate coach writing a complete, ready-to-deliver speech.
 
@@ -101,7 +112,9 @@ Requirements:
 - Write the ACTUAL speech text, ready to be read aloud — not an outline or instructions.
 - ${greetingInstruction}
 - Open with a CATCHY, attention-grabbing hook — a surprising statistic, a vivid scenario, a powerful rhetorical question, or a bold statement that immediately grabs the audience. Make the hook memorable and specific (not generic).
-- Structure: catchy hook + state the resolution → contentions (with claim, warrant, impact, and cite evidence/research) → preempt and rebut likely opponent arguments → weighing → powerful conclusion.
+- Structure: catchy hook + state the resolution → contentions (with claim, warrant, impact, and cite evidence/research) → preempt and rebut likely opponent arguments → weighing → conclusion.
+- ${contentionInstruction}
+- ${conclusionInstruction}
 - ${ctaInstruction}
 - Use the contentions, evidence, research facts, and prepared rebuttals above. Weave them in naturally.
 - Include brief [pause] or [transition] cues where helpful for delivery.
@@ -197,9 +210,27 @@ Pick 4-6 of the most relevant tips for THIS speech and format. For MUN/Congress,
         </div>
       </div>
 
+      <div className="grid sm:grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs font-medium text-slate-600 mb-1 block">Main points / contentions (goal)</label>
+          <input type="number" min={1} max={20} step={1} value={contentionCount} onChange={e => setContentionCount(e.target.value)} placeholder="Auto" className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm text-black" />
+        </div>
+        <div className="flex items-end">
+          <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer select-none pb-2">
+            <input type="checkbox" checked={longConclusion} onChange={e => setLongConclusion(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
+            Long conclusion
+          </label>
+        </div>
+      </div>
+
       <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer select-none">
         <input type="checkbox" checked={includeGreeting} onChange={e => setIncludeGreeting(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
         Start with formal greeting ("Honorable Chair, fellow delegates…")
+      </label>
+
+      <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer select-none">
+        <input type="checkbox" checked={includeCta} onChange={e => setIncludeCta(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
+        Include call to action
       </label>
 
       <div>
