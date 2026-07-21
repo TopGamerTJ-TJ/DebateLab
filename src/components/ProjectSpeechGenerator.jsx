@@ -2,6 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, Copy, Save, Mic } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from "react-markdown";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -15,6 +16,7 @@ export default function ProjectSpeechGenerator({ project, contentions, rebuttals
   const [minutes, setMinutes] = useState(7);
   const [tone, setTone] = useState("persuasive");
   const [includeGreeting, setIncludeGreeting] = useState(true);
+  const [customPrompt, setCustomPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [speech, setSpeech] = useState("");
   const [saving, setSaving] = useState(false);
@@ -94,7 +96,7 @@ ${context}
 Write a full ${minutes}-minute speech (approximately ${Math.round(minutes * 130)} words) for the ${project?.side || 'assigned'} side.
 
 Tone: ${tone}.
-
+${customPrompt.trim() ? `\nADDITIONAL INSTRUCTIONS (what to write about):\n${customPrompt.trim()}\n` : ""}
 Requirements:
 - Write the ACTUAL speech text, ready to be read aloud — not an outline or instructions.
 - ${greetingInstruction}
@@ -176,7 +178,7 @@ Pick 4-6 of the most relevant tips for THIS speech and format. For MUN/Congress,
       <div className="grid sm:grid-cols-3 gap-3">
         <div>
           <label className="text-xs font-medium text-slate-600 mb-1 block">Speech length</label>
-          <input type="number" min={0.5} max={30} step={0.5} value={minutes} onChange={e => setMinutes(Math.min(30, Math.max(0.5, +e.target.value || 0.5)))} className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm text-black" />
+          <input type="number" min={0.05} max={30} step={0.05} value={minutes} onChange={e => setMinutes(Math.min(30, Math.max(0.05, +e.target.value || 0.05)))} className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm text-black" />
         </div>
         <div>
           <label className="text-xs font-medium text-slate-600 mb-1 block">Tone</label>
@@ -199,6 +201,17 @@ Pick 4-6 of the most relevant tips for THIS speech and format. For MUN/Congress,
         <input type="checkbox" checked={includeGreeting} onChange={e => setIncludeGreeting(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
         Start with formal greeting ("Honorable Chair, fellow delegates…")
       </label>
+
+      <div>
+        <label className="text-xs font-medium text-slate-600 mb-1 block">What to write about (optional)</label>
+        <Textarea
+          value={customPrompt}
+          onChange={e => setCustomPrompt(e.target.value)}
+          placeholder="e.g., Focus on the economic argument and preempt the opponent's climate counterplan, emphasize our second contention, keep it simple for a lay judge..."
+          rows={2}
+          className="resize-none text-sm"
+        />
+      </div>
 
       {contentions.length === 0 && !agentResults && (
         <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-2">

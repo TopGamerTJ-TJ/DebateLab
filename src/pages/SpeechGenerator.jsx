@@ -185,7 +185,7 @@ REQUIREMENTS:
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
                 <label className="text-xs font-medium text-slate-600 mb-1 flex items-center gap-1"><Clock className="w-3 h-3" /> Minutes</label>
-                <input type="number" min={0.5} max={60} step={0.5} value={minutes} onChange={e => setMinutes(Math.min(60, Math.max(0.5, +e.target.value || 0.5)))} className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm text-black" />
+                <input type="number" min={0.05} max={60} step={0.05} value={minutes} onChange={e => setMinutes(Math.min(60, Math.max(0.05, +e.target.value || 0.05)))} className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm text-black" />
               </div>
               <div>
                 <label className="text-xs font-medium text-slate-600 mb-1 block">Tone</label>
