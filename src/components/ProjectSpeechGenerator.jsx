@@ -106,7 +106,29 @@ Requirements:
 - Stay within ${minutes} minutes when spoken at a normal pace (~130 words/minute). Aim for ~${Math.round(minutes * 130)} words.
 - Format with clear section headers (## Introduction, ## Contention 1, etc.) using Markdown.
 - After the speech, include a "## Key Takeaways" section with 3-5 concise bullet points summarizing the main arguments. These takeaways will appear at the bottom of the saved document.
-- After Key Takeaways, include a "## Sources" section listing any sources, facts, or evidence cited (if none, write "None cited").`;
+- After Key Takeaways, include a "## Sources" section listing any sources, facts, or evidence cited (if none, write "None cited").
+- After Sources, include a "## Delivery Tips" section with practical speaking advice drawn from this guide, adapted to the speech format:
+
+DELIVERY GUIDE (draw general advice for all formats, MUN-specific for MUN/Congress):
+Sight (Body Language):
+- Maintain eye contact to appear confident; hold your notes low and use bullet points, glancing briefly.
+- Look at the back of the room or at people's foreheads if direct eye contact is difficult; alternate eye contact between people on opposite sides.
+- Keep hands from becoming a distraction — rest at sides, clasp together, or hold paper against body.
+- Useful gestures: Merkel Diamond, counting gestures (first, second, third), Obama Point, palms up to appear welcoming, palms down to show control.
+- Stand still whenever possible; keep feet shoulder-width apart; avoid shifting weight. If you tend to move, imagine a triangle on the floor — move to a different corner only between sentences.
+
+Sound (Voice):
+- Pace: pause naturally at commas and periods; take a breath instead of using filler words ("um," "like"); become comfortable with silence; use dramatic pauses for emphasis.
+- Volume: speak at about twice your normal conversational volume; practice proper breathing to project.
+- Tone: avoid sounding monotone; raise pitch when giving details; lower pitch when emphasizing key points; vary pitch to keep listeners engaged; speak with genuine enthusiasm; use your opening hook to experiment with vocal variety.
+
+Improvisation:
+- Essential for thinking on your feet during moderated caucuses, building alliances during unmoderated caucuses, and developing strong impromptu speaking skills.
+
+Moderated Caucus (MUN/Congress only):
+- Break the overall topic into smaller, manageable issues; present your country's policy on a specific issue; propose realistic solutions; listen to other delegates and build agreement; suggest how agreed solutions can be incorporated into draft resolutions.
+
+Pick 4-6 of the most relevant tips for THIS speech and format. For MUN/Congress, include moderated caucus and improvisation tips. For other debate formats, focus on the general sight/sound advice. Format as concise bullet points.`;
 
       const res = await base44.integrations.Core.InvokeLLM({ prompt, add_context_from_internet: false });
       setSpeech(typeof res === 'string' ? res : JSON.stringify(res));
