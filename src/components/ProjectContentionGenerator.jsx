@@ -273,7 +273,7 @@ export default function ProjectContentionGenerator({ project, contentions, confe
           </div>
           {generated.map((c, i) => (
             <div key={i} className="relative">
-              <ContentionCard contention={c} onSave={() => saveOne(c)} saving={false} />
+              <ContentionCard contention={c} onSave={() => saveOne(c)} saving={false} defaultExpanded />
             </div>
           ))}
         </div>

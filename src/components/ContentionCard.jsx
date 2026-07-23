@@ -11,8 +11,8 @@ const Section = ({ label, children, color = "bg-slate-50" }) => (
   </div>
 );
 
-export default function ContentionCard({ contention: c, onSave, saving }) {
-  const [expanded, setExpanded] = useState(false);
+export default function ContentionCard({ contention: c, onSave, saving, defaultExpanded = false }) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const { toast } = useToast();
 
   const handleShare = async (e) => {

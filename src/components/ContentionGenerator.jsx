@@ -298,7 +298,7 @@ export default function ContentionGenerator({ format = "parliamentary" }) {
                 </Button>
               </div>
               {generatedContentions.map((c, i) => (
-                <ContentionCard key={i} contention={c} onSave={() => handleSingleSave(c)} saving={false} />
+                <ContentionCard key={i} contention={c} onSave={() => handleSingleSave(c)} saving={false} defaultExpanded />
               ))}
             </div>
           )}
