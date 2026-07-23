@@ -188,7 +188,7 @@ export default function Projects() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1,2,3].map(i => <div key={i} className="h-40 bg-slate-100 rounded-2xl animate-pulse" />)}
         </div>
-      ) : projects.length === 0 && folders.length === 0 ? (
+      ) : visibleProjects.length === 0 && folders.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
           <Folder className="w-12 h-12 text-slate-200 mx-auto mb-4" />
           <h3 className="font-bold text-slate-700 font-heading mb-2">No projects yet</h3>

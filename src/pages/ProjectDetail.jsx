@@ -218,7 +218,7 @@ export default function ProjectDetail() {
 
   const archiveProject = useMutation({
     mutationFn: (val) => base44.entities.Project.update(id, { isArchived: val }),
-    onSuccess: (_, val) => { queryClient.invalidateQueries({ queryKey: ['projects'] }); toast({ title: val ? "Project archived" : "Project unarchived" }); }
+    onSuccess: (_, val) => { queryClient.invalidateQueries({ queryKey: ['projects'] }); queryClient.invalidateQueries({ queryKey: ['project', id] }); toast({ title: val ? "Project archived" : "Project unarchived" }); }
   });
 
   const updateProject = useMutation({
