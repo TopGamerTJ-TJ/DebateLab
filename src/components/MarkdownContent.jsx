@@ -6,7 +6,7 @@ const components = {
   h3: ({ node, ...p }) => <h3 className="text-base font-bold text-slate-900 mt-4 mb-1.5 font-heading" {...p} />,
   h4: ({ node, ...p }) => <h4 className="text-sm font-bold text-slate-900 mt-3 mb-1 font-heading" {...p} />,
   h5: ({ node, ...p }) => <h5 className="text-xs font-bold text-slate-900 mt-2 mb-1 font-heading uppercase tracking-wide" {...p} />,
-  p: ({ node, ...p }) => <p className="text-sm text-slate-700 leading-relaxed my-2" {...p} />,
+  p: ({ node, ...p }) => <p className="text-sm text-slate-700 leading-relaxed my-2 whitespace-pre-wrap break-words" {...p} />,
   ul: ({ node, ...p }) => <ul className="list-disc pl-5 my-2 space-y-1 text-sm text-slate-700" {...p} />,
   ol: ({ node, ...p }) => <ol className="list-decimal pl-5 my-2 space-y-1 text-sm text-slate-700" {...p} />,
   li: ({ node, ...p }) => <li className="text-sm text-slate-700 leading-relaxed" {...p} />,
@@ -26,7 +26,7 @@ export default function MarkdownContent({ content, className = "" }) {
   if (!content) return null;
   return (
     <div className={className}>
-      <ReactMarkdown components={components}>{content}</ReactMarkdown>
+      <ReactMarkdown components={components} breaks>{content}</ReactMarkdown>
     </div>
   );
 }
