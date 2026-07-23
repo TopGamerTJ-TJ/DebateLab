@@ -112,6 +112,7 @@ Requirements:
 - Write the ACTUAL speech text, ready to be read aloud — not an outline or instructions.
 - ${greetingInstruction}
 - Open with a CATCHY, attention-grabbing hook — a surprising statistic, a vivid scenario, a powerful rhetorical question, or a bold statement that immediately grabs the audience. Make the hook memorable and specific (not generic).
+- ORIGINALITY IS CRITICAL: Every opening, hook, conclusion, transition, and rhetorical device must be COMPLETELY ORIGINAL and unique to this speech. Do NOT reuse any phrases, sentence structures, or rhetorical patterns that you've generated before. Each section must sound fresh, distinct, and natural — never formulaic, generic, or templated. Vary your word choice, sentence length, and rhetorical approach throughout. If you find yourself reaching for a cliché or a familiar template phrase, STOP and write something completely different. The opening, the conclusion, and every contention should feel like it was written from scratch by a human, not assembled from a template.
 - Structure: catchy hook + state the resolution → contentions (with claim, warrant, impact, and cite evidence/research) → preempt and rebut likely opponent arguments → weighing → conclusion.
 - ${contentionInstruction}
 - ${conclusionInstruction}

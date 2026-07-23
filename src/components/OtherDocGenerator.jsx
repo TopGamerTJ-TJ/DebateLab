@@ -83,6 +83,7 @@ REQUIREMENTS:
 - Write in a polished, confident tone suited to competitive debate / MUN / Congress preparation.
 - If the described document implies a known structure (e.g. a briefing memo, cross-examination prep sheet, flow template, judge adaptation guide, research summary, alliance map), follow that structure faithfully.
 - Open with a catchy, attention-grabbing hook if the document is speech-like or persuasive — a surprising statistic, a vivid scenario, a rhetorical question, or a bold statement.
+- ORIGINALITY IS CRITICAL: Every opening, hook, conclusion, and piece of content must be COMPLETELY ORIGINAL and unique to this document. Do NOT reuse any phrases, sentence structures, or rhetorical patterns that you've generated before. Each section must sound fresh, distinct, and natural — never formulaic, generic, or templated. Vary your word choice, sentence length, and rhetorical approach throughout. If you find yourself reaching for a cliché or a familiar template phrase, STOP and write something completely different.
 - End with a "## Key Takeaways" section containing 3-5 concise bullet points summarizing the key points of the document. These takeaways will appear at the bottom of the saved document.
 - Output ONLY the document content (with a clear title at the top). Do not add meta-commentary about the document.`;
 

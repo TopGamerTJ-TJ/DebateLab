@@ -108,6 +108,7 @@ REQUIREMENTS:
 - If contentions or research are provided, weave them in naturally with claim, warrant, and impact.
 - Format with clear section headers using Markdown (## Introduction, ## Main Point, etc.).
 - End with a powerful, memorable conclusion.
+- ORIGINALITY IS CRITICAL: Every opening, hook, conclusion, transition, and rhetorical device must be COMPLETELY ORIGINAL and unique to this speech. Do NOT reuse any phrases, sentence structures, or rhetorical patterns that you've generated before. Each section must sound fresh, distinct, and natural — never formulaic, generic, or templated. Vary your word choice, sentence length, and rhetorical approach throughout. If you find yourself reaching for a cliché or a familiar template phrase, STOP and write something completely different. The opening, the conclusion, and every main point should feel like it was written from scratch by a human, not assembled from a template.
 - After the speech, include a "## Sources" section listing any sources, facts, or references used (if none, write "None cited").`;
 
       const res = await base44.integrations.Core.InvokeLLM({ prompt, add_context_from_internet: false });
