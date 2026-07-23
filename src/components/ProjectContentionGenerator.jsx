@@ -55,6 +55,7 @@ ${form.context ? `\nAdditional context from the debater (prioritize this): ${for
 ${conferenceText ? `\n${conferenceText}\nAdhere to the conference rules/context above.\n` : ""}
 Create comprehensive, tournament-quality contentions with real academic evidence, statistics, and expert citations. Include realistic source URLs. Make each contention distinct and strategically strong.
 - ORIGINALITY IS CRITICAL: Every contention must be COMPLETELY ORIGINAL and unique. Do NOT reuse any phrases, argument structures, framing, or rhetorical patterns across contentions or from previous outputs. Each contention should feel like it was written from scratch by a human, never formulaic, generic, or templated. Vary your word choice, sentence structure, and strategic approach for each one.
+- STAY ON TOPIC: Every contention must directly address the specific ${motionLabel} and side provided. Do NOT drift into generic debate arguments, tangential points, or broad claims that aren't grounded in the specific resolution. If an argument could apply to any debate on any topic, rewrite it to be specific to THIS resolution. Use real evidence and specific reasoning tied to the actual topic — don't fall back on generic-sounding claims.
 
 Return a JSON object with a "contentions" array. Each must include: title, claim, warrant, impact, evidence (array of {text, source, sourceUrl}), possibleRebuttals, rebuttalResponses, crossfireQuestions, crossfireAnswers, strategicNotes.`;
 
