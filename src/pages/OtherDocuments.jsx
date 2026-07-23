@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import OtherDocGenerator from "@/components/OtherDocGenerator";
 import QnAPrepGenerator from "@/components/QnAPrepGenerator";
+import ResolutionGenerator from "@/components/ResolutionGenerator";
 import DocumentViewer from "@/components/DocumentViewer";
 import AnimatedPage from "@/components/AnimatedPage";
 
@@ -62,6 +63,10 @@ export default function OtherDocuments() {
         <div className="grid lg:grid-cols-2 gap-6 mb-6">
           <OtherDocGenerator />
           <QnAPrepGenerator onSaved={() => queryClient.invalidateQueries({ queryKey: ['other_documents'] })} />
+        </div>
+
+        <div className="mb-6">
+          <ResolutionGenerator onSaved={() => queryClient.invalidateQueries({ queryKey: ['other_documents'] })} />
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
