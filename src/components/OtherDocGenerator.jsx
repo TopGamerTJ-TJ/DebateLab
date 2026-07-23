@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Loader2, Save, Folder, FileText } from "lucide-react";
+import { Sparkles, Loader2, Save, Folder, FileText, FilePlus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 /**
@@ -57,6 +57,14 @@ export default function OtherDocGenerator({ projectId, onSaved }) {
     },
     enabled: !projectId,
   });
+
+  const createBlank = () => {
+    setDescription("");
+    setContext("");
+    setDocLabel("");
+    setTitle("Untitled Document");
+    setContent("");
+  };
 
   const generate = async () => {
     if (!description.trim()) {
@@ -195,10 +203,16 @@ REQUIREMENTS:
         </div>
       </div>
 
-      <Button onClick={generate} disabled={generating} className="w-full h-11 gap-2 font-semibold bg-violet-600 hover:bg-violet-700">
-        {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-        {generating ? "Generating document..." : "Generate Document"}
-      </Button>
+      <div className="flex gap-2">
+        <Button onClick={generate} disabled={generating} className="flex-1 h-11 gap-2 font-semibold bg-violet-600 hover:bg-violet-700">
+          {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+          {generating ? "Generating..." : "Generate with AI"}
+        </Button>
+        <Button onClick={createBlank} variant="outline" className="flex-1 h-11 gap-2 font-semibold border-violet-200 text-violet-700 hover:bg-violet-50">
+          <FilePlus className="w-4 h-4" />
+          Blank Doc
+        </Button>
+      </div>
       {generating && <p className="text-xs text-center text-slate-400">Using Claude AI for highest quality output...</p>}
 
       {(title || content) && (
