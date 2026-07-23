@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +11,7 @@ import ReactMarkdown from "react-markdown";
 
 export default function QnAPrepGenerator({ projectId, contentions = [], otherDocs = [], onSaved }) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [mode, setMode] = useState("paste"); // "paste" | "select"
   const [pastedText, setPastedText] = useState("");
   const [selectedDocId, setSelectedDocId] = useState("");
@@ -95,7 +96,10 @@ IMPORTANT:
       });
     },
     onSuccess: () => {
+      const saveProjectId = projectId || pickedProjectId || "";
       toast({ title: "Q&A prep saved!" });
+      queryClient.invalidateQueries({ queryKey: ['other_documents'] });
+      if (saveProjectId) queryClient.invalidateQueries({ queryKey: ['project_other_documents', saveProjectId] });
       setPrep("");
       setTitle("");
       setPastedText("");
@@ -207,9 +211,9 @@ IMPORTANT:
             </div>
           )}
 
-          <Button onClick={handleSave} disabled={saving || !prep.trim()} className="w-full gap-2 bg-amber-600 hover:bg-amber-700">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            {saving ? "Saving..." : projectId ? "Save to This Project" : "Save Prep Sheet"}
+          <Button onClick={handleSave} disabled={save.isPending || !prep.trim()} className="w-full gap-2 bg-amber-600 hover:bg-amber-700">
+            {save.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            {save.isPending ? "Saving..." : projectId ? "Save to This Project" : "Save Prep Sheet"}
           </Button>
         </div>
       )}

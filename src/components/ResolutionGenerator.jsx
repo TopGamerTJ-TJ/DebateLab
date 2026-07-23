@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +17,7 @@ const getInitialFields = (preset) => {
 
 export default function ResolutionGenerator({ projectId, onSaved }) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedPresetId, setSelectedPresetId] = useState('resolutions');
   const [fieldValues, setFieldValues] = useState(() => getInitialFields(PRESETS[0]));
   const [results, setResults] = useState("");
@@ -89,8 +90,11 @@ export default function ResolutionGenerator({ projectId, onSaved }) {
       });
     },
     onSuccess: (_, { idx }) => {
+      const saveProjectId = projectId || pickedProjectId || "";
       setSavedIdxs(prev => new Set(prev).add(idx));
       toast({ title: "Saved to documents!" });
+      queryClient.invalidateQueries({ queryKey: ['other_documents'] });
+      if (saveProjectId) queryClient.invalidateQueries({ queryKey: ['project_other_documents', saveProjectId] });
       if (onSaved) onSaved();
     },
     onError: () => toast({ title: "Could not save", variant: "destructive" }),
