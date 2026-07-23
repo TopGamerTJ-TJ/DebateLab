@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, ChevronDown, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText, Users, Activity, Check, Copy, ScrollText, Lightbulb, ExternalLink, Scale, Wand2, FileDown, Mic } from "lucide-react";
+import { ArrowLeft, BookOpen, MessageSquare, StickyNote, Trash2, Plus, ChevronLeft, ChevronRight, ChevronDown, X, Maximize2, Sparkles, Loader2, CheckSquare, Square, Globe, Archive, ArchiveRestore, ShieldAlert, FileText, Users, Activity, Check, Copy, ScrollText, Lightbulb, ExternalLink, Scale, Wand2, FileDown, Mic, HelpCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/AuthContext";
 import ReactMarkdown from "react-markdown";
@@ -13,6 +13,7 @@ import ProjectSuggestionsWidget from "@/components/ProjectSuggestionsWidget";
 import AnimatedPage from "@/components/AnimatedPage";
 import ProjectAIChats from "@/components/ProjectAIChats";
 import OtherDocGenerator from "@/components/OtherDocGenerator";
+import QnAPrepGenerator from "@/components/QnAPrepGenerator";
 import ProjectContextCard from "@/components/ProjectContextCard";
 import ProjectFlowTab from "@/components/ProjectFlowTab";
 import ProjectContentionGenerator from "@/components/ProjectContentionGenerator";
@@ -373,6 +374,7 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
     { id: "flow", icon: ScrollText, label: "Flow" },
     { id: "speech", icon: Mic, label: "Speech" },
     { id: "rebuttals", icon: ShieldAlert, label: "Rebuttal Hub" },
+    { id: "qna", icon: HelpCircle, label: "Q&A Prep" },
     { id: "notes", icon: StickyNote, label: "Notes" },
     { id: "chat", icon: MessageSquare, label: "AI Chats" },
     { id: "agent", icon: Globe, label: "Research Agent" },
@@ -612,6 +614,16 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
             </div>
           ))}
         </div>
+      )}
+
+      {/* Q&A Prep tab */}
+      {tab === "qna" && (
+        <QnAPrepGenerator
+          projectId={id}
+          contentions={contentions}
+          otherDocs={otherDocs}
+          onSaved={() => queryClient.invalidateQueries({ queryKey: ['project_other_documents', id] })}
+        />
       )}
 
       {/* Notes tab */}
