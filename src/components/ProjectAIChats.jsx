@@ -3,13 +3,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Loader2, MessageSquare, ChevronLeft, Plus, Brain, Globe, Trash2 } from "lucide-react";
+import { Sparkles, Loader2, MessageSquare, ChevronLeft, Plus, Brain, Globe, Trash2, FileDown } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 import ReactMarkdown from "react-markdown";
+import { MUN_GUIDE_SUMMARY } from "@/lib/munGuide";
 
 export default function ProjectAIChats({ project, contentions, conferenceContext = "" }) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [sessionId, setSessionId] = useState("");
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
@@ -71,6 +74,9 @@ ${context || 'No contentions yet'}
 Conversation history:
 ${currentMessages.map(m => `${m.role === 'user' ? 'Student' : 'Coach'}: ${m.content}`).join('\n')}
 Provide specific, actionable coaching advice.`;
+        if (project.format === 'model_un') {
+          promptText += `\n\nYou are coaching a Model UN delegate. Use this MUN mastery framework to ground your advice:\n\n${MUN_GUIDE_SUMMARY}`;
+        }
         if (conferenceContext) promptText += `\n\n${conferenceContext}\nFollow the conference rules/context above.`;
       } else {
         const context = [project.resolution, project.format, project.side].filter(Boolean).join(', ');
@@ -88,6 +94,23 @@ Provide a helpful, accurate response.`;
       console.error(e);
     }
     setChatLoading(false);
+  };
+
+  const saveTranscript = async () => {
+    if (messages.length === 0) return;
+    const transcript = messages.map(m => `**${m.role === 'user' ? 'Student' : 'Coach'}:**\n\n${m.content}`).join('\n\n---\n\n');
+    const content = `# Chat Transcript: ${currentSession?.title || 'AI Chat'}\n\nProject: ${project.name}\nDate: ${new Date().toLocaleString()}\n\n---\n\n${transcript}`;
+    await base44.entities.OtherDocument.create({
+      ownerUserId: user?.id,
+      title: `${currentSession?.title || 'AI Chat'} — Transcript`,
+      docLabel: "Chat Transcript",
+      description: `Saved transcript from the AI Chats tab of "${project.name}".`,
+      content,
+      projectId: project.id,
+    });
+    queryClient.invalidateQueries({ queryKey: ['project_other_documents', project.id] });
+    queryClient.invalidateQueries({ queryKey: ['other_documents'] });
+    toast({ title: "Chat saved as a document!" });
   };
 
   useEffect(() => { chatRef.current?.scrollTo(0, chatRef.current.scrollHeight); }, [messages, chatLoading]);
@@ -148,6 +171,9 @@ Provide a helpful, accurate response.`;
           </h3>
           <p className="text-xs text-slate-400 truncate">Tailored to "{project.name}"</p>
         </div>
+        <Button variant="outline" size="sm" onClick={saveTranscript} disabled={messages.length === 0} className="gap-1.5 text-xs shrink-0">
+          <FileDown className="w-3.5 h-3.5" /> Save as Doc
+        </Button>
       </div>
       <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 && (

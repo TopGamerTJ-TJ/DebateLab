@@ -18,6 +18,7 @@ import ProjectContextCard from "@/components/ProjectContextCard";
 import ProjectFlowTab from "@/components/ProjectFlowTab";
 import ProjectContentionGenerator from "@/components/ProjectContentionGenerator";
 import ProjectSpeechGenerator from "@/components/ProjectSpeechGenerator";
+import FeedbackGenerator from "@/components/FeedbackGenerator";
 import ResearchAgent from "@/components/ResearchAgent";
 import DocumentViewer from "@/components/DocumentViewer";
 import ConferenceLinkSelect from "@/components/ConferenceLinkSelect";
@@ -375,6 +376,7 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
     { id: "speech", icon: Mic, label: "Speech" },
     { id: "rebuttals", icon: ShieldAlert, label: "Rebuttal Hub" },
     { id: "qna", icon: HelpCircle, label: "Q&A Prep" },
+    { id: "feedback", icon: Lightbulb, label: "Feedback" },
     { id: "notes", icon: StickyNote, label: "Notes" },
     { id: "chat", icon: MessageSquare, label: "AI Chats" },
     { id: "agent", icon: Globe, label: "Research Agent" },
@@ -622,6 +624,15 @@ Generate 2-3 strong, evidence-backed rebuttals to their arguments. Format as a c
           projectId={id}
           contentions={contentions}
           otherDocs={otherDocs}
+          onSaved={() => queryClient.invalidateQueries({ queryKey: ['project_other_documents', id] })}
+        />
+      )}
+
+      {/* Feedback tab */}
+      {tab === "feedback" && (
+        <FeedbackGenerator
+          project={project}
+          documents={otherDocs}
           onSaved={() => queryClient.invalidateQueries({ queryKey: ['project_other_documents', id] })}
         />
       )}

@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 import AdminPanel from "@/components/AdminPanel";
 import ContactForm from "@/components/ContactForm";
+import MUNKnowledgeHub from "@/components/MUNKnowledgeHub";
 import AppStoreBadge from "@/components/AppStoreBadge";
 import { appConfig } from "@/lib/app-config";
 import { isNativeApp } from "@/lib/platform";
@@ -449,6 +450,8 @@ export default function ProfilePage() {
           />
         </div>
       )}
+
+      <MUNKnowledgeHub />
 
       {/* Contact form on all subpages */}
       <ContactForm />

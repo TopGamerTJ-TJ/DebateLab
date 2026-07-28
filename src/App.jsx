@@ -47,6 +47,7 @@ import MockCommittee from './pages/MockCommittee';
 import OtherDocuments from './pages/OtherDocuments';
 import Research from './pages/Research';
 import SpeechGenerator from './pages/SpeechGenerator';
+import Feedback from './pages/Feedback';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -138,6 +139,7 @@ const AuthenticatedApp = () => {
           <Route path="/other-documents" element={<OtherDocuments />} />
           <Route path="/research" element={<Research />} />
           <Route path="/speech-generator" element={<SpeechGenerator />} />
+          <Route path="/feedback" element={<Feedback />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
