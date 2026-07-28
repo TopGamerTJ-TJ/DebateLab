@@ -5,6 +5,7 @@ import { Sparkles, Loader2, Copy, Save, Mic } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from "react-markdown";
 import { useToast } from "@/components/ui/use-toast";
+import { extractHooksAndCtas, buildAntiRepetitionText } from "@/lib/hookCtaUtils";
 
 /**
  * Generates a full written speech from ALL project info:
@@ -73,6 +74,11 @@ export default function ProjectSpeechGenerator({ project, contentions, rebuttals
     return parts.join("\n");
   };
 
+  const buildAntiRepetition = () => {
+    const { hooks, ctas } = extractHooksAndCtas(otherDocs);
+    return buildAntiRepetitionText(hooks, ctas);
+  };
+
   const generate = async () => {
     setLoading(true);
     setSpeech("");
@@ -99,11 +105,13 @@ export default function ProjectSpeechGenerator({ project, contentions, rebuttals
         ? `Write a LONG, powerful conclusion — restate key arguments, deliver a strong emotional appeal, and end memorably.`
         : `Write a SHORT, punchy conclusion — 2-3 sentences that land the final blow and sit down. No rambling.`;
 
+      const antiRepetition = buildAntiRepetition();
+
       const prompt = `You are an elite debate coach writing a complete, ready-to-deliver speech.
 
 PROJECT CONTEXT:
 ${context}
-
+${antiRepetition ? `\n${antiRepetition}\n` : ""}
 Write a full ${minutes}-minute speech (approximately ${Math.round(minutes * 130)} words) for the ${project?.side || 'assigned'} side.
 
 Tone: ${tone}.

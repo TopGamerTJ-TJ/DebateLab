@@ -9,6 +9,7 @@ import ReactMarkdown from "react-markdown";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/AuthContext";
 import SaveGeneratedDialog from "@/components/SaveGeneratedDialog";
+import { extractHooksAndCtas, buildAntiRepetitionText } from "@/lib/hookCtaUtils";
 
 const TONES = ["Persuasive", "Conversational", "Formal", "Aggressive", "Inspirational", "Analytical", "Passionate", "Neutral", "Humorous"];
 const SPEECH_TYPES = ["Opening Statement", "Closing Argument", "Constructive Speech", "Rebuttal Speech", "Cross-Examination Prep", "Position Speech", "Committee Speech", "Keynote Address", "TED-style Talk", "Commencement", "Impromptu", "Custom"];
@@ -44,6 +45,12 @@ export default function SpeechGenerator() {
   const { data: projectContentions = [] } = useQuery({
     queryKey: ['speech_contentions', selectedProjectId],
     queryFn: () => selectedProjectId ? base44.entities.Contention.filter({ projectId: selectedProjectId }, 'created_date', 50) : [],
+    enabled: !!selectedProjectId
+  });
+
+  const { data: projectDocs = [] } = useQuery({
+    queryKey: ['speech_project_docs', selectedProjectId],
+    queryFn: () => selectedProjectId ? base44.entities.OtherDocument.filter({ projectId: selectedProjectId }, '-created_date', 30) : [],
     enabled: !!selectedProjectId
   });
 
@@ -86,10 +93,13 @@ export default function SpeechGenerator() {
       const context = buildContext();
       const wordTarget = Math.round(minutes * 130);
 
+      const { hooks, ctas } = extractHooksAndCtas(projectDocs);
+      const antiRepetition = buildAntiRepetitionText(hooks, ctas);
+
       const prompt = `You are an elite speechwriter and debate coach. Write a complete, ready-to-deliver speech.
 
 ${context}
-
+${antiRepetition ? `\n${antiRepetition}\n` : ""}
 SPEECH PARAMETERS:
 - Length: ${minutes} minutes (approximately ${wordTarget} words)
 - Tone: ${tone}

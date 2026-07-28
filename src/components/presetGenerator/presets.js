@@ -1,7 +1,9 @@
 import {
   ScrollText, Globe, Landmark, Gavel, FileText,
-  MessageSquare, FileCheck, Mic
+  MessageSquare, FileCheck, Mic, AlertTriangle
 } from "lucide-react";
+
+const ANTI_REPETITION_SPEECH = `\n- ANTI-REPETITION: Never reuse the same hook (opening device) or call to action (closing appeal) that has appeared in any other speech in this project. Each hook must use a completely different rhetorical device (statistic, anecdote, question, scenario, quote) and each call to action must use different language and framing. Vary your openings and closings entirely every single time.`;
 
 // Each preset defines a document type users can generate.
 // Fields are dynamic — the UI renders them based on type (text/textarea/select).
@@ -160,7 +162,7 @@ Tone: formal, diplomatic, persuasive. Write as if speaking aloud.
 
 IMPORTANT:
 - ORIGINALITY: Write a genuine, specific speech — not generic filler.
-- STAY ON TOPIC: Everything must directly relate to "${f.topic}".`,
+- STAY ON TOPIC: Everything must directly relate to "${f.topic}".${ANTI_REPETITION_SPEECH}`,
     parseItems: (text) => [text.trim()],
     cleanItem: (text) => text.trim(),
     titleFromItem: (text, f) => `Opening Speech: ${f.country} — ${f.topic}`.slice(0, 120),
@@ -201,6 +203,88 @@ IMPORTANT:
     parseItems: (text) => [text.trim()],
     cleanItem: (text) => text.trim(),
     titleFromItem: (text, f) => `Working Paper: ${f.topic}`.slice(0, 120),
+  },
+  {
+    id: 'mun_moderated_caucus',
+    category: 'MUN',
+    label: 'Moderated Caucus Speech',
+    icon: Mic,
+    docLabel: 'MUN Speech',
+    color: 'emerald',
+    description: 'Short focused speech for a moderated caucus (45-60 seconds)',
+    multi: false,
+    fields: [
+      { key: 'topic', label: 'Overall topic', type: 'text', placeholder: 'e.g. Global food security', required: true },
+      { key: 'subTopic', label: 'Sub-topic / caucus focus', type: 'text', placeholder: 'e.g. Sustainable agriculture in Sub-Saharan Africa', required: true },
+      { key: 'country', label: 'Your country', type: 'text', placeholder: 'e.g. Kenya', required: true },
+      { key: 'committee', label: 'Committee', type: 'text', placeholder: 'e.g. FAO' },
+      { key: 'stance', label: 'Your position / proposed solution', type: 'textarea', placeholder: 'What solution or point do you want to advocate?' },
+    ],
+    buildPrompt: (f) => `You are an expert Model UN delegate writing a moderated caucus speech.
+
+Country: ${f.country}
+${f.committee ? `Committee: ${f.committee}` : ''}
+Overall topic: "${f.topic}"
+Caucus sub-topic: "${f.subTopic}"
+${f.stance ? `Key message: ${f.stance}` : ''}
+
+Write a 45-60 second moderated caucus speech (approx. 120-180 words). This is NOT a full opening speech — it's a focused, punchy speech on ONE specific sub-topic.
+
+Structure:
+1. **Hook** — Open with a striking fact or brief anecdote about THIS sub-topic (not the overall topic)
+2. **Country position** — State ${f.country}'s stance on this specific issue clearly and concisely
+3. **Proposed solution** — Offer one concrete, realistic solution or proposal
+4. **Call to action** — End with a brief appeal to fellow delegates to support this approach
+
+Tone: concise, assertive, diplomatic. Get straight to the point — moderated caucus speeches are short.
+
+IMPORTANT:
+- ORIGINALITY: Write a genuine, specific speech — not generic filler.
+- STAY ON TOPIC: Everything must directly relate to "${f.subTopic}".${ANTI_REPETITION_SPEECH}`,
+    parseItems: (text) => [text.trim()],
+    cleanItem: (text) => text.trim(),
+    titleFromItem: (text, f) => `Mod Caucus: ${f.country} — ${f.subTopic}`.slice(0, 120),
+  },
+  {
+    id: 'mun_crisis_directive',
+    category: 'MUN',
+    label: 'Crisis Directive',
+    icon: AlertTriangle,
+    docLabel: 'Crisis Directive',
+    color: 'emerald',
+    description: 'Crisis committee directive with operative orders and rationale',
+    multi: false,
+    fields: [
+      { key: 'crisis', label: 'Crisis scenario', type: 'textarea', placeholder: 'e.g. A cyberattack has disabled the power grid across three EU nations...', required: true },
+      { key: 'committee', label: 'Crisis committee', type: 'text', placeholder: 'e.g. UN Security Council, NATO, Historical Cabinet...' },
+      { key: 'country', label: 'Your country/role', type: 'text', placeholder: 'e.g. United States, Secretary of Defense...' },
+      { key: 'objectives', label: 'Your objectives (optional)', type: 'textarea', placeholder: 'What outcomes do you want the directive to achieve?' },
+    ],
+    buildPrompt: (f) => `You are an expert Model UN crisis delegate writing a crisis directive.
+
+${f.committee ? `Committee: ${f.committee}` : ''}
+${f.country ? `Role/Country: ${f.country}` : ''}
+Crisis scenario: "${f.crisis}"
+${f.objectives ? `Your objectives: ${f.objectives}` : ''}
+
+Write a formal crisis directive with:
+1. **Directive header** — Committee name, directive title, sponsors
+2. **Sitational overview** — 1-2 paragraphs summarizing the crisis and immediate threat (show you understand the scenario)
+3. **Operative orders** — 3-5 numbered directives, each a clear, actionable order:
+   - Use directive language ("Orders," "Directs," "Authorizes," "Mandates")
+   - Each order should specify WHO does WHAT and by WHEN
+   - Include sub-clauses (a, b, c) where appropriate
+4. **Rationale** — 1 paragraph explaining why these actions are necessary and proportional
+5. **Resource allocation** — Brief note on what resources/manpower are needed
+
+Tone: urgent, authoritative, decisive. This is a crisis — act like a leader under pressure.
+
+IMPORTANT:
+- ORIGINALITY: Write specific, scenario-appropriate directives — not generic filler.
+- STAY ON TOPIC: All directives must directly respond to "${f.crisis}".`,
+    parseItems: (text) => [text.trim()],
+    cleanItem: (text) => text.trim(),
+    titleFromItem: (text, f) => `Crisis Directive: ${f.crisis.slice(0, 60)}`.slice(0, 120),
   },
 
   // ═══ MODEL CONGRESS ═══
@@ -305,7 +389,7 @@ Tone: persuasive, formal, confident. Write as if speaking on the chamber floor.
 
 IMPORTANT:
 - ORIGINALITY: Write specific, genuine arguments — not generic filler.
-- STAY ON TOPIC: All arguments must directly relate to "${f.billTitle}".`,
+- STAY ON TOPIC: All arguments must directly relate to "${f.billTitle}".${ANTI_REPETITION_SPEECH}`,
     parseItems: (text) => [text.trim()],
     cleanItem: (text) => text.trim(),
     titleFromItem: (text, f) => `Speech: ${f.side.includes('Pro') ? 'Pro' : 'Con'} — ${f.billTitle}`.slice(0, 120),
@@ -391,7 +475,7 @@ Write in spoken, conversational-yet-formal debate style. Include signposting ("M
 
 IMPORTANT:
 - ORIGINALITY: Write unique, specific arguments — not generic filler.
-- STAY ON TOPIC: All content must directly support the ${f.side} on "${f.resolution}".`,
+- STAY ON TOPIC: All content must directly support the ${f.side} on "${f.resolution}".${ANTI_REPETITION_SPEECH}`,
     parseItems: (text) => [text.trim()],
     cleanItem: (text) => text.trim(),
     titleFromItem: (text, f) => `${f.side} Constructive: ${f.resolution.slice(0, 60)}`.slice(0, 120),

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { Brain, Target, TrendingUp, Award, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
+import { Brain, Target, TrendingUp, Award, CheckCircle, AlertCircle, ArrowRight, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
+import { MUN_GUIDE_SUMMARY } from "@/lib/munGuide";
 
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
@@ -149,6 +150,17 @@ export default function AICoach() {
                 </ul>
               )}
             </div>
+          </div>
+
+          {/* MUN Mastery Tips */}
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100 p-6">
+            <h3 className="font-bold text-slate-900 font-heading mb-4 flex items-center gap-2">
+              <Globe className="w-5 h-5 text-emerald-600" /> Model UN Mastery Tips
+            </h3>
+            <div className="bg-white rounded-xl p-4 border border-emerald-100 text-sm text-slate-700 whitespace-pre-line leading-relaxed max-h-[300px] overflow-y-auto">
+              {MUN_GUIDE_SUMMARY}
+            </div>
+            <p className="text-xs text-slate-500 mt-3">Grounded in "The Complete Student Guide to Model United Nations." These principles power your AI coach and feedback tools.</p>
           </div>
 
           {/* Recommendations */}
